@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DailyVet | Prescription Scanner & Neural OCR</title>
+    <meta name="theme-color" content="#035D69" />
+    <link rel="manifest" href="manifest.json" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+
+    <!-- Tailwind CSS v4 -->
+    <script src="js/tailwind-v4.js"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --font-heading: 'Plus Jakarta Sans', sans-serif;
+            --font-sans: 'Inter', sans-serif;
+            --color-deep: #035D69;
+            --color-dark: #023d47;
+            --color-teal: #088F8F;
+            --color-line: #b2e0e6;
+            --color-soft: #eef7f8;
+            --color-edge: #e0f0f2;
+            --color-mute: #8ab8be;
+            --color-danger: #e74c3c;
+        }
+
+        /* ── History Cards ── */
+        .pr-history-item {
+            background: #fff;
+            border: 1.5px solid #e0f0f2;
+            border-radius: 18px;
+            padding: 0;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(3,93,105,0.05);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16,1,0.3,1);
+        }
+        .pr-history-item:hover {
+            border-color: #088F8F;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(3,93,105,0.12);
+        }
+        .pr-history-item-bar {
+            height: 3px;
+            background: linear-gradient(90deg, #035D69, #088F8F);
+        }
+        .pr-history-item-body {
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .pr-history-item-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .pr-history-item-title {
+            font-size: 12.5px;
+            font-weight: 800;
+            color: #035D69;
+            line-height: 1.3;
+            flex: 1;
+        }
+        .pr-history-item-date {
+            font-size: 10px;
+            color: #94a3b8;
+            font-weight: 600;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .pr-history-item-disease {
+            font-size: 12px;
+            color: #475569;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+        .pr-history-item-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 8px;
+            border-top: 1px dashed #e0f0f2;
+        }
+        .pr-history-item-meds {
+            font-size: 11px;
+            font-weight: 700;
+            color: #088F8F;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: #eef7f8;
+            padding: 4px 10px;
+            border-radius: 8px;
+        }
+        .pr-history-delete-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 9px;
+            border: 1px solid #fca5a5;
+            background: #fff1f2;
+            color: #dc2626;
+            font-size: 11px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+        .pr-history-delete-btn:hover {
+            background: #dc2626;
+            color: #fff;
+        }
+        .pr-history-empty {
+            text-align: center;
+            color: #8ab8be;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 32px 16px;
+            background: #f8fcfc;
+            border-radius: 14px;
+            border: 1.5px dashed #e0f0f2;
+        }
+
+        /* ── Scan Result ── */
+        .pr-result-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #035D69, #088F8F);
+            border-radius: 18px;
+            color: #fff;
+        }
+        .pr-result-header i { font-size: 20px; }
+        .pr-result-header h3 { margin: 0; font-size: 15px; font-weight: 800; }
+        .pr-result-section {
+            background: #fff;
+            border: 1.5px solid #e0f0f2;
+            border-radius: 16px;
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            box-shadow: 0 2px 8px rgba(3,93,105,0.04);
+        }
+        .pr-result-label {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            color: #088F8F;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .pr-result-value {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+        .pr-medicine-card {
+            background: #f8fcfc;
+            border: 1.5px solid #e0f0f2;
+            border-left: 4px solid #088F8F;
+            border-radius: 14px;
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 4px;
+        }
+        .pr-medicine-name {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: #035D69;
+        }
+        .pr-medicine-detail {
+            font-size: 12px;
+            color: #475569;
+            font-weight: 500;
+            display: flex;
+            align-items: flex-start;
+            gap: 7px;
+            line-height: 1.5;
+        }
+        .pr-medicine-detail i {
+            color: #088F8F;
+            margin-top: 1px;
+            flex-shrink: 0;
+            width: 12px;
+        }
+        .pr-bengali-summary {
+            font-size: 13px;
+            color: #78350f;
+            line-height: 1.9;
+            font-weight: 500;
+            background: linear-gradient(135deg, #fffbeb, #fef3c7);
+            border: 1.5px solid #fcd34d;
+            border-radius: 14px;
+            padding: 14px 16px;
+        }
+        .pr-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #93c5fd;
+            border-radius: 8px;
+            padding: 3px 10px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+    </style>
+    <style>
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        h1, h2, h3, h4, h5, .font-heading { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        /* Dashboard Nav Dropdown on Hover */
+        .nav-dashboard-group:hover .nav-dashboard-dropdown,
+        .nav-dashboard-group:focus-within .nav-dashboard-dropdown {
+            opacity: 1 !important;
+            transform: translateY(0) scale(1) !important;
+            pointer-events: auto !important;
+            visibility: visible !important;
+        }
+        .nav-dashboard-dropdown {
+            opacity: 0;
+            transform: translateY(-6px) scale(0.98);
+            pointer-events: none;
+            visibility: hidden;
+            transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.2s;
+        }
+        .nav-dashboard-group:hover .nav-dashboard-chevron {
+            transform: rotate(180deg);
+        }
+    </style>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <!-- Firebase SDKs -->
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+    <style>
+        /* Fixed Bottom Navigation Bar - ONLY on smaller devices (<1024px) */
+        @media (max-width: 1023px) {
+            .app-bottom-nav {
+                position: fixed !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                z-index: 50 !important;
+                display: flex !important;
+            }
+        }
+        @media (min-width: 1024px) {
+            .app-bottom-nav {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-[#F8FCFC] text-slate-800 antialiased min-h-screen flex flex-col selection:bg-teal selection:text-white">
+
+    <!-- ===== GLOBAL UNIFIED NAVIGATION BAR ===== -->
+    <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-edge/80 shadow-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
+            <!-- Brand -->
+            <div class="flex items-center gap-2.5 sm:gap-3 cursor-pointer shrink-0" onclick="window.location.href='home.html'">
+                <img src="assets/dailyvetlogo.png" alt="DailyVet" class="w-10 h-10 object-contain drop-shadow-xs shrink-0" />
+                <div class="flex flex-col">
+                    <span class="text-xl sm:text-2xl font-extrabold tracking-tight leading-none font-heading whitespace-nowrap">
+                        <span class="text-deep">Daily</span><span class="text-teal">Vet</span>
+                    </span>
+                    <span class="hidden sm:block text-[10px] font-semibold text-teal tracking-wider uppercase mt-0.5 whitespace-nowrap">Clinical &amp; Farm Intelligence</span>
+                </div>
+            </div>
+
+            <!-- Desktop Nav Links -->
+            <nav class="hidden lg:flex items-center gap-1.5 lg:gap-2.5 bg-soft/70 px-3 py-1.5 rounded-full border border-line/60 text-xs font-semibold text-slate-700 whitespace-nowrap">
+                <!-- Dashboard with Hover Suites Dropdown -->
+                <div class="relative nav-dashboard-group group">
+                    <a href="home.html" class="px-3 py-1 rounded-full hover:text-deep hover:bg-white transition-all inline-flex items-center gap-1.5">
+                        <span>Dashboard</span>
+                        <i class="fas fa-chevron-down text-[9px] opacity-75 nav-dashboard-chevron transition-transform duration-200"></i>
+                    </a>
+
+                    <!-- Hover Dropdown Menu -->
+                    <div class="absolute left-0 top-full pt-2 z-50 min-w-[260px] nav-dashboard-dropdown">
+                        <div class="bg-white/98 backdrop-blur-md border border-edge rounded-2xl shadow-xl shadow-deep/15 p-2 flex flex-col gap-1 text-slate-700">
+                            <div class="px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                                Clinical &amp; Farm Suites
+                            </div>
+
+                            <!-- 1. AI Feed Advisor -->
+                            <a href="advisor.html" class="flex items-center gap-3 px-2.5 py-2 rounded-xl hover:bg-soft transition-all text-xs font-semibold text-slate-700 hover:text-deep no-underline group/item">
+                                <div class="w-8 h-8 rounded-lg bg-teal/10 text-teal flex items-center justify-center text-xs group-hover/item:bg-teal group-hover/item:text-white transition-colors">
+                                    <i class="fas fa-wheat-awn"></i>
+                                </div>
+                                <div class="flex flex-col min-w-0">
+                                    <span class="font-bold text-deep leading-tight">AI Feed Advisor</span>
+                                    <span class="text-[10px] text-slate-400 font-normal truncate">Smart nutrition &amp; ration planner</span>
+                                </div>
+                            </a>
+
+                            <!-- 2. DailyVet Pharma -->
+                            <a href="pharma.html" class="flex items-center gap-3 px-2.5 py-2 rounded-xl hover:bg-soft transition-all text-xs font-semibold text-slate-700 hover:text-deep no-underline group/item">
+                                <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-xs group-hover/item:bg-purple-600 group-hover/item:text-white transition-colors">
+                                    <i class="fas fa-pills"></i>
+                                </div>
+                                <div class="flex flex-col min-w-0">
+                                    <span class="font-bold text-deep leading-tight">DailyVet Pharma</span>
+                                    <span class="text-[10px] text-slate-400 font-normal truncate">Formulary &amp; dose verification</span>
+                                </div>
+                            </a>
+
+                            <!-- 3. Breed Detection AI -->
+                            <a href="breed-detection.html" class="flex items-center gap-3 px-2.5 py-2 rounded-xl hover:bg-soft transition-all text-xs font-semibold text-slate-700 hover:text-deep no-underline group/item">
+                                <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs group-hover/item:bg-emerald-600 group-hover/item:text-white transition-colors">
+                                    <i class="fas fa-cow"></i>
+                                </div>
+                                <div class="flex flex-col min-w-0">
+                                    <span class="font-bold text-deep leading-tight">Breed Detection AI</span>
+                                    <span class="text-[10px] text-slate-400 font-normal truncate">Bovine phenotype classifier</span>
+                                </div>
+                            </a>
+
+                            <!-- 4. Health Scan -->
+                            <a href="excreta-scan.html" class="flex items-center gap-3 px-2.5 py-2 rounded-xl hover:bg-soft transition-all text-xs font-semibold text-slate-700 hover:text-deep no-underline group/item">
+                                <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-xs group-hover/item:bg-amber-600 group-hover/item:text-white transition-colors">
+                                    <i class="fas fa-microscope"></i>
+                                </div>
+                                <div class="flex flex-col min-w-0">
+                                    <span class="font-bold text-deep leading-tight">Health Scan</span>
+                                    <span class="text-[10px] text-slate-400 font-normal truncate">Dung &amp; urine diagnostic scan</span>
+                                </div>
+                            </a>
+
+                            <!-- 5. PR Scan -->
+                            <a href="scanner.html" class="flex items-center gap-3 px-2.5 py-2 rounded-xl hover:bg-soft transition-all text-xs font-semibold text-slate-700 hover:text-deep no-underline group/item">
+                                <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs group-hover/item:bg-blue-600 group-hover/item:text-white transition-colors">
+                                    <i class="fas fa-file-prescription"></i>
+                                </div>
+                                <div class="flex flex-col min-w-0">
+                                    <span class="font-bold text-deep leading-tight">PR Scan</span>
+                                    <span class="text-[10px] text-slate-400 font-normal truncate">Prescription neural OCR reader</span>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <a href="ai.html" class="px-3 py-1 rounded-full hover:text-deep hover:bg-white transition-all">AI Consultation</a>
+                <a href="climate-dashboard.html" class="px-3 py-1 rounded-full hover:text-deep hover:bg-white transition-all flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    NASA Climate
+                </a>
+                <a href="community.html" class="px-3 py-1 rounded-full hover:text-deep hover:bg-white transition-all">Community</a>
+                <a href="support.html" class="px-3 py-1 rounded-full hover:text-deep hover:bg-white transition-all">Support</a>
+                <a href="vet-home.html" class="px-3 py-1 rounded-full hover:text-deep hover:bg-white transition-all text-teal font-bold">Vets Portal</a>
+            </nav>
+
+            <!-- Action Tools -->
+            <div class="flex items-center gap-2.5 sm:gap-3 shrink-0">
+                <button class="w-10 h-10 rounded-xl bg-soft hover:bg-edge text-deep flex items-center justify-center transition-colors cursor-pointer border border-line shrink-0" onclick="window.location.href='home.html'" title="Return to Dashboard">
+                    <i class="fas fa-home"></i>
+                </button>
+
+                <!-- Mobile Sandwich Button (lg:hidden) -->
+                <button type="button"
+                        id="mobileSandwichBtn"
+                        onclick="toggleMobileSandwichMenu(event)"
+                        class="lg:hidden w-10 h-10 rounded-xl bg-soft hover:bg-edge border border-line text-deep flex items-center justify-center cursor-pointer transition-colors shadow-2xs shrink-0"
+                        aria-label="Toggle Navigation Menu">
+                    <i id="mobileSandwichIcon" class="fas fa-bars text-sm"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== MOBILE SANDWICH DRAWER (lg:hidden) ===== -->
+        <div id="mobileSandwichMenu" class="hidden lg:hidden border-t border-edge bg-white/98 backdrop-blur-xl px-4 py-4 flex flex-col gap-3.5 shadow-2xl max-h-[calc(100vh-4.5rem)] overflow-y-auto text-left transition-all">
+            <!-- TOP: All Dash Menu Options -->
+            <div class="flex flex-col gap-1.5">
+                <div class="px-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                    <i class="fas fa-sparkles text-teal"></i>
+                    <span>Clinical &amp; Farm Suites</span>
+                </div>
+                <div class="grid grid-cols-1 gap-1">
+                    <!-- 1. AI Feed Advisor -->
+                    <a href="advisor.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-soft transition-all text-xs font-semibold text-slate-700 hover:text-deep no-underline group/item bg-slate-50/70 border border-slate-100">
+                        <div class="w-8 h-8 rounded-lg bg-teal/10 text-teal flex items-center justify-center text-xs group-hover/item:bg-teal group-hover/item:text-white transition-colors">
+                            <i class="fas fa-wheat-awn"></i>
+                        </div>
+                        <div class="flex flex-col min-w-0 flex-1">
+                            <span class="font-bold text-deep leading-tight">AI Feed Advisor</span>
+                            <span class="text-[10px] text-slate-400 font-normal truncate">Smart nutrition &amp; ration planner</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-[10px] text-mute group-hover/item:translate-x-0.5 transition-transform"></i>
+                    </a>
+
+                    <!-- 2. DailyVet Pharma -->
+                    <a href="pharma.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-soft transition-all text-xs font-semibold text-slate-700 hover:text-deep no-underline group/item bg-slate-50/70 border border-slate-100">
+                        <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-xs group-hover/item:bg-purple-600 group-hover/item:text-white transition-colors">
+                            <i class="fas fa-pills"></i>
+                        </div>
+                        <div class="flex flex-col min-w-0 flex-1">
+                            <span class="font-bold text-deep leading-tight">DailyVet Pharma</span>
+                            <span class="text-[10px] text-slate-400 font-normal truncate">Formulary &amp; dose verification</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-[10px] text-mute group-hover/item:translate-x-0.5 transition-transform"></i>
+                    </a>
+
+                    <!-- 3. Breed Detection AI -->
+                    <a href="breed-detection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-soft transition-all text-xs font-semibold text-slate-700 hover:text-deep no-underline group/item bg-slate-50/70 border border-slate-100">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs group-hover/item:bg-emerald-600 group-hover/item:text-white transition-colors">
+                            <i class="fas fa-cow"></i>
+                        </div>
+                        <div class="flex flex-col min-w-0 flex-1">
+                            <span class="font-bold text-deep leading-tight">Breed Detection AI</span>
+                            <span class="text-[10px] text-slate-400 font-normal truncate">Bovine phenotype classifier</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-[10px] text-mute group-hover/item:translate-x-0.5 transition-transform"></i>
+                    </a>
+
+                    <!-- 4. Health Scan -->
+                    <a href="excreta-scan.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-soft transition-all text-xs font-semibold text-slate-700 hover:text-deep no-underline group/item bg-slate-50/70 border border-slate-100">
+                        <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-xs group-hover/item:bg-amber-600 group-hover/item:text-white transition-colors">
+                            <i class="fas fa-microscope"></i>
+                        </div>
+                        <div class="flex flex-col min-w-0 flex-1">
+                            <span class="font-bold text-deep leading-tight">Health Scan</span>
+                            <span class="text-[10px] text-slate-400 font-normal truncate">Dung &amp; urine diagnostic scan</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-[10px] text-mute group-hover/item:translate-x-0.5 transition-transform"></i>
+                    </a>
+
+                    <!-- 5. PR Scan -->
+                    <a href="scanner.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-soft transition-all text-xs font-semibold text-slate-700 hover:text-deep no-underline group/item bg-slate-50/70 border border-slate-100">
+                        <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs group-hover/item:bg-blue-600 group-hover/item:text-white transition-colors">
+                            <i class="fas fa-file-prescription"></i>
+                        </div>
+                        <div class="flex flex-col min-w-0 flex-1">
+                            <span class="font-bold text-deep leading-tight">PR Scan</span>
+                            <span class="text-[10px] text-slate-400 font-normal truncate">Prescription neural OCR reader</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-[10px] text-mute group-hover/item:translate-x-0.5 transition-transform"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- BOTTOM: Current Profile Menu Options (Exact 2nd Card) -->
+            <div class="pt-2 border-t border-edge flex flex-col gap-1.5">
+                <div class="px-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                    <i class="fas fa-user-circle text-teal"></i>
+                    <span>Account &amp; Profile</span>
+                </div>
+                <div class="bg-white border border-edge rounded-2xl shadow-xs overflow-hidden">
+                    <!-- User Information Header -->
+                    <div class="p-3.5 bg-gradient-to-r from-soft via-white to-soft/40 border-b border-edge flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-full ring-2 ring-teal/30 overflow-hidden flex-shrink-0 bg-white shadow-2xs">
+                            <img id="mobileMenuAvatar" src="assets/dailyvetlogo.png" alt="User Avatar" class="w-full h-full object-cover" />
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-1.5">
+                                <span id="mobileMenuName" class="text-xs font-extrabold text-deep truncate">DailyVet User</span>
+                                <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" title="Active"></span>
+                            </div>
+                            <span id="mobileMenuRole" class="text-[11px] font-semibold text-teal truncate block">Pet &amp; Farm Owner</span>
+                        </div>
+                    </div>
+
+                    <!-- Menu Options -->
+                    <div class="p-1.5 flex flex-col gap-0.5">
+                        <!-- Option 1: Profile -->
+                        <a href="profile.html"
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 hover:text-deep hover:bg-soft transition-all text-xs font-semibold group no-underline cursor-pointer">
+                            <div class="w-8 h-8 rounded-lg bg-teal/10 text-teal flex items-center justify-center text-xs group-hover:bg-deep group-hover:text-white transition-all">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <span class="block font-bold">Profile</span>
+                                <span class="block text-[10px] text-slate-400 font-normal">View &amp; edit account</span>
+                            </div>
+                            <i class="fas fa-chevron-right text-[10px] text-mute group-hover:translate-x-0.5 transition-transform"></i>
+                        </a>
+
+                        <!-- Option 2: Support -->
+                        <a href="support.html"
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 hover:text-deep hover:bg-soft transition-all text-xs font-semibold group no-underline cursor-pointer">
+                            <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center text-xs group-hover:bg-sky-600 group-hover:text-white transition-all">
+                                <i class="fas fa-headset"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <span class="block font-bold">Support</span>
+                                <span class="block text-[10px] text-slate-400 font-normal">Helpdesk &amp; 24h helpline</span>
+                            </div>
+                            <i class="fas fa-chevron-right text-[10px] text-mute group-hover:translate-x-0.5 transition-transform"></i>
+                        </a>
+
+                        <div class="my-0.5 border-t border-edge"></div>
+
+                        <!-- Option 3: Log Out -->
+                        <button type="button"
+                                onclick="logout()"
+                                class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-danger hover:bg-red-50 transition-all text-xs font-bold text-left cursor-pointer border-0 bg-transparent group">
+                            <div class="w-8 h-8 rounded-lg bg-red-100/70 text-danger flex items-center justify-center text-xs group-hover:bg-danger group-hover:text-white transition-all">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <span class="block font-bold">Log Out</span>
+                                <span class="block text-[10px] text-red-400 font-normal">Sign out from DailyVet</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== MAIN SCANNER WORKSPACE CONTAINER ===== -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-1 flex flex-col gap-8 pb-24 lg:pb-8">
+
+        <!-- Top Banner -->
+        <div class="bg-gradient-to-r from-deep via-dark to-[#044c56] rounded-3xl p-6 sm:p-8 text-white shadow-lg shadow-deep/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div class="max-w-2xl flex flex-col gap-2">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-xs text-xs font-semibold text-teal-100 self-start border border-white/10">
+                    <i class="fas fa-brain text-teal-300"></i>
+                    Neural Veterinary OCR Engine
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight font-heading m-0 leading-tight">
+                    Prescription Scanner & Report Digitizer
+                </h1>
+                <p class="text-teal-100/90 text-sm leading-relaxed m-0">
+                    Digitize handwritten paper prescriptions, verify generic drug compositions, and translate medical schedules into plain Bengali.
+                </p>
+            </div>
+            <div class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/15 border border-white/20 text-xs font-bold text-white flex-shrink-0">
+                <i class="fas fa-camera text-teal-300"></i> Vision OCR Active
+            </div>
+        </div>
+
+        <!-- 2-COLUMN RESPONSIVE LAYOUT -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+            <!-- LEFT COLUMN: SCAN & UPLOAD (7 cols) -->
+            <div class="lg:col-span-7 bg-white p-6 sm:p-8 rounded-3xl border border-edge shadow-xs flex flex-col gap-6 text-left">
+                <div class="border-b border-edge pb-4">
+                    <h2 class="text-lg font-bold text-deep font-heading flex items-center gap-2 m-0">
+                        <i class="fas fa-file-prescription text-teal"></i>
+                        Capture or Upload Prescription
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-1 m-0">Supports physical slips, clinic PDFs, and mobile camera snapshots</p>
+                </div>
+
+                <!-- ACTION BUTTONS -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <button class="flex flex-col items-center justify-center gap-2.5 p-6 rounded-2xl border-2 border-slate-200 bg-slate-50 hover:bg-white hover:border-teal hover:shadow-md transition-all cursor-pointer text-deep group" onclick="openCamera()">
+                        <div class="w-14 h-14 rounded-2xl bg-teal/10 text-teal flex items-center justify-center text-2xl group-hover:scale-110 transition-transform shadow-2xs">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        <span class="text-sm font-bold text-deep">Live Camera Capture</span>
+                        <small class="text-xs text-mute font-medium">Capture prescription document</small>
+                    </button>
+                    <button class="flex flex-col items-center justify-center gap-2.5 p-6 rounded-2xl border-2 border-slate-200 bg-slate-50 hover:bg-white hover:border-teal hover:shadow-md transition-all cursor-pointer text-deep group" onclick="openGallery()">
+                        <div class="w-14 h-14 rounded-2xl bg-deep/10 text-deep flex items-center justify-center text-2xl group-hover:scale-110 transition-transform shadow-2xs">
+                            <i class="fas fa-images"></i>
+                        </div>
+                        <span class="text-sm font-bold text-deep">Upload from Gallery</span>
+                        <small class="text-xs text-mute font-medium">PNG, JPG, PDF scan files</small>
+                    </button>
+                </div>
+
+                <!-- Hidden file inputs -->
+                <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;" />
+                <input type="file" id="galleryInput" accept="image/*" style="display:none;" />
+
+                <!-- ===== IMAGE PREVIEW ===== -->
+                <div class="relative rounded-2xl border border-slate-200 overflow-hidden bg-slate-50 p-4 flex flex-col gap-4" id="prPreview" style="display:none;">
+                    <img id="previewImage" src="" alt="Preview" class="w-full max-h-[380px] object-contain rounded-xl bg-white shadow-xs" />
+                    <button class="absolute top-6 right-6 w-9 h-9 rounded-full bg-deep/80 text-white flex items-center justify-center hover:bg-red-600 transition-colors border-none cursor-pointer text-sm shadow-md" onclick="removePreview()" title="Remove image">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <button class="w-full bg-gradient-to-r from-deep via-dark to-teal hover:from-dark hover:to-deep text-white rounded-2xl py-4 text-sm font-bold tracking-wide cursor-pointer inline-flex items-center justify-center gap-2.5 shadow-lg shadow-teal/20 transition-all hover:-translate-y-0.5 border-none active:scale-95" id="scanBtn" onclick="startScan()">
+                        <i class="fas fa-wand-magic-sparkles"></i>
+                        <span>Start Prescription Neural Scan</span>
+                    </button>
+                </div>
+
+                <!-- ===== LOADING ===== -->
+                <div class="flex flex-col items-center justify-center gap-3 py-12 text-center bg-soft/40 rounded-2xl border border-dashed border-edge" id="prLoading" style="display:none;">
+                    <div class="w-12 h-12 border-4 border-teal/20 border-t-teal rounded-full animate-spin"></div>
+                    <div class="text-base font-bold text-deep" id="loadingText">Analyzing veterinary prescription...</div>
+                    <div class="text-xs text-mute font-medium">Extracting brand names, generics & dosage schedules</div>
+                </div>
+
+                <!-- ===== SCAN RESULT ===== -->
+                <div class="flex flex-col gap-3" id="prResult" style="display:none;"></div>
+            </div>
+
+            <!-- RIGHT COLUMN: SCAN HISTORY (5 cols) -->
+            <div class="lg:col-span-5 flex flex-col gap-4 text-left">
+                <div class="p-6 bg-white border border-edge rounded-3xl shadow-xs flex flex-col gap-3">
+                    <div class="flex items-center justify-between font-bold text-deep text-sm pb-2 border-b border-edge">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-history text-teal"></i>
+                            <span class="font-heading">Scanned Prescription Records</span>
+                        </div>
+                        <button class="w-8 h-8 rounded-xl bg-slate-50 shadow-xs text-teal hover:bg-soft flex items-center justify-center text-xs border border-slate-200 cursor-pointer transition-colors" onclick="loadHistory()" title="Refresh Records">
+                            <i class="fas fa-rotate-right"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs text-slate-500 font-medium m-0 leading-relaxed">
+                        Archived prescriptions linked to your livestock and pet accounts for easy follow-up.
+                    </p>
+
+                    <div class="flex flex-col gap-2.5 pt-2" id="historyList">
+                        <div class="p-6 text-center text-mute text-xs font-medium">Loading history...</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- ===== FIXED BOTTOM NAVIGATION BAR (SMALLER DEVICES ONLY) ===== -->
+    <nav class="app-bottom-nav lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-t border-edge shadow-[0_-4px_20px_rgba(3,93,105,0.08)] px-2 py-2 flex items-center justify-around">
+        <a href="home.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-home text-base"></i>
+            <span>Home</span>
+        </a>
+        <a href="ai.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-robot text-base"></i>
+            <span>AI Vet</span>
+        </a>
+        <a href="climate-dashboard.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-satellite-dish text-base"></i>
+            <span>Climate</span>
+        </a>
+        <a href="community.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-users text-base"></i>
+            <span>Community</span>
+        </a>
+        <a href="vet-home.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-user-md text-base"></i>
+            <span>Vets</span>
+        </a>
+    </nav>
+
+    <!-- Scripts -->
+    <script defer src="js/firebase-config.js"></script>
+    <script defer src="js/auth.js"></script>
+    <script defer src="js/scanner.js"></script>
+    <script defer src="js/scale.js"></script>
+</body>
+</html>

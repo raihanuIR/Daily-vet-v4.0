@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <title>DailyVet | Register as a Veterinarian</title>
+    <meta name="description" content="Register as a licensed veterinary practitioner on Bangladesh's DailyVet digital telemedicine and clinical network." />
+    <meta name="theme-color" content="#035D69" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+    <link rel="preconnect" href="https://flagcdn.com" crossorigin />
+
+    <!-- Tailwind CSS v4 -->
+    <script src="js/tailwind-v4.js"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --font-heading: 'Plus Jakarta Sans', sans-serif;
+            --font-sans: 'Inter', sans-serif;
+            --color-deep: #035D69;
+            --color-dark: #023d47;
+            --color-teal: #088F8F;
+            --color-line: #b2e0e6;
+            --color-soft: #eef7f8;
+            --color-edge: #e0f0f2;
+            --color-mute: #8ab8be;
+            --color-danger: #e74c3c;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, h5, .font-heading { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <!-- Firebase SDKs -->
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+</head>
+<body class="bg-[#F8FCFC] text-slate-800 antialiased min-h-screen selection:bg-teal selection:text-white">
+
+    <div class="min-h-screen flex flex-col lg:grid lg:grid-cols-12">
+        
+        <!-- ===== LEFT SHOWCASE PANEL (Desktop: 5 cols) ===== -->
+        <div class="hidden lg:flex lg:col-span-5 bg-gradient-to-br from-[#023D47] via-[#035D69] to-[#01262D] text-white p-10 xl:p-14 flex-col justify-between relative overflow-hidden select-none">
+            <!-- Ambient Background Glows -->
+            <div class="absolute -top-20 -right-20 w-80 h-80 bg-teal/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-20 -left-20 w-80 h-80 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <!-- Brand Header -->
+            <div class="relative z-10">
+                <a href="index.html" class="inline-flex items-center gap-3 no-underline group">
+                    <img src="assets/dailyvetlogo.png" alt="DailyVet" class="w-11 h-11 object-contain drop-shadow group-hover:scale-105 transition-transform" />
+                    <div class="flex flex-col">
+                        <span class="text-2xl font-extrabold font-heading text-white tracking-tight leading-none">
+                            Daily<span class="text-teal-300">Vet</span>
+                        </span>
+                        <span class="text-[10px] font-bold text-teal-200 uppercase tracking-widest mt-0.5">Veterinary Practitioner Network</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Value Highlights & Mission -->
+            <div class="relative z-10 flex flex-col gap-6 max-w-md my-auto py-8">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-teal-200 text-xs font-semibold w-fit">
+                    <i class="fas fa-user-doctor text-emerald-400"></i>
+                    <span>Doctor Portal Verification</span>
+                </div>
+                
+                <h2 class="text-3xl xl:text-4xl font-extrabold font-heading tracking-tight leading-tight">
+                    Empowering Bangladesh's Licensed Veterinary Doctors.
+                </h2>
+                
+                <p class="text-xs sm:text-sm text-teal-100/90 leading-relaxed">
+                    Join Bangladesh's premier clinical tele-veterinary network. Provide verified digital prescriptions, consult livestock farmers, and grow your clinical practice.
+                </p>
+
+                <!-- Value Pillars -->
+                <div class="flex flex-col gap-3 pt-2">
+                    <div class="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center gap-3.5">
+                        <div class="w-9 h-9 rounded-xl bg-teal-400/20 text-teal-300 flex items-center justify-center shrink-0 text-sm">
+                            <i class="fas fa-file-prescription"></i>
+                        </div>
+                        <div>
+                            <span class="block text-xs font-bold text-white">Digital Prescription Suite</span>
+                            <span class="block text-[11px] text-teal-100/80">Generate BVC-standard electronic Rx in seconds</span>
+                        </div>
+                    </div>
+
+                    <div class="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center gap-3.5">
+                        <div class="w-9 h-9 rounded-xl bg-emerald-400/20 text-emerald-300 flex items-center justify-center shrink-0 text-sm">
+                            <i class="fas fa-stethoscope"></i>
+                        </div>
+                        <div>
+                            <span class="block text-xs font-bold text-white">District Clinical Triage Queue</span>
+                            <span class="block text-[11px] text-teal-100/80">Consult inquiries routed directly to your area</span>
+                        </div>
+                    </div>
+
+                    <div class="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center gap-3.5">
+                        <div class="w-9 h-9 rounded-xl bg-purple-400/20 text-purple-300 flex items-center justify-center shrink-0 text-sm">
+                            <i class="fas fa-certificate"></i>
+                        </div>
+                        <div>
+                            <span class="block text-xs font-bold text-white">Verified BVC Doctor Profile</span>
+                            <span class="block text-[11px] text-teal-100/80">Official doctor badge for graduates of BAU, CVASU, SAU</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Status -->
+            <div class="relative z-10 pt-4 border-t border-white/15 flex items-center justify-between text-xs text-teal-200">
+                <span class="flex items-center gap-2">
+                    <i class="fas fa-check-circle text-emerald-400"></i>
+                    <span>Verified Veterinary Medical Network</span>
+                </span>
+                <span class="text-[11px] text-teal-300/80">&copy; 2026 DailyVet</span>
+            </div>
+        </div>
+
+        <!-- ===== RIGHT FORM PANEL (Desktop: 7 cols) ===== -->
+        <div class="flex-1 lg:col-span-7 flex flex-col justify-between p-6 sm:p-10 lg:p-14 overflow-y-auto">
+            
+            <!-- Mobile Brand Bar (< lg) -->
+            <div class="lg:hidden flex items-center justify-between mb-6 pb-4 border-b border-edge">
+                <a href="index.html" class="flex items-center gap-2.5 no-underline">
+                    <img src="assets/dailyvetlogo.png" alt="DailyVet" class="w-9 h-9 object-contain" />
+                    <span class="text-xl font-extrabold font-heading text-deep">
+                        Daily<span class="text-teal">Vet</span>
+                    </span>
+                </a>
+                <a href="login.html" class="text-xs font-bold text-teal hover:underline no-underline">
+                    Doctor Sign In →
+                </a>
+            </div>
+
+            <!-- Top Desktop Nav Controls -->
+            <div class="hidden lg:flex items-center justify-between mb-6">
+                <a href="index.html" class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-deep transition-colors no-underline">
+                    <i class="fas fa-arrow-left text-[11px]"></i>
+                    <span>Back to Home</span>
+                </a>
+                <div class="text-xs text-slate-500">
+                    <span>Already verified?</span>
+                    <a href="login.html" class="font-bold text-teal hover:underline ml-1">Doctor Sign In →</a>
+                </div>
+            </div>
+
+            <!-- Form Container: Tight, Ergonomic max-w-xl (never stretched) -->
+            <div class="w-full max-w-xl mx-auto my-auto py-2">
+                
+                <!-- Title Header -->
+                <div class="mb-5">
+                    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal/10 text-teal text-[11px] font-bold mb-2.5">
+                        <i class="fas fa-user-md text-[10px]"></i>
+                        <span>Veterinary Practitioner Onboarding</span>
+                    </div>
+                    <h1 class="text-2xl sm:text-3xl font-extrabold font-heading text-deep tracking-tight">
+                        Register as a Licensed Vet
+                    </h1>
+                    <p class="text-xs sm:text-sm text-slate-500 mt-1">
+                        Provide telemedicine, issue digital prescriptions, and connect with farm keepers across your district.
+                    </p>
+                </div>
+
+                <!-- VET REGISTRATION FORM -->
+                <form class="flex flex-col gap-4 text-left" id="vetForm">
+
+                    <!-- Compact Profile Picture Row -->
+                    <div class="flex items-center gap-3.5 p-3 rounded-2xl bg-soft/50 border border-edge">
+                        <div class="relative w-14 h-14 rounded-full bg-white border-2 border-dashed border-teal flex items-center justify-center cursor-pointer overflow-hidden group shadow-inner shrink-0 transition-transform hover:scale-105" id="profilePicWrapper" title="Upload doctor photo">
+                            <div id="profilePreview" class="text-xl text-teal flex items-center justify-center w-full h-full">
+                                <i class="fas fa-user-md"></i>
+                            </div>
+                            <div class="camera-overlay absolute inset-0 bg-deep/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-sm">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                            <input type="file"
+                                   id="profilePic"
+                                   accept="image/*"
+                                   style="display:none;" />
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-xs font-bold text-deep">Doctor Photo or Clinic Badge <span class="text-danger">*</span></span>
+                            <span class="text-[11px] text-slate-500">Upload professional doctor photo for patient verification</span>
+                        </div>
+                    </div>
+
+                    <!-- 2-Column Responsive Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+
+                        <!-- Full Name -->
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-bold text-deep uppercase tracking-wider" for="fullName">
+                                Doctor Full Name <span class="text-danger">*</span>
+                            </label>
+                            <div class="relative flex items-center w-full h-11 bg-white border border-line rounded-xl px-3.5 focus-within:border-deep focus-within:ring-2 focus-within:ring-teal/20 transition-all shadow-2xs">
+                                <i class="fas fa-user-doctor text-mute text-xs mr-2"></i>
+                                <input type="text"
+                                       id="fullName"
+                                       class="flex-1 min-w-0 h-full border-none outline-none bg-transparent font-sans text-xs sm:text-sm text-deep placeholder:text-mute font-medium"
+                                       placeholder="Dr. Md. Rafiqul Islam"
+                                       required />
+                            </div>
+                        </div>
+
+                        <!-- Mobile Phone Number with Country Picker -->
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-bold text-deep uppercase tracking-wider flex items-center justify-between" for="mobile">
+                                <span>Mobile Number <span class="text-danger">*</span></span>
+                                <span class="text-[10px] text-teal font-semibold">Account ID</span>
+                            </label>
+                            <div class="phone-input-wrapper relative flex items-center gap-1.5 w-full h-11 bg-white border border-line rounded-xl p-1 pr-3 focus-within:border-deep focus-within:ring-2 focus-within:ring-teal/20 transition-all shadow-2xs">
+                                <button type="button"
+                                        class="flex items-center gap-1.5 h-9 px-2 bg-soft/80 border border-line/60 rounded-lg font-bold text-xs text-deep whitespace-nowrap shrink-0 cursor-pointer hover:bg-edge transition-all"
+                                        id="countryBtn"
+                                        aria-expanded="false"
+                                        title="Select Country">
+                                    <img id="selectedFlag"
+                                         class="w-5 h-3.5 object-cover rounded-xs"
+                                         src="https://flagcdn.com/w40/bd.png"
+                                         alt="BD" />
+                                    <span class="font-bold text-xs text-deep" id="selectedCode">+880</span>
+                                    <i class="fas fa-chevron-down text-[9px] text-teal transition-transform duration-200 chevron"></i>
+                                </button>
+
+                                <input type="tel"
+                                       id="mobile"
+                                       class="phone-number-input flex-1 min-w-0 h-9 border-none outline-none bg-transparent font-sans text-xs sm:text-sm text-deep placeholder:text-mute font-semibold"
+                                       placeholder="1XXXXXXXXX"
+                                       maxlength="15"
+                                       inputmode="numeric"
+                                       autocomplete="tel"
+                                       required />
+
+                                <!-- Country Dropdown -->
+                                <div class="country-list hidden [&.open]:block absolute top-[calc(100%+8px)] left-0 right-0 max-h-80 bg-white border border-line rounded-2xl shadow-xl overflow-hidden z-50 text-left" id="countryList">
+                                    <div class="flex items-center gap-2.5 p-3 bg-soft border-b border-edge">
+                                        <i class="fas fa-search text-teal text-xs"></i>
+                                        <input type="text"
+                                               id="countrySearch"
+                                               class="flex-1 min-w-0 border-none outline-none bg-transparent font-sans text-xs text-deep placeholder:text-mute font-medium"
+                                               placeholder="Search country..." />
+                                    </div>
+                                    <div class="country-scroll max-h-64 overflow-y-auto" id="countryScroll"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Create Password -->
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-bold text-deep uppercase tracking-wider flex items-center justify-between" for="password">
+                                <span>Password <span class="text-danger">*</span></span>
+                                <span class="text-[10px] text-slate-400 font-medium">Min 6 chars</span>
+                            </label>
+                            <div class="relative flex items-center w-full h-11 bg-white border border-line rounded-xl px-3.5 focus-within:border-deep focus-within:ring-2 focus-within:ring-teal/20 transition-all shadow-2xs">
+                                <i class="fas fa-lock text-mute text-xs mr-2"></i>
+                                <input type="password"
+                                       id="password"
+                                       class="flex-1 min-w-0 h-full border-none outline-none bg-transparent font-sans text-xs sm:text-sm text-deep placeholder:text-mute font-medium"
+                                       placeholder="Create secure password"
+                                       required />
+                                <button type="button"
+                                        class="toggle-password border-none bg-transparent text-mute hover:text-teal cursor-pointer p-1 text-xs transition-colors"
+                                        data-target="password"
+                                        aria-label="Toggle password visibility">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-bold text-deep uppercase tracking-wider" for="confirmPassword">
+                                Confirm Password <span class="text-danger">*</span>
+                            </label>
+                            <div class="relative flex items-center w-full h-11 bg-white border border-line rounded-xl px-3.5 focus-within:border-deep focus-within:ring-2 focus-within:ring-teal/20 transition-all shadow-2xs">
+                                <i class="fas fa-shield-alt text-mute text-xs mr-2"></i>
+                                <input type="password"
+                                       id="confirmPassword"
+                                       class="flex-1 min-w-0 h-full border-none outline-none bg-transparent font-sans text-xs sm:text-sm text-deep placeholder:text-mute font-medium"
+                                       placeholder="Re-enter password"
+                                       required />
+                                <button type="button"
+                                        class="toggle-password border-none bg-transparent text-mute hover:text-teal cursor-pointer p-1 text-xs transition-colors"
+                                        data-target="confirmPassword"
+                                        aria-label="Toggle password visibility">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- District / City -->
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-bold text-deep uppercase tracking-wider" for="city">
+                                District / City <span class="text-danger">*</span>
+                            </label>
+                            <div class="relative flex items-center w-full h-11 bg-white border border-line rounded-xl px-3.5 focus-within:border-deep focus-within:ring-2 focus-within:ring-teal/20 transition-all shadow-2xs">
+                                <i class="fas fa-city text-mute text-xs mr-2"></i>
+                                <input type="text"
+                                       id="city"
+                                       class="flex-1 min-w-0 h-full border-none outline-none bg-transparent font-sans text-xs sm:text-sm text-deep placeholder:text-mute font-medium"
+                                       placeholder="Dhaka, Bogura, Mymensingh..."
+                                       required />
+                            </div>
+                        </div>
+
+                        <!-- Area / Upazila -->
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-bold text-deep uppercase tracking-wider" for="area">
+                                Area / Upazila <span class="text-danger">*</span>
+                            </label>
+                            <div class="relative flex items-center w-full h-11 bg-white border border-line rounded-xl px-3.5 focus-within:border-deep focus-within:ring-2 focus-within:ring-teal/20 transition-all shadow-2xs">
+                                <i class="fas fa-map-marker-alt text-mute text-xs mr-2"></i>
+                                <input type="text"
+                                       id="area"
+                                       class="flex-1 min-w-0 h-full border-none outline-none bg-transparent font-sans text-xs sm:text-sm text-deep placeholder:text-mute font-medium"
+                                       placeholder="Gulshan, Mirpur, Sadar..."
+                                       required />
+                            </div>
+                        </div>
+
+                        <!-- University / Institute -->
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-bold text-deep uppercase tracking-wider" for="institute">
+                                University / Institute <span class="text-danger">*</span>
+                            </label>
+                            <div class="relative flex items-center w-full h-11 bg-white border border-line rounded-xl px-3 focus-within:border-deep focus-within:ring-2 focus-within:ring-teal/20 transition-all shadow-2xs">
+                                <i class="fas fa-university text-mute text-xs mr-2 pointer-events-none"></i>
+                                <select id="institute"
+                                        class="flex-1 min-w-0 h-full border-none outline-none bg-transparent font-sans text-xs sm:text-sm text-deep font-medium cursor-pointer"
+                                        required>
+                                    <option value="">Select your institute</option>
+                                    <optgroup label="Bangladesh">
+                                        <option value="Bangladesh Agricultural University (BAU)">Bangladesh Agricultural University (BAU)</option>
+                                        <option value="Chittagong Veterinary and Animal Sciences University (CVASU)">Chittagong Veterinary & Animal Sciences University (CVASU)</option>
+                                        <option value="Sylhet Agricultural University (SAU)">Sylhet Agricultural University (SAU)</option>
+                                        <option value="Sher-e-Bangla Agricultural University (SAU)">Sher-e-Bangla Agricultural University (SAU)</option>
+                                        <option value="Patuakhali Science and Technology University (PSTU)">Patuakhali Science and Technology University (PSTU)</option>
+                                        <option value="Hajee Mohammad Danesh Science and Technology University (HSTU)">Hajee Mohammad Danesh Science & Technology University (HSTU)</option>
+                                    </optgroup>
+                                    <optgroup label="India / International">
+                                        <option value="Indian Veterinary Research Institute (IVRI)">Indian Veterinary Research Institute (IVRI)</option>
+                                        <option value="Madras Veterinary College (MVC)">Madras Veterinary College (MVC)</option>
+                                        <option value="Bombay Veterinary College (BVC)">Bombay Veterinary College (BVC)</option>
+                                        <option value="West Bengal University of Animal & Fishery Sciences (WBUAFS)">West Bengal University of Animal & Fishery Sciences</option>
+                                    </optgroup>
+                                    <optgroup label="Other">
+                                        <option value="Other Institute">Other Institute</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Clinical Speciality -->
+                        <div class="flex flex-col gap-1">
+                            <label class="text-xs font-bold text-deep uppercase tracking-wider" for="speciality">
+                                Clinical Speciality <span class="text-danger">*</span>
+                            </label>
+                            <div class="relative flex items-center w-full h-11 bg-white border border-line rounded-xl px-3 focus-within:border-deep focus-within:ring-2 focus-within:ring-teal/20 transition-all shadow-2xs">
+                                <i class="fas fa-stethoscope text-mute text-xs mr-2 pointer-events-none"></i>
+                                <select id="speciality"
+                                        class="flex-1 min-w-0 h-full border-none outline-none bg-transparent font-sans text-xs sm:text-sm text-deep font-medium cursor-pointer"
+                                        required>
+                                    <option value="">Select your speciality</option>
+                                    <option value="General Veterinary Medicine">General Veterinary Medicine</option>
+                                    <option value="Surgery">Surgery</option>
+                                    <option value="Pet Care (Dog & Cat)">Pet Care (Dog & Cat)</option>
+                                    <option value="Dairy & Livestock">Dairy & Livestock</option>
+                                    <option value="Poultry">Poultry</option>
+                                    <option value="Wildlife">Wildlife</option>
+                                    <option value="Dermatology">Dermatology (Skin)</option>
+                                    <option value="Dentistry">Dentistry</option>
+                                    <option value="Ophthalmology">Ophthalmology (Eye)</option>
+                                    <option value="Cardiology">Cardiology</option>
+                                    <option value="Orthopedics">Orthopedics</option>
+                                    <option value="Emergency & Critical Care">Emergency & Critical Care</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Pet Treatment Expertise -->
+                    <div class="flex flex-col gap-2 p-3.5 rounded-2xl bg-soft/60 border border-edge text-left">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <label class="text-xs font-bold text-deep uppercase tracking-wider block">
+                                    Animals &amp; Species Treated <span class="text-danger">*</span>
+                                </label>
+                                <span class="text-[11px] text-slate-500 font-medium">Select species you clinically manage</span>
+                            </div>
+                            <span class="text-[10px] font-bold text-teal bg-white px-2 py-0.5 rounded-full border border-teal/20">
+                                Check all that apply
+                            </span>
+                        </div>
+                        <div class="flex flex-wrap gap-1.5 pt-1" id="treatmentGroup">
+                            <label class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-line bg-white text-deep text-xs font-semibold cursor-pointer select-none transition-all has-[:checked]:bg-deep has-[:checked]:text-white has-[:checked]:border-deep hover:border-teal"><input type="checkbox" value="Dog" class="accent-teal cursor-pointer" /><span>🐕 Dog</span></label>
+                            <label class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-line bg-white text-deep text-xs font-semibold cursor-pointer select-none transition-all has-[:checked]:bg-deep has-[:checked]:text-white has-[:checked]:border-deep hover:border-teal"><input type="checkbox" value="Cat" class="accent-teal cursor-pointer" /><span>🐈 Cat</span></label>
+                            <label class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-line bg-white text-deep text-xs font-semibold cursor-pointer select-none transition-all has-[:checked]:bg-deep has-[:checked]:text-white has-[:checked]:border-deep hover:border-teal"><input type="checkbox" value="Cow" class="accent-teal cursor-pointer" /><span>🐄 Cow</span></label>
+                            <label class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-line bg-white text-deep text-xs font-semibold cursor-pointer select-none transition-all has-[:checked]:bg-deep has-[:checked]:text-white has-[:checked]:border-deep hover:border-teal"><input type="checkbox" value="Goat" class="accent-teal cursor-pointer" /><span>🐐 Goat</span></label>
+                            <label class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-line bg-white text-deep text-xs font-semibold cursor-pointer select-none transition-all has-[:checked]:bg-deep has-[:checked]:text-white has-[:checked]:border-deep hover:border-teal"><input type="checkbox" value="Chicken" class="accent-teal cursor-pointer" /><span>🐔 Chicken</span></label>
+                            <label class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-line bg-white text-deep text-xs font-semibold cursor-pointer select-none transition-all has-[:checked]:bg-deep has-[:checked]:text-white has-[:checked]:border-deep hover:border-teal"><input type="checkbox" value="Duck" class="accent-teal cursor-pointer" /><span>🦆 Duck</span></label>
+                            <label class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-line bg-white text-deep text-xs font-semibold cursor-pointer select-none transition-all has-[:checked]:bg-deep has-[:checked]:text-white has-[:checked]:border-deep hover:border-teal"><input type="checkbox" value="Sheep" class="accent-teal cursor-pointer" /><span>🐑 Sheep</span></label>
+                            <label class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-line bg-white text-deep text-xs font-semibold cursor-pointer select-none transition-all has-[:checked]:bg-deep has-[:checked]:text-white has-[:checked]:border-deep hover:border-teal"><input type="checkbox" value="Buffalo" class="accent-teal cursor-pointer" /><span>🐃 Buffalo</span></label>
+                            <label class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-line bg-white text-deep text-xs font-semibold cursor-pointer select-none transition-all has-[:checked]:bg-deep has-[:checked]:text-white has-[:checked]:border-deep hover:border-teal"><input type="checkbox" value="Horse" class="accent-teal cursor-pointer" /><span>🐎 Horse</span></label>
+                            <label class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-line bg-white text-deep text-xs font-semibold cursor-pointer select-none transition-all has-[:checked]:bg-deep has-[:checked]:text-white has-[:checked]:border-deep hover:border-teal"><input type="checkbox" value="Bird" class="accent-teal cursor-pointer" /><span>🦜 Bird</span></label>
+                            <label class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-line bg-white text-deep text-xs font-semibold cursor-pointer select-none transition-all has-[:checked]:bg-deep has-[:checked]:text-white has-[:checked]:border-deep hover:border-teal"><input type="checkbox" value="Fish" class="accent-teal cursor-pointer" /><span>🐟 Fish</span></label>
+                            <label class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-line bg-white text-deep text-xs font-semibold cursor-pointer select-none transition-all has-[:checked]:bg-deep has-[:checked]:text-white has-[:checked]:border-deep hover:border-teal"><input type="checkbox" value="Rabbit" class="accent-teal cursor-pointer" /><span>🐇 Rabbit</span></label>
+                            <label class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-line bg-white text-deep text-xs font-semibold cursor-pointer select-none transition-all has-[:checked]:bg-deep has-[:checked]:text-white has-[:checked]:border-deep hover:border-teal"><input type="checkbox" value="Other" class="accent-teal cursor-pointer" /><span>🐾 Other</span></label>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit"
+                            class="w-full mt-1 py-3.5 px-6 bg-gradient-to-r from-deep via-dark to-teal hover:from-dark hover:to-deep text-white rounded-2xl font-bold text-sm sm:text-base tracking-wide shadow-md shadow-deep/20 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2.5 border-0"
+                            id="registerBtn">
+                        <i class="fas fa-stethoscope text-teal-200"></i>
+                        <span>Register as a Licensed Vet</span>
+                        <i class="fas fa-arrow-right text-xs ml-0.5"></i>
+                    </button>
+                </form>
+
+                <p class="text-center text-xs text-slate-500 pt-4 mt-4 border-t border-edge">
+                    Already registered as a vet? <a href="login.html" class="font-bold text-teal hover:underline ml-1">Doctor Sign In →</a>
+                </p>
+
+            </div>
+
+            <!-- Footer Copyright -->
+            <div class="text-center text-[11px] text-slate-400 pt-4">
+                &copy; 2026 DailyVet &bull; BVC Veterinary Medical Standards
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ===== SCRIPTS (ORDER MATTERS!) ===== -->
+    <script defer src="js/firebase-config.js"></script>
+    <script defer src="js/script.js"></script>
+    <script defer src="js/auth.js"></script>
+    <script defer src="js/scale.js"></script>
+</body>
+</html>

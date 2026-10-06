@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DailyVet | Support &amp; Helpdesk Center</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+
+    <!-- Tailwind CSS v4 -->
+    <script src="js/tailwind-v4.js"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-deep: #035D69;
+            --color-dark: #023d47;
+            --color-teal: #088F8F;
+            --color-line: #b2e0e6;
+            --color-soft: #eef7f8;
+            --color-edge: #e0f0f2;
+            --color-mute: #8ab8be;
+            --color-danger: #e74c3c;
+        }
+    </style>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+        }
+        details summary::-webkit-details-marker {
+            display: none;
+        }
+        .profile-dropdown.open {
+            display: block !important;
+            animation: profileDropIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes profileDropIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Dashboard Nav Dropdown on Hover */
+        .nav-dashboard-group:hover .nav-dashboard-dropdown,
+        .nav-dashboard-group:focus-within .nav-dashboard-dropdown {
+            opacity: 1 !important;
+            transform: translateY(0) scale(1) !important;
+            pointer-events: auto !important;
+            visibility: visible !important;
+        }
+        .nav-dashboard-dropdown {
+            opacity: 0;
+            transform: translateY(-6px) scale(0.98);
+            pointer-events: none;
+            visibility: hidden;
+            transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.2s;
+        }
+        .nav-dashboard-group:hover .nav-dashboard-chevron {
+            transform: rotate(180deg);
+        }
+    </style>
+   
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <!-- Firebase SDKs -->
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+    <style>
+        /* Fixed Bottom Navigation Bar - ONLY on smaller devices (<1024px) */
+        @media (max-width: 1023px) {
+            .app-bottom-nav {
+                position: fixed !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                z-index: 50 !important;
+                display: flex !important;
+            }
+        }
+        @media (min-width: 1024px) {
+            .app-bottom-nav {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-[#F8FCFC] text-slate-800 antialiased min-h-screen flex flex-col selection:bg-teal selection:text-white pb-20 lg:pb-12">
+
+    <!-- ===== GLOBAL UNIFIED NAVIGATION BAR ===== -->
+    <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-edge/80 shadow-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
+            <!-- Brand -->
+            <div class="flex items-center gap-2.5 sm:gap-3 cursor-pointer shrink-0" onclick="window.location.href='home.html'">
+                <img src="assets/dailyvetlogo.png" alt="DailyVet" class="w-10 h-10 object-contain drop-shadow-xs shrink-0" />
+                <div class="flex flex-col">
+                    <span class="text-xl sm:text-2xl font-extrabold tracking-tight leading-none font-heading whitespace-nowrap">
+                        <span class="text-deep">Daily</span><span class="text-teal">Vet</span>
+                    </span>
+                    <span class="hidden sm:block text-[10px] font-semibold text-teal tracking-wider uppercase mt-0.5 whitespace-nowrap">Clinical &amp; Farm Intelligence</span>
+                </div>
+            </div>
+
+            <!-- Desktop Nav Links -->
+            <nav class="hidden lg:flex items-center gap-1.5 lg:gap-2.5 bg-soft/70 px-3 py-1.5 rounded-full border border-line/60 text-xs font-semibold text-slate-700 whitespace-nowrap">
+                <!-- Dashboard with Hover Suites Dropdown -->
+                <div class="relative nav-dashboard-group group">
+                    <a href="home.html" class="px-3 py-1 rounded-full hover:text-deep hover:bg-white transition-all inline-flex items-center gap-1.5">
+                        <span>Dashboard</span>
+                        <i class="fas fa-chevron-down text-[9px] opacity-75 nav-dashboard-chevron transition-transform duration-200"></i>
+                    </a>
+
+                    <!-- Hover Dropdown Menu -->
+                    <div class="absolute left-0 top-full pt-2 z-50 min-w-[260px] nav-dashboard-dropdown">
+                        <div class="bg-white/98 backdrop-blur-md border border-edge rounded-2xl shadow-xl shadow-deep/15 p-2 flex flex-col gap-1 text-slate-700">
+                            <div class="px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                                Clinical &amp; Farm Suites
+                            </div>
+
+                            <!-- 1. AI Feed Advisor -->
+                            <a href="advisor.html" class="flex items-center gap-3 px-2.5 py-2 rounded-xl hover:bg-soft transition-all text-xs font-semibold text-slate-700 hover:text-deep no-underline group/item">
+                                <div class="w-8 h-8 rounded-lg bg-teal/10 text-teal flex items-center justify-center text-xs group-hover/item:bg-teal group-hover/item:text-white transition-colors">
+                                    <i class="fas fa-wheat-awn"></i>
+                                </div>
+                                <div class="flex flex-col min-w-0">
+                                    <span class="font-bold text-deep leading-tight">AI Feed Advisor</span>
+                                    <span class="text-[10px] text-slate-400 font-normal truncate">Smart nutrition &amp; ration planner</span>
+                                </div>
+                            </a>
+
+                            <!-- 2. DailyVet Pharma -->
+                            <a href="pharma.html" class="flex items-center gap-3 px-2.5 py-2 rounded-xl hover:bg-soft transition-all text-xs font-semibold text-slate-700 hover:text-deep no-underline group/item">
+                                <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-xs group-hover/item:bg-purple-600 group-hover/item:text-white transition-colors">
+                                    <i class="fas fa-pills"></i>
+                                </div>
+                                <div class="flex flex-col min-w-0">
+                                    <span class="font-bold text-deep leading-tight">DailyVet Pharma</span>
+                                    <span class="text-[10px] text-slate-400 font-normal truncate">Formulary &amp; dose verification</span>
+                                </div>
+                            </a>
+
+                            <!-- 3. Breed Detection AI -->
+                            <a href="breed-detection.html" class="flex items-center gap-3 px-2.5 py-2 rounded-xl hover:bg-soft transition-all text-xs font-semibold text-slate-700 hover:text-deep no-underline group/item">
+                                <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs group-hover/item:bg-emerald-600 group-hover/item:text-white transition-colors">
+                                    <i class="fas fa-cow"></i>
+                                </div>
+                                <div class="flex flex-col min-w-0">
+                                    <span class="font-bold text-deep leading-tight">Breed Detection AI</span>
+                                    <span class="text-[10px] text-slate-400 font-normal truncate">Bovine phenotype classifier</span>
+                                </div>
+                            </a>
+
+                            <!-- 4. Health Scan -->
+                            <a href="excreta-scan.html" class="flex items-center gap-3 px-2.5 py-2 rounded-xl hover:bg-soft transition-all text-xs font-semibold text-slate-700 hover:text-deep no-underline group/item">
+                                <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-xs group-hover/item:bg-amber-600 group-hover/item:text-white transition-colors">
+                                    <i class="fas fa-microscope"></i>
+                                </div>
+                                <div class="flex flex-col min-w-0">
+                                    <span class="font-bold text-deep leading-tight">Health Scan</span>
+                                    <span class="text-[10px] text-slate-400 font-normal truncate">Dung &amp; urine diagnostic scan</span>
+                                </div>
+                            </a>
+
+                            <!-- 5. PR Scan -->
+                            <a href="scanner.html" class="flex items-center gap-3 px-2.5 py-2 rounded-xl hover:bg-soft transition-all text-xs font-semibold text-slate-700 hover:text-deep no-underline group/item">
+                                <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs group-hover/item:bg-blue-600 group-hover/item:text-white transition-colors">
+                                    <i class="fas fa-file-prescription"></i>
+                                </div>
+                                <div class="flex flex-col min-w-0">
+                                    <span class="font-bold text-deep leading-tight">PR Scan</span>
+                                    <span class="text-[10px] text-slate-400 font-normal truncate">Prescription neural OCR reader</span>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <a href="ai.html" class="px-3 py-1 rounded-full hover:text-deep hover:bg-white transition-all">AI Consultation</a>
+                <a href="climate-dashboard.html" class="px-3 py-1 rounded-full hover:text-deep hover:bg-white transition-all flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    NASA Climate
+                </a>
+                <a href="community.html" class="px-3 py-1 rounded-full hover:text-deep hover:bg-white transition-all">Community</a>
+                <a href="support.html" class="px-3 py-1 rounded-full bg-deep text-white shadow-xs">Support</a>
+                <a href="vet-home.html" class="px-3 py-1 rounded-full hover:text-deep hover:bg-white transition-all text-teal font-bold">Vets Portal</a>
+            </nav>
+
+            <!-- Action Tools -->
+            <div class="flex items-center gap-2.5 sm:gap-3 shrink-0">
+                <button class="w-10 h-10 rounded-xl bg-soft hover:bg-edge text-deep flex items-center justify-center transition-colors cursor-pointer border border-line shrink-0" onclick="window.location.href='home.html'" title="Return to Dashboard">
+                    <i class="fas fa-home"></i>
+                </button>
+
+                <!-- Profile Avatar & Dropdown -->
+                <div class="relative profile-menu-wrapper">
+                    <!-- Desktop Profile Avatar Button (hidden on mobile) -->
+                    <button type="button"
+                            id="profileDropdownBtn"
+                            onclick="toggleProfileDropdown(event)"
+                            class="hidden lg:block w-10 h-10 rounded-full ring-2 ring-teal/30 hover:ring-teal focus:ring-4 focus:ring-teal/20 overflow-hidden cursor-pointer flex-shrink-0 transition-all shadow-xs bg-transparent border-0 p-0"
+                            aria-label="User Profile Menu"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                            title="Profile menu">
+                        <img id="profileIconImg" src="assets/dailyvetlogo.png" alt="Profile" class="w-full h-full object-cover" />
+                    </button>
+
+                    <!-- Mobile Sandwich Button (lg:hidden) -->
+                    <button type="button"
+                            id="mobileSandwichBtn"
+                            onclick="toggleMobileSandwichMenu(event)"
+                            class="lg:hidden w-10 h-10 rounded-xl bg-soft hover:bg-edge border border-line text-deep flex items-center justify-center cursor-pointer transition-colors shadow-2xs shrink-0"
+                            aria-label="Toggle Navigation Menu">
+                        <i id="mobileSandwichIcon" class="fas fa-bars text-sm"></i>
+                    </button>
+
+                    <!-- Profile Dropdown Menu -->
+                    <div id="profileDropdown"
+                         class="profile-dropdown hidden absolute right-0 mt-2.5 w-60 sm:w-64 bg-white/98 backdrop-blur-md border border-edge rounded-2xl shadow-xl shadow-deep/15 z-50 overflow-hidden text-left"
+                         role="menu"
+                         aria-orientation="vertical">
+                        
+                        <!-- User Information Header -->
+                        <div class="p-3.5 bg-gradient-to-r from-soft via-white to-soft/40 border-b border-edge flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-full ring-2 ring-teal/30 overflow-hidden flex-shrink-0 bg-white shadow-2xs">
+                                <img id="profileMenuAvatar" src="assets/dailyvetlogo.png" alt="User Avatar" class="w-full h-full object-cover" />
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-1.5">
+                                    <span id="profileMenuName" class="text-xs font-extrabold text-deep truncate">DailyVet User</span>
+                                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" title="Active"></span>
+                                </div>
+                                <span id="profileMenuRole" class="text-[11px] font-semibold text-teal truncate block">Pet &amp; Farm Owner</span>
+                            </div>
+                        </div>
+
+                        <!-- Menu Options -->
+                        <div class="p-1.5 flex flex-col gap-0.5">
+                            <!-- Option 1: Profile -->
+                            <a href="profile.html"
+                               id="profileMenuLinkProfile"
+                               class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 hover:text-deep hover:bg-soft transition-all text-xs font-semibold group no-underline cursor-pointer"
+                               role="menuitem">
+                                <div class="w-8 h-8 rounded-lg bg-teal/10 text-teal flex items-center justify-center text-xs group-hover:bg-deep group-hover:text-white transition-all">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <span class="block font-bold">Profile</span>
+                                    <span class="block text-[10px] text-slate-400 font-normal">View &amp; edit account</span>
+                                </div>
+                                <i class="fas fa-chevron-right text-[10px] text-mute group-hover:translate-x-0.5 transition-transform"></i>
+                            </a>
+
+                            <!-- Option 2: Support (Visible ONLY on mobile and smaller tab view; hidden on desktop where Support is in main navbar) -->
+                            <a href="support.html"
+                               id="profileMenuLinkSupport"
+                               class="lg:hidden flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 hover:text-deep hover:bg-soft transition-all text-xs font-semibold group no-underline cursor-pointer"
+                               role="menuitem">
+                                <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center text-xs group-hover:bg-sky-600 group-hover:text-white transition-all">
+                                    <i class="fas fa-headset"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <span class="block font-bold">Support</span>
+                                    <span class="block text-[10px] text-slate-400 font-normal">Helpdesk &amp; 24h helpline</span>
+                                </div>
+                                <i class="fas fa-chevron-right text-[10px] text-mute group-hover:translate-x-0.5 transition-transform"></i>
+                            </a>
+
+                            <div class="my-0.5 border-t border-edge"></div>
+
+                            <!-- Option 3: Log Out -->
+                            <button type="button"
+                                    onclick="logout()"
+                                    id="profileMenuBtnLogout"
+                                    class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-danger hover:bg-red-50 transition-all text-xs font-bold text-left cursor-pointer border-0 bg-transparent group"
+                                    role="menuitem">
+                                <div class="w-8 h-8 rounded-lg bg-red-100/70 text-danger flex items-center justify-center text-xs group-hover:bg-danger group-hover:text-white transition-all">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <span class="block font-bold">Log Out</span>
+                                    <span class="block text-[10px] text-red-400 font-normal">Sign out from DailyVet</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== MOBILE SANDWICH DRAWER (lg:hidden) ===== -->
+        <div id="mobileSandwichMenu" class="hidden lg:hidden border-t border-edge bg-white/98 backdrop-blur-xl px-4 py-4 flex flex-col gap-3.5 shadow-2xl max-h-[calc(100vh-4.5rem)] overflow-y-auto text-left transition-all">
+            <!-- TOP: All Dash Menu Options -->
+            <div class="flex flex-col gap-1.5">
+                <div class="px-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                    <i class="fas fa-sparkles text-teal"></i>
+                    <span>Clinical &amp; Farm Suites</span>
+                </div>
+                <div class="grid grid-cols-1 gap-1">
+                    <!-- 1. AI Feed Advisor -->
+                    <a href="advisor.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-soft transition-all text-xs font-semibold text-slate-700 hover:text-deep no-underline group/item bg-slate-50/70 border border-slate-100">
+                        <div class="w-8 h-8 rounded-lg bg-teal/10 text-teal flex items-center justify-center text-xs group-hover/item:bg-teal group-hover/item:text-white transition-colors">
+                            <i class="fas fa-wheat-awn"></i>
+                        </div>
+                        <div class="flex flex-col min-w-0 flex-1">
+                            <span class="font-bold text-deep leading-tight">AI Feed Advisor</span>
+                            <span class="text-[10px] text-slate-400 font-normal truncate">Smart nutrition &amp; ration planner</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-[10px] text-mute group-hover/item:translate-x-0.5 transition-transform"></i>
+                    </a>
+
+                    <!-- 2. DailyVet Pharma -->
+                    <a href="pharma.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-soft transition-all text-xs font-semibold text-slate-700 hover:text-deep no-underline group/item bg-slate-50/70 border border-slate-100">
+                        <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-xs group-hover/item:bg-purple-600 group-hover/item:text-white transition-colors">
+                            <i class="fas fa-pills"></i>
+                        </div>
+                        <div class="flex flex-col min-w-0 flex-1">
+                            <span class="font-bold text-deep leading-tight">DailyVet Pharma</span>
+                            <span class="text-[10px] text-slate-400 font-normal truncate">Formulary &amp; dose verification</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-[10px] text-mute group-hover/item:translate-x-0.5 transition-transform"></i>
+                    </a>
+
+                    <!-- 3. Breed Detection AI -->
+                    <a href="breed-detection.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-soft transition-all text-xs font-semibold text-slate-700 hover:text-deep no-underline group/item bg-slate-50/70 border border-slate-100">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs group-hover/item:bg-emerald-600 group-hover/item:text-white transition-colors">
+                            <i class="fas fa-cow"></i>
+                        </div>
+                        <div class="flex flex-col min-w-0 flex-1">
+                            <span class="font-bold text-deep leading-tight">Breed Detection AI</span>
+                            <span class="text-[10px] text-slate-400 font-normal truncate">Bovine phenotype classifier</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-[10px] text-mute group-hover/item:translate-x-0.5 transition-transform"></i>
+                    </a>
+
+                    <!-- 4. Health Scan -->
+                    <a href="excreta-scan.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-soft transition-all text-xs font-semibold text-slate-700 hover:text-deep no-underline group/item bg-slate-50/70 border border-slate-100">
+                        <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-xs group-hover/item:bg-amber-600 group-hover/item:text-white transition-colors">
+                            <i class="fas fa-microscope"></i>
+                        </div>
+                        <div class="flex flex-col min-w-0 flex-1">
+                            <span class="font-bold text-deep leading-tight">Health Scan</span>
+                            <span class="text-[10px] text-slate-400 font-normal truncate">Dung &amp; urine diagnostic scan</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-[10px] text-mute group-hover/item:translate-x-0.5 transition-transform"></i>
+                    </a>
+
+                    <!-- 5. PR Scan -->
+                    <a href="scanner.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-soft transition-all text-xs font-semibold text-slate-700 hover:text-deep no-underline group/item bg-slate-50/70 border border-slate-100">
+                        <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs group-hover/item:bg-blue-600 group-hover/item:text-white transition-colors">
+                            <i class="fas fa-file-prescription"></i>
+                        </div>
+                        <div class="flex flex-col min-w-0 flex-1">
+                            <span class="font-bold text-deep leading-tight">PR Scan</span>
+                            <span class="text-[10px] text-slate-400 font-normal truncate">Prescription neural OCR reader</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-[10px] text-mute group-hover/item:translate-x-0.5 transition-transform"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- BOTTOM: Current Profile Menu Options (Exact 2nd Card) -->
+            <div class="pt-2 border-t border-edge flex flex-col gap-1.5">
+                <div class="px-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                    <i class="fas fa-user-circle text-teal"></i>
+                    <span>Account &amp; Profile</span>
+                </div>
+                <div class="bg-white border border-edge rounded-2xl shadow-xs overflow-hidden">
+                    <!-- User Information Header -->
+                    <div class="p-3.5 bg-gradient-to-r from-soft via-white to-soft/40 border-b border-edge flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-full ring-2 ring-teal/30 overflow-hidden flex-shrink-0 bg-white shadow-2xs">
+                            <img id="mobileMenuAvatar" src="assets/dailyvetlogo.png" alt="User Avatar" class="w-full h-full object-cover" />
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-1.5">
+                                <span id="mobileMenuName" class="text-xs font-extrabold text-deep truncate">DailyVet User</span>
+                                <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" title="Active"></span>
+                            </div>
+                            <span id="mobileMenuRole" class="text-[11px] font-semibold text-teal truncate block">Pet &amp; Farm Owner</span>
+                        </div>
+                    </div>
+
+                    <!-- Menu Options -->
+                    <div class="p-1.5 flex flex-col gap-0.5">
+                        <!-- Option 1: Profile -->
+                        <a href="profile.html"
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 hover:text-deep hover:bg-soft transition-all text-xs font-semibold group no-underline cursor-pointer">
+                            <div class="w-8 h-8 rounded-lg bg-teal/10 text-teal flex items-center justify-center text-xs group-hover/item:bg-deep group-hover/item:text-white transition-all">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <span class="block font-bold">Profile</span>
+                                <span class="block text-[10px] text-slate-400 font-normal">View &amp; edit account</span>
+                            </div>
+                            <i class="fas fa-chevron-right text-[10px] text-mute group-hover:translate-x-0.5 transition-transform"></i>
+                        </a>
+
+                        <!-- Option 2: Support -->
+                        <a href="support.html"
+                           class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-700 hover:text-deep hover:bg-soft transition-all text-xs font-semibold group no-underline cursor-pointer">
+                            <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center text-xs group-hover/item:bg-sky-600 group-hover/item:text-white transition-all">
+                                <i class="fas fa-headset"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <span class="block font-bold">Support</span>
+                                <span class="block text-[10px] text-slate-400 font-normal">Helpdesk &amp; 24h helpline</span>
+                            </div>
+                            <i class="fas fa-chevron-right text-[10px] text-mute group-hover:translate-x-0.5 transition-transform"></i>
+                        </a>
+
+                        <div class="my-0.5 border-t border-edge"></div>
+
+                        <!-- Option 3: Log Out -->
+                        <button type="button"
+                                onclick="logout()"
+                                class="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-danger hover:bg-red-50 transition-all text-xs font-bold text-left cursor-pointer border-0 bg-transparent group">
+                            <div class="w-8 h-8 rounded-lg bg-red-100/70 text-danger flex items-center justify-center text-xs group-hover/item:bg-danger group-hover/item:text-white transition-all">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <span class="block font-bold">Log Out</span>
+                                <span class="block text-[10px] text-red-400 font-normal">Sign out from DailyVet</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== MAIN CONTENT CONTAINER ===== -->
+    <main class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 pb-24 lg:pb-8 flex-1 flex flex-col gap-8">
+
+        <!-- ===== HERO HEADER BANNER ===== -->
+        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-deep via-dark to-[#044c56] p-6 sm:p-8 text-white shadow-lg shadow-deep/15 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="relative z-10 max-w-2xl flex flex-col gap-2.5">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-xs text-xs font-semibold text-teal-100 self-start border border-white/10">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    DailyVet Care Desk &bull; Standard SLA &lt; 24h
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight font-heading leading-tight">
+                    Support &amp; Helpdesk Center
+                </h1>
+                <p class="text-teal-100/90 text-sm sm:text-base leading-relaxed">
+                    Have an inquiry, technical issue, or report regarding veterinary verification? Our dedicated team is here to assist livestock keepers and pet parents.
+                </p>
+            </div>
+            
+            <div class="relative z-10 flex flex-col sm:flex-row md:flex-col gap-2.5 flex-shrink-0 text-xs">
+                <div class="p-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center text-teal-200">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <div>
+                        <span class="block text-[11px] text-teal-200 font-medium">National Vet Hotline</span>
+                        <span class="block text-sm font-extrabold text-white">Dial 16358</span>
+                    </div>
+                </div>
+                <div class="p-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div>
+                        <span class="block text-[11px] text-teal-200 font-medium">Direct Email Desk</span>
+                        <span class="block text-xs font-bold text-white">support@dailyvet.app</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Decorative backdrop elements -->
+            <div class="absolute -right-16 -bottom-16 w-64 h-64 rounded-full bg-teal/20 blur-3xl pointer-events-none"></div>
+        </div>
+
+        <!-- ===== 3 FAST-ASSISTANCE CARDS ===== -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+            <!-- Card 1: 24/7 AI Diagnosis -->
+            <div class="p-5 bg-white rounded-3xl border border-edge hover:border-teal/40 shadow-xs hover:shadow-md transition-all flex flex-col justify-between gap-4">
+                <div class="flex items-start gap-3.5">
+                    <div class="w-12 h-12 rounded-2xl bg-teal/10 text-teal flex items-center justify-center text-xl flex-shrink-0">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div>
+                        <span class="px-2 py-0.5 rounded-full bg-teal/10 text-teal text-[10px] font-bold uppercase tracking-wider">Instant 24/7</span>
+                        <h3 class="font-bold text-base text-deep mt-1">Clinical AI Diagnostic</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                            Need fast animal health consultation? Don't wait for a ticket—get immediate symptom checks and home care advice.
+                        </p>
+                    </div>
+                </div>
+                <button onclick="window.location.href='ai.html'" class="w-full py-2.5 px-4 rounded-xl bg-soft text-deep font-bold text-xs hover:bg-deep hover:text-white transition-colors cursor-pointer border border-line flex items-center justify-center gap-2">
+                    <span>Ask AI Veterinarian</span>
+                    <i class="fas fa-arrow-right text-[10px]"></i>
+                </button>
+            </div>
+
+            <!-- Card 2: Animal Critical Care -->
+            <div class="p-5 bg-white rounded-3xl border border-edge hover:border-red-200 shadow-xs hover:shadow-md transition-all flex flex-col justify-between gap-4">
+                <div class="flex items-start gap-3.5">
+                    <div class="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center text-xl flex-shrink-0">
+                        <i class="fas fa-truck-medical"></i>
+                    </div>
+                    <div>
+                        <span class="px-2 py-0.5 rounded-full bg-red-100 text-red-700 text-[10px] font-bold uppercase tracking-wider">Urgent Triage</span>
+                        <h3 class="font-bold text-base text-deep mt-1">Animal Emergency?</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                            For acute bloat, severe bleeding, or poisoning, access rapid first aid steps and emergency dispatch numbers immediately.
+                        </p>
+                    </div>
+                </div>
+                <button onclick="window.location.href='emergency.html'" class="w-full py-2.5 px-4 rounded-xl bg-red-50 text-red-700 font-bold text-xs hover:bg-red-600 hover:text-white transition-colors cursor-pointer border border-red-200 flex items-center justify-center gap-2">
+                    <span>Emergency Portal</span>
+                    <i class="fas fa-arrow-right text-[10px]"></i>
+                </button>
+            </div>
+
+            <!-- Card 3: Trust & Safety Reporting -->
+            <div class="p-5 bg-white rounded-3xl border border-edge hover:border-amber-300 shadow-xs hover:shadow-md transition-all flex flex-col justify-between gap-4">
+                <div class="flex items-start gap-3.5">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl flex-shrink-0">
+                        <i class="fas fa-shield-halved"></i>
+                    </div>
+                    <div>
+                        <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold uppercase tracking-wider">Safety Priority</span>
+                        <h3 class="font-bold text-base text-deep mt-1">Trust &amp; Verification</h3>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                            Encountered an unverified veterinary practitioner or misleading community profile? Help protect farmers and animals.
+                        </p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="reportFakeVet()" class="py-2.5 px-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-xl font-bold text-[11px] border border-red-200 transition-colors cursor-pointer flex items-center justify-center gap-1.5">
+                        <i class="fas fa-user-slash text-xs"></i>
+                        <span>Report Fake Vet</span>
+                    </button>
+                    <button onclick="reportFakeUser()" class="py-2.5 px-2 bg-sky-50 hover:bg-sky-100 text-sky-700 rounded-xl font-bold text-[11px] border border-sky-200 transition-colors cursor-pointer flex items-center justify-center gap-1.5">
+                        <i class="fas fa-flag text-xs"></i>
+                        <span>Report Spam</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ===== MAIN 2-COLUMN TICKET & FAQ WORKSPACE ===== -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+            <!-- LEFT COLUMN: TICKET SUBMISSION FORM (7 cols on lg) -->
+            <div class="lg:col-span-7 bg-white p-6 sm:p-8 rounded-3xl border border-edge shadow-xs flex flex-col gap-6">
+                <div class="border-b border-edge pb-4">
+                    <h2 class="text-xl font-bold text-deep font-heading flex items-center gap-2.5">
+                        <i class="fas fa-ticket text-teal"></i>
+                        Open a Support Ticket
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-1">
+                        Please provide specific details so our support engineers can resolve your request promptly.
+                    </p>
+                </div>
+
+                <form class="flex flex-col gap-4.5" id="supportForm">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Your Name -->
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-xs font-bold text-deep uppercase tracking-wider flex items-center gap-1">
+                                Your Full Name <span class="text-danger">*</span>
+                            </label>
+                            <input type="text"
+                                   id="supportName"
+                                   class="w-full p-3.5 px-4 text-sm font-medium text-deep bg-soft/40 border border-line/80 rounded-2xl outline-none focus:bg-white focus:border-deep focus:ring-4 focus:ring-teal/15 transition-all placeholder:text-mute"
+                                   placeholder="Enter your name"
+                                   required />
+                        </div>
+
+                        <!-- Phone Number -->
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-xs font-bold text-deep uppercase tracking-wider flex items-center gap-1">
+                                Contact Phone <span class="text-danger">*</span>
+                            </label>
+                            <input type="tel"
+                                   id="supportPhone"
+                                   class="w-full p-3.5 px-4 text-sm font-medium text-deep bg-soft/40 border border-line/80 rounded-2xl outline-none focus:bg-white focus:border-deep focus:ring-4 focus:ring-teal/15 transition-all placeholder:text-mute"
+                                   placeholder="01XXXXXXXXX"
+                                   required />
+                        </div>
+                    </div>
+
+                    <!-- Issue Category Dropdown -->
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-xs font-bold text-deep uppercase tracking-wider flex items-center gap-1">
+                            Issue Category <span class="text-danger">*</span>
+                        </label>
+                        <select id="supportType"
+                                class="w-full p-3.5 px-4 text-sm font-medium text-deep bg-soft/40 border border-line/80 rounded-2xl outline-none focus:bg-white focus:border-deep focus:ring-4 focus:ring-teal/15 transition-all cursor-pointer"
+                                required>
+                            <option value="">-- Choose Category --</option>
+                            <optgroup label="🔐 Account &amp; Access">
+                                <option value="login">Login / Sign In Issue</option>
+                                <option value="register">Registration Problem</option>
+                                <option value="password">Password Reset Problem</option>
+                                <option value="profile">Profile &amp; Location Update</option>
+                            </optgroup>
+                            <optgroup label="🤖 AI Clinical &amp; Diagnostics">
+                                <option value="ai-chat">AI Symptom Checker Not Responding</option>
+                                <option value="ai-feed">Feed Advisor Ration Balancing Issue</option>
+                                <option value="ai-rx">Prescription Scanner (OCR) Problem</option>
+                                <option value="vision-breed">Breed Detection Vision Error</option>
+                            </optgroup>
+                            <optgroup label="🩺 Veterinary Portal &amp; Directory">
+                                <option value="vet-find">Cannot Locate Local Practitioner</option>
+                                <option value="vet-fake">Report Unverified / Fake Practitioner</option>
+                                <option value="vet-register">Veterinarian DLS Verification Issue</option>
+                            </optgroup>
+                            <optgroup label="📡 Climate Telemetry &amp; Radar">
+                                <option value="climate-radar">NASA THI Heat Stress Data Query</option>
+                                <option value="climate-outbreak">Disease Outbreak Alert Anomaly</option>
+                            </optgroup>
+                            <optgroup label="💡 Feedback &amp; Suggestions">
+                                <option value="feature">New Feature Request</option>
+                                <option value="bug">Technical Bug Report</option>
+                                <option value="other">General Inquiry</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <!-- Subject -->
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-xs font-bold text-deep uppercase tracking-wider flex items-center gap-1">
+                            Subject Summary <span class="text-danger">*</span>
+                        </label>
+                        <input type="text"
+                               id="supportSubject"
+                               class="w-full p-3.5 px-4 text-sm font-medium text-deep bg-soft/40 border border-line/80 rounded-2xl outline-none focus:bg-white focus:border-deep focus:ring-4 focus:ring-teal/15 transition-all placeholder:text-mute"
+                               placeholder="Brief summary of the inquiry"
+                               required />
+                    </div>
+
+                    <!-- Message -->
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-xs font-bold text-deep uppercase tracking-wider flex items-center gap-1">
+                            Detailed Description <span class="text-danger">*</span>
+                        </label>
+                        <textarea id="supportMessage"
+                                  class="w-full p-3.5 px-4 text-sm font-medium text-deep bg-soft/40 border border-line/80 rounded-2xl outline-none focus:bg-white focus:border-deep focus:ring-4 focus:ring-teal/15 transition-all placeholder:text-mute min-h-[130px] resize-y"
+                                  placeholder="Describe the issue, animal breed (if applicable), steps taken, or device used..."
+                                  required></textarea>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit"
+                            id="supportSubmitBtn"
+                            class="w-full py-4 rounded-2xl bg-gradient-to-r from-deep via-dark to-deep text-white font-bold text-sm shadow-md hover:shadow-lg hover:from-teal hover:to-deep transition-all cursor-pointer flex items-center justify-center gap-2.5 mt-2 active:scale-98">
+                        <i class="fas fa-paper-plane text-xs"></i>
+                        <span>Dispatch Support Ticket</span>
+                    </button>
+
+                    <!-- Status Alerts -->
+                    <div id="successMsg" class="p-4 rounded-2xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold flex items-center gap-2.5 shadow-xs" style="display:none;">
+                        <i class="fas fa-circle-check text-base text-emerald-600"></i>
+                        <span>Ticket received! Our clinical care desk will review and contact you shortly.</span>
+                    </div>
+                    <div id="errorMsg" class="p-4 rounded-2xl bg-red-50 text-red-800 border border-red-200 text-xs font-bold flex items-center gap-2.5 shadow-xs" style="display:none;">
+                        <i class="fas fa-circle-exclamation text-base text-red-600"></i>
+                        <span id="errorText">Unable to submit ticket. Please check connection.</span>
+                    </div>
+                </form>
+            </div>
+
+            <!-- RIGHT COLUMN: FAQS & KNOWLEDGEBASE (5 cols on lg) -->
+            <div class="lg:col-span-5 flex flex-col gap-6">
+
+                <!-- FAQ Accordion Card -->
+                <div class="bg-white p-6 sm:p-7 rounded-3xl border border-edge shadow-xs flex flex-col gap-4">
+                    <div class="border-b border-edge pb-3">
+                        <h3 class="text-base font-bold text-deep font-heading flex items-center gap-2">
+                            <i class="fas fa-circle-question text-teal"></i>
+                            Frequently Asked Questions
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Quick answers to common questions</p>
+                    </div>
+
+                    <div class="flex flex-col gap-2.5">
+
+                        <!-- FAQ 1 -->
+                        <details class="group p-3.5 rounded-2xl bg-soft/50 border border-edge transition-all" open>
+                            <summary class="font-bold text-xs sm:text-sm text-deep cursor-pointer flex items-center justify-between list-none">
+                                <span>How long does veterinary verification take?</span>
+                                <i class="fas fa-chevron-down text-xs text-teal group-open:rotate-180 transition-transform"></i>
+                            </summary>
+                            <p class="text-xs text-slate-600 mt-2.5 leading-relaxed">
+                                Veterinarians registered with the Department of Livestock Services (DLS) or Bangladesh Veterinary Council are verified within 24 to 48 hours after license validation.
+                            </p>
+                        </details>
+
+                        <!-- FAQ 2 -->
+                        <details class="group p-3.5 rounded-2xl bg-soft/50 border border-edge transition-all">
+                            <summary class="font-bold text-xs sm:text-sm text-deep cursor-pointer flex items-center justify-between list-none">
+                                <span>Can I use DailyVet AI without internet?</span>
+                                <i class="fas fa-chevron-down text-xs text-teal group-open:rotate-180 transition-transform"></i>
+                            </summary>
+                            <p class="text-xs text-slate-600 mt-2.5 leading-relaxed">
+                                DailyVet caches your recent consultations and animal profiles offline. For real-time satellite climate radar and live diagnosis, an active cellular data or WiFi connection is required.
+                            </p>
+                        </details>
+
+                        <!-- FAQ 3 -->
+                        <details class="group p-3.5 rounded-2xl bg-soft/50 border border-edge transition-all">
+                            <summary class="font-bold text-xs sm:text-sm text-deep cursor-pointer flex items-center justify-between list-none">
+                                <span>Why did my prescription scan fail?</span>
+                                <i class="fas fa-chevron-down text-xs text-teal group-open:rotate-180 transition-transform"></i>
+                            </summary>
+                            <p class="text-xs text-slate-600 mt-2.5 leading-relaxed">
+                                Ensure the prescription paper is placed on a flat, well-lit surface without glare. If handwriting is illegible, try uploading a high-resolution gallery photo.
+                            </p>
+                        </details>
+
+                        <!-- FAQ 4 -->
+                        <details class="group p-3.5 rounded-2xl bg-soft/50 border border-edge transition-all">
+                            <summary class="font-bold text-xs sm:text-sm text-deep cursor-pointer flex items-center justify-between list-none">
+                                <span>Is DailyVet available across all divisions?</span>
+                                <i class="fas fa-chevron-down text-xs text-teal group-open:rotate-180 transition-transform"></i>
+                            </summary>
+                            <p class="text-xs text-slate-600 mt-2.5 leading-relaxed">
+                                Yes. DailyVet covers all 8 divisions of Bangladesh (Dhaka, Chittagong, Rajshahi, Khulna, Barisal, Sylhet, Rangpur, and Mymensingh) with localized climate telemetry.
+                            </p>
+                        </details>
+
+                    </div>
+                </div>
+
+                <!-- Operating Hours & Office Card -->
+                <div class="p-6 rounded-3xl bg-gradient-to-br from-soft to-[#e2f3f5] border border-line/70 shadow-xs flex flex-col gap-3.5">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-deep text-white flex items-center justify-center text-sm flex-shrink-0">
+                            <i class="fas fa-building-columns"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-bold text-deep">Care Operations Desk</h4>
+                            <span class="text-xs text-teal font-semibold">Saturday &ndash; Thursday &bull; 9:00 AM &ndash; 8:00 PM BST</span>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Tickets submitted outside business hours are queued and attended to first thing the next business day. For urgent cases, please use the hotline numbers.
+                    </p>
+                    <div class="pt-2 border-t border-line/50 flex items-center justify-between text-xs text-deep font-semibold">
+                        <span>Response Guarantee</span>
+                        <span class="text-teal font-bold">&lt; 24 Business Hours</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- ===== FIXED BOTTOM NAVIGATION BAR (SMALLER DEVICES ONLY) ===== -->
+    <nav class="app-bottom-nav lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-t border-edge shadow-[0_-4px_20px_rgba(3,93,105,0.08)] px-2 py-2 flex items-center justify-around">
+        <a href="home.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-home text-base"></i>
+            <span>Home</span>
+        </a>
+        <a href="ai.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-robot text-base"></i>
+            <span>AI Vet</span>
+        </a>
+        <a href="climate-dashboard.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-satellite-dish text-base"></i>
+            <span>Climate</span>
+        </a>
+        <a href="community.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-users text-base"></i>
+            <span>Community</span>
+        </a>
+        <a href="vet-home.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-user-md text-base"></i>
+            <span>Vets</span>
+        </a>
+    </nav>
+
+    <!-- Scripts -->
+    <script defer src="js/firebase-config.js"></script>
+    <script defer src="js/auth.js"></script>
+    <script defer src="js/support.js"></script>
+    <script defer src="js/scale.js"></script>
+</body>
+</html>

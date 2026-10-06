@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <title>DailyVet | AI Veterinary &amp; Livestock Health Platform</title>
+    <meta name="description" content="Bangladesh's leading AI-powered veterinary clinical consultation, livestock health intelligence, verified doctor telemedicine, and NASA satellite outbreak radar." />
+    <meta name="theme-color" content="#035D69" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+
+    <!-- PWA Manifest & Favicon -->
+    <link rel="manifest" href="manifest.json" />
+    <link rel="icon" href="assets/dailyvetlogo.jpeg" type="image/png" />
+    <link rel="apple-touch-icon" href="assets/dailyvetlogo.jpeg" />
+
+    <!-- Tailwind CSS v4 -->
+    <script src="js/tailwind-v4.js"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --font-heading: 'Plus Jakarta Sans', sans-serif;
+            --font-sans: 'Inter', sans-serif;
+            --color-deep: #035D69;
+            --color-dark: #023d47;
+            --color-teal: #088F8F;
+            --color-line: #b2e0e6;
+            --color-soft: #eef7f8;
+            --color-edge: #e0f0f2;
+            --color-mute: #8ab8be;
+            --color-danger: #e74c3c;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, h5, .font-heading { font-family: 'Plus Jakarta Sans', sans-serif; }
+        details summary::-webkit-details-marker { display: none; }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+</head>
+<body class="bg-[#F8FCFC] text-slate-800 antialiased min-h-screen flex flex-col selection:bg-teal selection:text-white">
+
+    <!-- ===== TOP EMERGENCY & NATIONAL HOTLINE BANNER ===== -->
+    <div class="bg-gradient-to-r from-deep via-dark to-deep text-white text-[11px] font-semibold py-2 px-4 border-b border-white/10 shadow-2xs">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>National Emergency Veterinary Hotline: <strong class="text-white underline">Dial 16358</strong> &bull; 24/7 Response Across 64 Districts</span>
+            </div>
+            <div class="hidden md:flex items-center gap-4 text-[10px] text-teal-100">
+                <span class="inline-flex items-center gap-1"><i class="fas fa-microchip text-teal-300"></i> AI Clinical Diagnostic</span>
+                <span>&bull;</span>
+                <span class="inline-flex items-center gap-1"><i class="fas fa-user-md text-teal-300"></i> BVC Verified Doctors</span>
+                <span>&bull;</span>
+                <span class="inline-flex items-center gap-1"><i class="fas fa-satellite-dish text-teal-300"></i> NASA Telemetry</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MAIN GLOBAL NAVIGATION BAR ===== -->
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-edge shadow-2xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 sm:h-20 flex items-center justify-between gap-4">
+            <!-- Brand -->
+            <a href="index.html" class="flex items-center gap-2.5 sm:gap-3 no-underline group shrink-0">
+                <img src="assets/dailyvetlogo.png" alt="DailyVet" class="w-10 h-10 sm:w-11 sm:h-11 object-contain drop-shadow-xs group-hover:scale-105 transition-transform shrink-0" />
+                <div class="flex flex-col">
+                    <span class="text-xl sm:text-2xl font-extrabold tracking-tight leading-none font-heading whitespace-nowrap">
+                        <span class="text-deep">Daily</span><span class="text-teal">Vet</span>
+                    </span>
+                    <span class="hidden md:block text-[10px] font-semibold text-teal tracking-wider uppercase mt-0.5 whitespace-nowrap">Clinical &amp; Farm Intelligence</span>
+                </div>
+            </a>
+
+            <!-- Desktop Nav Links (Only options available on the landing page) -->
+            <nav class="hidden lg:flex items-center gap-1 bg-soft/75 px-3 py-1.5 rounded-full border border-line/70 text-xs font-semibold text-slate-700 whitespace-nowrap">
+                <a href="#features" class="px-3 py-1 rounded-full hover:text-deep hover:bg-white transition-all no-underline">Features</a>
+                <a href="#how-it-works" class="px-3 py-1 rounded-full hover:text-deep hover:bg-white transition-all no-underline">How It Works</a>
+                <a href="#species" class="px-3 py-1 rounded-full hover:text-deep hover:bg-white transition-all no-underline">Animal Care</a>
+                <a href="#doctors" class="px-3 py-1 rounded-full hover:text-deep hover:bg-white transition-all no-underline">For Doctors</a>
+                <a href="#faq" class="px-3 py-1 rounded-full hover:text-deep hover:bg-white transition-all no-underline">FAQ</a>
+                <a href="#support" class="px-3 py-1 rounded-full hover:text-deep hover:bg-white transition-all no-underline">Support</a>
+            </nav>
+
+            <!-- Actions Header (Right Side) -->
+            <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                <a href="login.html" class="hidden sm:inline-flex px-3.5 sm:px-4 py-2 rounded-xl text-deep hover:bg-soft text-xs font-bold transition-all no-underline border border-transparent hover:border-line whitespace-nowrap">
+                    Sign In
+                </a>
+                <a href="account.html" class="px-3.5 sm:px-4 py-2 sm:py-2.5 bg-gradient-to-r from-deep via-dark to-teal hover:from-dark hover:to-deep text-white rounded-xl text-xs font-bold shadow-md shadow-deep/15 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all no-underline inline-flex items-center gap-1.5 whitespace-nowrap">
+                    <span>Get Started</span>
+                    <i class="fas fa-arrow-right text-[10px] text-teal-200"></i>
+                </a>
+                
+                <!-- Hamburger Toggle (lg:hidden) -->
+                <button type="button"
+                        onclick="toggleMobileMenu()"
+                        class="lg:hidden w-10 h-10 rounded-xl bg-soft border border-line text-deep flex items-center justify-center cursor-pointer hover:bg-edge transition-colors shrink-0"
+                        aria-label="Toggle navigation menu">
+                    <i id="menuIcon" class="fas fa-bars text-sm"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Drawer Menu (Expandable on Small/Tablet Screens) -->
+        <div id="mobileMenu" class="hidden lg:hidden border-t border-edge bg-white/98 backdrop-blur-xl px-5 py-4 flex flex-col gap-2 shadow-xl animate-in fade-in slide-in-from-top-2 duration-150">
+            <a href="#features" onclick="toggleMobileMenu()" class="px-3 py-2 rounded-xl text-sm font-bold text-slate-700 hover:bg-soft transition-colors no-underline">Features &amp; Services</a>
+            <a href="#how-it-works" onclick="toggleMobileMenu()" class="px-3 py-2 rounded-xl text-sm font-bold text-slate-700 hover:bg-soft transition-colors no-underline">How It Works</a>
+            <a href="#species" onclick="toggleMobileMenu()" class="px-3 py-2 rounded-xl text-sm font-bold text-slate-700 hover:bg-soft transition-colors no-underline">Animal Care &amp; Sectors</a>
+            <a href="#doctors" onclick="toggleMobileMenu()" class="px-3 py-2 rounded-xl text-sm font-bold text-slate-700 hover:bg-soft transition-colors no-underline">For Doctors (Vet Portal)</a>
+            <a href="#faq" onclick="toggleMobileMenu()" class="px-3 py-2 rounded-xl text-sm font-bold text-slate-700 hover:bg-soft transition-colors no-underline">Frequently Asked Questions</a>
+            <a href="#support" onclick="toggleMobileMenu()" class="px-3 py-2 rounded-xl text-sm font-bold text-teal hover:bg-soft transition-colors no-underline flex items-center justify-between">
+                <span>Support &amp; Contact Desk</span>
+                <span class="text-[10px] bg-teal/10 text-teal px-2 py-0.5 rounded-full font-bold">Contact Us</span>
+            </a>
+            
+            <div class="pt-3 border-t border-edge flex flex-col gap-2">
+                <a href="account.html" class="w-full py-3 bg-gradient-to-r from-deep to-teal text-white rounded-xl text-center text-xs font-bold shadow-md no-underline flex items-center justify-center gap-2">
+                    <span>Get Started Free</span>
+                    <i class="fas fa-arrow-right text-xs"></i>
+                </a>
+                <a href="login.html" class="w-full py-2.5 bg-soft text-deep border border-line rounded-xl text-center text-xs font-bold no-underline">
+                    Sign In
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== HERO SECTION ===== -->
+    <section class="relative overflow-hidden pt-12 pb-20 sm:pt-16 sm:pb-28 bg-gradient-to-b from-white via-soft/30 to-[#F0F8F9] border-b border-edge/60">
+        <!-- Subtle Background Glows -->
+        <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-r from-teal/15 via-deep/10 to-teal/15 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+                
+                <!-- Left Column: Copy & Actions (7 cols) -->
+                <div class="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left gap-5">
+                    
+                    <!-- Pill Badge -->
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal/10 border border-teal/20 text-deep text-xs font-bold shadow-xs">
+                        <span class="w-2 h-2 rounded-full bg-teal animate-ping"></span>
+                        <span>Clinical AI &bull; BVC Telemedicine &bull; Emergency 16358</span>
+                    </div>
+
+                    <!-- Main Hero Title -->
+                    <h1 class="text-3xl sm:text-5xl xl:text-6xl font-extrabold text-deep tracking-tight font-heading leading-[1.12]">
+                        Healthy Animals.<br class="hidden sm:inline" />
+                        Empowered Keepers.<br />
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal via-emerald-600 to-deep">
+                            Thriving Farms.
+                        </span>
+                    </h1>
+
+                    <!-- Subtitle -->
+                    <p class="text-sm sm:text-lg text-slate-600 font-normal leading-relaxed max-w-xl">
+                        Bangladesh's complete veterinary intelligence suite. Run instant clinical AI symptom screenings, consult licensed animal surgeons, and monitor NASA climate disease risks — all accessible in seconds.
+                    </p>
+
+                    <!-- CTAs Group: Get Started Free -->
+                    <div class="w-full max-w-md flex flex-col sm:flex-row items-center gap-3 pt-2">
+                        <a href="account.html"
+                           class="w-full sm:w-auto flex-1 py-4 px-6 bg-gradient-to-r from-deep via-dark to-teal hover:from-dark hover:to-deep text-white rounded-2xl font-bold text-sm sm:text-base tracking-wide shadow-lg shadow-deep/20 hover:shadow-xl hover:-translate-y-0.5 active:scale-95 transition-all cursor-pointer inline-flex items-center justify-center gap-2.5 no-underline">
+                            <i class="fas fa-sparkles text-teal-200 text-sm"></i>
+                            <span>Get Started Free</span>
+                            <i class="fas fa-arrow-right text-xs"></i>
+                        </a>
+
+                        <a href="login.html"
+                           class="w-full sm:w-auto py-4 px-6 bg-white hover:bg-soft text-deep border border-line rounded-2xl font-bold text-sm tracking-wide shadow-xs hover:border-teal/50 transition-all cursor-pointer inline-flex items-center justify-center gap-2 no-underline">
+                            <i class="fas fa-right-to-bracket text-teal"></i>
+                            <span>Sign In</span>
+                        </a>
+                    </div>
+
+                    <!-- Trust Checklist -->
+                    <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-6 pt-3 text-xs font-semibold text-slate-500">
+                        <span class="flex items-center gap-1.5 text-deep">
+                            <i class="fas fa-check-circle text-teal"></i> 100% Free for Farmers
+                        </span>
+                        <span class="flex items-center gap-1.5 text-deep">
+                            <i class="fas fa-check-circle text-teal"></i> No App Store Install Required
+                        </span>
+                        <span class="flex items-center gap-1.5 text-deep">
+                            <i class="fas fa-check-circle text-teal"></i> Dial 16358 24/7
+                        </span>
+                    </div>
+
+                </div>
+
+                <!-- Right Column: Interactive Platform Preview Card (5 cols) -->
+                <div class="lg:col-span-5 relative">
+                    <div class="relative bg-white/95 backdrop-blur-xl border border-edge rounded-3xl p-6 sm:p-7 shadow-[0_25px_60px_rgba(3,93,105,0.12)] flex flex-col gap-4 text-left">
+                        
+                        <!-- Mini Preview Header -->
+                        <div class="flex items-center justify-between pb-3 border-b border-edge">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-10 h-10 rounded-2xl bg-teal/10 text-teal flex items-center justify-center text-lg">
+                                    <i class="fas fa-microchip"></i>
+                                </div>
+                                <div>
+                                    <span class="block text-xs font-extrabold text-deep">DailyVet Intelligence Engine</span>
+                                    <span class="block text-[10px] text-emerald-600 font-bold flex items-center gap-1">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> Live Clinical Diagnostic Active
+                                    </span>
+                                </div>
+                            </div>
+                            <span class="text-[10px] font-bold text-teal bg-soft px-2.5 py-1 rounded-full border border-teal/20">
+                                v2.4 BD
+                            </span>
+                        </div>
+
+                        <!-- Live Diagnostic Simulation Card -->
+                        <div class="p-3.5 rounded-2xl bg-soft/60 border border-line flex flex-col gap-2 text-xs">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-deep flex items-center gap-1.5">
+                                    <i class="fas fa-stethoscope text-teal"></i> Real-time Triage Test
+                                </span>
+                                <span class="text-[10px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">High Priority</span>
+                            </div>
+                            <p class="text-slate-600 text-[11px] m-0 leading-relaxed">
+                                <strong>Symptoms:</strong> Dairy Cow &bull; High fever 104°F, swollen hot quarter, watery milk clots.
+                            </p>
+                            <div class="p-2.5 rounded-xl bg-white border border-edge text-[11px] text-deep flex items-center justify-between">
+                                <span>AI Detection: <strong>Acute Bovine Mastitis</strong></span>
+                                <span class="font-extrabold text-teal">94% match</span>
+                            </div>
+                            <div class="flex items-center justify-between pt-1 text-[10px] text-slate-500">
+                                <span>Immediate cold compress + consult registered surgeon</span>
+                                <a href="login.html" class="font-bold text-teal hover:underline">Full Protocol →</a>
+                            </div>
+                        </div>
+
+                        <!-- Live Key Stats Grid -->
+                        <div class="grid grid-cols-3 gap-2 text-center pt-1">
+                            <div class="p-2.5 rounded-2xl bg-white border border-edge shadow-2xs">
+                                <span class="block text-base font-extrabold text-deep">64</span>
+                                <span class="block text-[10px] font-semibold text-slate-400">Districts</span>
+                            </div>
+                            <div class="p-2.5 rounded-2xl bg-white border border-edge shadow-2xs">
+                                <span class="block text-base font-extrabold text-teal">500+</span>
+                                <span class="block text-[10px] font-semibold text-slate-400">Doctors</span>
+                            </div>
+                            <div class="p-2.5 rounded-2xl bg-white border border-edge shadow-2xs">
+                                <span class="block text-base font-extrabold text-emerald-600">&lt; 24h</span>
+                                <span class="block text-[10px] font-semibold text-slate-400">Doctor SLA</span>
+                            </div>
+                        </div>
+
+                        <!-- Quick Hotline CTA -->
+                        <a href="tel:16358" class="p-3 rounded-2xl bg-red-50 hover:bg-red-100 border border-red-200 transition-colors flex items-center justify-between no-underline text-xs">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-xl bg-danger text-white flex items-center justify-center text-xs">
+                                    <i class="fas fa-phone-alt"></i>
+                                </div>
+                                <div>
+                                    <span class="block font-bold text-slate-900 leading-tight">Need immediate vet assistance?</span>
+                                    <span class="block text-[10px] text-slate-500">Tap to call national response desk</span>
+                                </div>
+                            </div>
+                            <span class="text-xs font-extrabold text-danger underline">Dial 16358</span>
+                        </a>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== COMPREHENSIVE ANIMAL CARE & MULTI-SPECIES ECOSYSTEM ===== -->
+    <section id="species" class="py-16 sm:py-20 bg-white border-b border-edge relative overflow-hidden">
+        <div id="animals" class="absolute -top-10"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- Section Header -->
+            <div class="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal/10 border border-teal/20 text-deep text-xs font-bold shadow-2xs mb-3.5">
+                    <i class="fas fa-paw text-teal"></i>
+                    <span>Multi-Sector Clinical Intelligence &bull; Continuously Expanding</span>
+                </div>
+                <h2 class="text-2xl sm:text-4xl font-extrabold text-deep tracking-tight font-heading">
+                    Clinical Care Across Every Animal Sector
+                </h2>
+                <p class="text-xs sm:text-base text-slate-500 mt-2 leading-relaxed">
+                    From backyard homesteads and smallholder herds to commercial dairy enterprises and domestic companions — DailyVet delivers AI triage, certified doctor consults, and preventive health telemetry across the entire veterinary spectrum.
+                </p>
+            </div>
+
+            <!-- Core Care Sectors (Expansive Category Architecture) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                
+                <!-- Sector 1: Large Ruminants & Dairy -->
+                <div class="p-6 rounded-3xl bg-[#F8FCFC] border border-edge hover:border-teal/50 hover:shadow-md transition-all flex flex-col justify-between group">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-teal/10 text-teal flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
+                            🐄
+                        </div>
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-teal block mb-1">Large Ruminants</span>
+                        <h3 class="text-base font-extrabold text-deep font-heading">Dairy &amp; Beef Livestock</h3>
+                        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                            Bovine clinical triaging, mastitis early screening, FMD telemetry forecasting, ruminal acidosis diagnosis, and dairy calf rearing protocols.
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-edge flex flex-wrap gap-1.5">
+                        <span class="text-[10px] font-semibold bg-white border border-line/80 text-slate-700 px-2.5 py-0.5 rounded-full">Mastitis AI</span>
+                        <span class="text-[10px] font-semibold bg-white border border-line/80 text-slate-700 px-2.5 py-0.5 rounded-full">FMD Radar</span>
+                        <span class="text-[10px] font-semibold bg-white border border-line/80 text-slate-700 px-2.5 py-0.5 rounded-full">Lactation</span>
+                    </div>
+                </div>
+
+                <!-- Sector 2: Small Ruminants & Herds -->
+                <div class="p-6 rounded-3xl bg-[#F8FCFC] border border-edge hover:border-teal/50 hover:shadow-md transition-all flex flex-col justify-between group">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
+                            🐐
+                        </div>
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-600 block mb-1">Small Ruminants</span>
+                        <h3 class="text-base font-extrabold text-deep font-heading">Caprine &amp; Ovine Herds</h3>
+                        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                            Screening for Black Bengal, Jamnapari, and crossbred herds. Rapid triage for Peste des Petits Ruminants (PPR), enterotoxemia, and deworming.
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-edge flex flex-wrap gap-1.5">
+                        <span class="text-[10px] font-semibold bg-white border border-line/80 text-slate-700 px-2.5 py-0.5 rounded-full">PPR Control</span>
+                        <span class="text-[10px] font-semibold bg-white border border-line/80 text-slate-700 px-2.5 py-0.5 rounded-full">Deworming</span>
+                        <span class="text-[10px] font-semibold bg-white border border-line/80 text-slate-700 px-2.5 py-0.5 rounded-full">Kid Care</span>
+                    </div>
+                </div>
+
+                <!-- Sector 3: Poultry & Avian Flocks -->
+                <div class="p-6 rounded-3xl bg-[#F8FCFC] border border-edge hover:border-teal/50 hover:shadow-md transition-all flex flex-col justify-between group">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
+                            🐔
+                        </div>
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-amber-600 block mb-1">Commercial &amp; Backyard</span>
+                        <h3 class="text-base font-extrabold text-deep font-heading">Poultry &amp; Avian Flocks</h3>
+                        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                            Flock mortality risk monitoring, Ranikhet (Newcastle) triaging, Gumboro defense, and farm biosecurity protocols for broilers, layers, and Sonali.
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-edge flex flex-wrap gap-1.5">
+                        <span class="text-[10px] font-semibold bg-white border border-line/80 text-slate-700 px-2.5 py-0.5 rounded-full">Ranikhet (ND)</span>
+                        <span class="text-[10px] font-semibold bg-white border border-line/80 text-slate-700 px-2.5 py-0.5 rounded-full">Gumboro</span>
+                        <span class="text-[10px] font-semibold bg-white border border-line/80 text-slate-700 px-2.5 py-0.5 rounded-full">Biosecurity</span>
+                    </div>
+                </div>
+
+                <!-- Sector 4: Companion & Family Pets -->
+                <div class="p-6 rounded-3xl bg-[#F8FCFC] border border-edge hover:border-teal/50 hover:shadow-md transition-all flex flex-col justify-between group">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
+                            🐕
+                        </div>
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-sky-600 block mb-1">Companion Animals</span>
+                        <h3 class="text-base font-extrabold text-deep font-heading">Pets &amp; Domestic Health</h3>
+                        <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
+                            Compassionate primary care, canine parvovirus emergency triage, digital vaccination schedule tracking, dermatology, and licensed surgical consults.
+                        </p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-edge flex flex-wrap gap-1.5">
+                        <span class="text-[10px] font-semibold bg-white border border-line/80 text-slate-700 px-2.5 py-0.5 rounded-full">Parvo Triage</span>
+                        <span class="text-[10px] font-semibold bg-white border border-line/80 text-slate-700 px-2.5 py-0.5 rounded-full">Vaccine Logs</span>
+                        <span class="text-[10px] font-semibold bg-white border border-line/80 text-slate-700 px-2.5 py-0.5 rounded-full">Surgery</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Continuous Growth & Expansion Ribbon -->
+            <div class="mt-8 sm:mt-10 p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-soft via-white to-soft/80 border border-line/80 flex flex-col md:flex-row items-center justify-between gap-5 shadow-2xs">
+                <div class="flex items-center gap-3.5 text-left">
+                    <div class="w-10 h-10 rounded-2xl bg-teal text-white flex items-center justify-center text-base shrink-0 shadow-xs">
+                        <i class="fas fa-arrows-spin animate-spin text-xs"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h4 class="text-xs sm:text-sm font-extrabold text-deep font-heading">
+                                Continuously Growing Animal Health Ecosystem
+                            </h4>
+                            <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                                Scaling Nationwide
+                            </span>
+                        </div>
+                        <p class="text-slate-500 text-[11px] sm:text-xs mt-0.5 leading-relaxed">
+                            Our clinical models and telemedicine network actively learn and expand to support all domestic, aquatic, and working animals across Bangladesh.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Expansive Category Chips (Showcasing Endless Expansion) -->
+                <div class="flex flex-wrap items-center justify-center md:justify-end gap-1.5 shrink-0">
+                    <span class="px-3 py-1 rounded-xl bg-white border border-line/70 text-slate-700 text-xs font-semibold shadow-2xs">
+                        🐟 Aquaculture
+                    </span>
+                    <span class="px-3 py-1 rounded-xl bg-white border border-line/70 text-slate-700 text-xs font-semibold shadow-2xs">
+                        🐎 Equine
+                    </span>
+                    <span class="px-3 py-1 rounded-xl bg-white border border-line/70 text-slate-700 text-xs font-semibold shadow-2xs">
+                        🦆 Waterfowl
+                    </span>
+                    <span class="px-3 py-1 rounded-xl bg-white border border-line/70 text-slate-700 text-xs font-semibold shadow-2xs">
+                        🐃 Buffalo
+                    </span>
+                    <a href="#support" class="px-3 py-1 rounded-xl bg-teal/10 hover:bg-teal/20 text-teal text-xs font-bold transition-colors no-underline inline-flex items-center gap-1">
+                        <span>+ Custom Animal Inquiries</span>
+                        <i class="fas fa-arrow-right text-[10px]"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ===== HOW DAILYVET WORKS SECTION ===== -->
+    <section id="how-it-works" class="py-16 sm:py-24 bg-[#F8FCFC] border-b border-edge">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            
+            <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-teal/10 text-teal text-xs font-bold mb-3">
+                <span>Simple 3-Step Process</span>
+            </div>
+            
+            <h2 class="text-2xl sm:text-4xl font-extrabold text-deep tracking-tight font-heading">
+                How DailyVet Works for Keepers &amp; Doctors
+            </h2>
+            <p class="text-xs sm:text-base text-slate-500 max-w-2xl mx-auto mt-2">
+                Designed to be straightforward, intuitive, and accessible from any smartphone or computer without complicated downloads.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mt-12 text-left">
+                <!-- Step 1 -->
+                <div class="p-6 sm:p-8 bg-white rounded-3xl border border-edge shadow-xs hover:shadow-md transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-deep text-white font-extrabold text-lg flex items-center justify-center mb-5 shadow-xs">
+                            01
+                        </div>
+                        <h3 class="text-lg font-bold text-deep font-heading">Create Your Free Account</h3>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-2 leading-relaxed">
+                            Get started in under 30 seconds. Choose your animals, set your farm area, and get immediate access to AI screening and vet advice.
+                        </p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-edge text-xs font-bold text-teal flex items-center gap-1.5">
+                        <i class="fas fa-check"></i> Instant access
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="p-6 sm:p-8 bg-white rounded-3xl border border-edge shadow-xs hover:shadow-md transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-teal text-white font-extrabold text-lg flex items-center justify-center mb-5 shadow-xs">
+                            02
+                        </div>
+                        <h3 class="text-lg font-bold text-deep font-heading">AI Diagnosis or Find a Vet</h3>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-2 leading-relaxed">
+                            Describe animal symptoms to DailyVet AI for 24/7 initial triaging, or connect directly with certified veterinary surgeons in your district.
+                        </p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-edge text-xs font-bold text-teal flex items-center gap-1.5">
+                        <i class="fas fa-check"></i> 96% symptom matching
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="p-6 sm:p-8 bg-white rounded-3xl border border-edge shadow-xs hover:shadow-md transition-all flex flex-col justify-between">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-600 text-white font-extrabold text-lg flex items-center justify-center mb-5 shadow-xs">
+                            03
+                        </div>
+                        <h3 class="text-lg font-bold text-deep font-heading">Remedies &amp; Climate Telemetry</h3>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-2 leading-relaxed">
+                            Receive home remedy steps, dosage safety guides, and stay ahead of regional climate disease outbreaks with NASA satellite telemetry.
+                        </p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-edge text-xs font-bold text-emerald-600 flex items-center gap-1.5">
+                        <i class="fas fa-check"></i> 24h Telemedicine SLA
+                    </div>
+                </div>
+            </div>
+
+            <!-- Get Started Callout Button -->
+            <div class="mt-10">
+                <a href="account.html" class="inline-flex items-center gap-2.5 px-7 py-3.5 bg-gradient-to-r from-deep to-teal text-white font-bold text-sm rounded-2xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all no-underline">
+                    <span>Get Started Free</span>
+                    <i class="fas fa-arrow-right text-xs"></i>
+                </a>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ===== CORE FEATURES & SERVICES SECTION ===== -->
+    <section id="features" class="py-16 sm:py-24 bg-white border-b border-edge">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-teal/10 text-teal text-xs font-bold mb-3">
+                    <span>Comprehensive Clinical Suite</span>
+                </div>
+                <h2 class="text-2xl sm:text-4xl font-extrabold text-deep tracking-tight font-heading">
+                    Engineered for Livestock Keepers &amp; Pet Parents
+                </h2>
+                <p class="text-xs sm:text-base text-slate-500 mt-2">
+                    Combining artificial intelligence, registered medical practitioners, and real-time remote sensing to safeguard animal health.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                
+                <!-- Feature 1: Clinical AI -->
+                <div class="p-6 bg-[#F8FCFC] rounded-3xl border border-edge hover:border-teal/40 transition-all flex flex-col justify-between group">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-teal/10 text-teal flex items-center justify-center text-xl mb-4 group-hover:scale-105 group-hover:bg-deep group-hover:text-white transition-all">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-deep font-heading">24/7 AI Clinical Symptom Checker</h3>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-2 leading-relaxed">
+                            Immediate triage for acute bovine mastitis, lumpy skin disease (LSD), canine parvovirus, poultry Ranikhet, and digestive disorders.
+                        </p>
+                    </div>
+                    <a href="login.html" class="inline-flex items-center gap-1.5 text-xs font-bold text-teal mt-4 pt-3 border-t border-edge no-underline group-hover:translate-x-1 transition-transform">
+                        Launch AI Consultant →
+                    </a>
+                </div>
+
+                <!-- Feature 2: Telemedicine Doctors -->
+                <div class="p-6 bg-[#F8FCFC] rounded-3xl border border-edge hover:border-teal/40 transition-all flex flex-col justify-between group">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center text-xl mb-4 group-hover:scale-105 group-hover:bg-sky-600 group-hover:text-white transition-all">
+                            <i class="fas fa-stethoscope"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-deep font-heading">Verified Veterinarian Directory</h3>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-2 leading-relaxed">
+                            Search and directly contact registered doctors from BAU, CVASU, SAU across all 64 districts for farm visits and clinical consultations.
+                        </p>
+                    </div>
+                    <a href="login.html" class="inline-flex items-center gap-1.5 text-xs font-bold text-sky-600 mt-4 pt-3 border-t border-edge no-underline group-hover:translate-x-1 transition-transform">
+                        Find Certified Vets →
+                    </a>
+                </div>
+
+                <!-- Feature 3: Emergency Rescue 16358 -->
+                <div class="p-6 bg-[#F8FCFC] rounded-3xl border border-edge hover:border-red-300 transition-all flex flex-col justify-between group">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-red-50 text-danger flex items-center justify-center text-xl mb-4 group-hover:scale-105 group-hover:bg-danger group-hover:text-white transition-all">
+                            <i class="fas fa-truck-medical"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-deep font-heading">Animal Emergency Hotline (16358)</h3>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-2 leading-relaxed">
+                            Severe bleeding, difficult animal birth (dystocia), poisonings, or trauma. One-tap instant connection to national veterinary emergency dispatch.
+                        </p>
+                    </div>
+                    <a href="tel:16358" class="inline-flex items-center gap-1.5 text-xs font-bold text-danger mt-4 pt-3 border-t border-edge no-underline">
+                        Call Emergency Desk (16358) →
+                    </a>
+                </div>
+
+                <!-- Feature 4: NASA Climate Radar -->
+                <div id="climate" class="p-6 bg-[#F8FCFC] rounded-3xl border border-edge hover:border-teal/40 transition-all flex flex-col justify-between group">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl mb-4 group-hover:scale-105 group-hover:bg-emerald-600 group-hover:text-white transition-all">
+                            <i class="fas fa-satellite-dish"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-deep font-heading">NASA Satellite Outbreak Radar</h3>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-2 leading-relaxed">
+                            Continuous environmental remote sensing using NASA POWER, GPM, and Open-Meteo models to forecast Temperature-Humidity Index (THI) & disease vectors.
+                        </p>
+                    </div>
+                    <a href="login.html" class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 mt-4 pt-3 border-t border-edge no-underline group-hover:translate-x-1 transition-transform">
+                        Explore Climate Radar →
+                    </a>
+                </div>
+
+                <!-- Feature 5: Vision & Prescription OCR -->
+                <div class="p-6 bg-[#F8FCFC] rounded-3xl border border-edge hover:border-teal/40 transition-all flex flex-col justify-between group">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl mb-4 group-hover:scale-105 group-hover:bg-amber-600 group-hover:text-white transition-all">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-deep font-heading">PR Scanner &amp; Excreta Diagnostics</h3>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-2 leading-relaxed">
+                            Digitize handwritten veterinary prescriptions with intelligent OCR and screen livestock fecal samples for digestive and parasitic disorders.
+                        </p>
+                    </div>
+                    <a href="login.html" class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 mt-4 pt-3 border-t border-edge no-underline group-hover:translate-x-1 transition-transform">
+                        Launch AI Scanners →
+                    </a>
+                </div>
+
+                <!-- Feature 6: Community Network -->
+                <div class="p-6 bg-[#F8FCFC] rounded-3xl border border-edge hover:border-teal/40 transition-all flex flex-col justify-between group">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl mb-4 group-hover:scale-105 group-hover:bg-purple-600 group-hover:text-white transition-all">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-deep font-heading">National Farmer Community</h3>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-2 leading-relaxed">
+                            Connect with thousands of verified dairy farmers, goat keepers, poultry breeders, and pet owners across Bangladesh to exchange proven care tips.
+                        </p>
+                    </div>
+                    <a href="community.html" class="inline-flex items-center gap-1.5 text-xs font-bold text-purple-600 mt-4 pt-3 border-t border-edge no-underline group-hover:translate-x-1 transition-transform">
+                        Visit Community Page →
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ===== DOCTOR ONBOARDING SPOTLIGHT SECTION ===== -->
+    <section id="doctors" class="py-16 sm:py-20 bg-gradient-to-r from-deep via-dark to-[#03525D] text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-8 sm:gap-12">
+                
+                <div class="max-w-2xl text-center lg:text-left flex flex-col gap-3">
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/15 backdrop-blur-xs text-xs font-semibold text-teal-100 self-center lg:self-start border border-white/15">
+                        <i class="fas fa-user-md text-emerald-400"></i>
+                        <span>Veterinary Practitioner Network</span>
+                    </div>
+                    <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight font-heading leading-tight">
+                        Are you a Licensed Veterinarian or Surgeon?
+                    </h2>
+                    <p class="text-teal-100/90 text-xs sm:text-base leading-relaxed">
+                        Join Bangladesh's largest digital veterinary healthcare network. Provide digital prescriptions, accept telemedicine inquiries, manage local farm appointments, and verify your practice with our BVC-standard doctor badge.
+                    </p>
+                    
+                    <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2 text-xs font-semibold text-teal-200">
+                        <span><i class="fas fa-check text-emerald-400"></i> Verified Doctor Profile</span>
+                        <span><i class="fas fa-check text-emerald-400"></i> Digital Rx Tools</span>
+                        <span><i class="fas fa-check text-emerald-400"></i> Clinical Triage Queue</span>
+                    </div>
+                </div>
+
+                <div class="flex-shrink-0 flex flex-col sm:flex-row items-center gap-3">
+                    <a href="vet-login.html"
+                       class="w-full sm:w-auto px-6 py-4 bg-white hover:bg-soft text-deep rounded-2xl font-extrabold text-sm sm:text-base shadow-xl shadow-black/20 hover:-translate-y-0.5 transition-all no-underline inline-flex items-center justify-center gap-2">
+                        <i class="fas fa-user-md text-teal"></i>
+                        <span>Register as a Licensed Vet</span>
+                    </a>
+                    <a href="login.html"
+                       class="w-full sm:w-auto px-6 py-4 bg-white/10 hover:bg-white/20 border border-white/25 text-white rounded-2xl font-bold text-sm transition-all no-underline inline-flex items-center justify-center">
+                        Doctor Sign In
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FAQ ACCORDION SECTION ===== -->
+    <section id="faq" class="py-16 sm:py-24 bg-[#F8FCFC] border-b border-edge">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            
+            <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-teal/10 text-teal text-xs font-bold mb-3">
+                <span>Help &amp; Answers</span>
+            </div>
+            
+            <h2 class="text-2xl sm:text-4xl font-extrabold text-deep tracking-tight font-heading">
+                Frequently Asked Questions
+            </h2>
+            <p class="text-xs sm:text-base text-slate-500 mt-2 mb-10">
+                Everything you need to know about using DailyVet on your phone or computer.
+            </p>
+
+            <div class="flex flex-col gap-3.5 text-left">
+                
+                <!-- FAQ 1 -->
+                <details class="group bg-white rounded-2xl border border-edge p-4 sm:p-5 transition-all [&[open]]:border-teal/50 shadow-xs">
+                    <summary class="flex items-center justify-between font-bold text-sm sm:text-base text-deep cursor-pointer list-none select-none">
+                        <span>Is DailyVet free to use for farmers and pet owners?</span>
+                        <i class="fas fa-chevron-down text-xs text-mute group-open:rotate-180 transition-transform"></i>
+                    </summary>
+                    <p class="text-xs sm:text-sm text-slate-600 mt-3 pt-3 border-t border-edge/60 leading-relaxed">
+                        Yes, DailyVet's core services — including AI clinical symptom triaging, emergency guides, community discussions, and NASA satellite weather alerts — are 100% free for all livestock farmers and pet parents in Bangladesh.
+                    </p>
+                </details>
+
+                <!-- FAQ 2 -->
+                <details class="group bg-white rounded-2xl border border-edge p-4 sm:p-5 transition-all [&[open]]:border-teal/50 shadow-xs">
+                    <summary class="flex items-center justify-between font-bold text-sm sm:text-base text-deep cursor-pointer list-none select-none">
+                        <span>How do I get started with DailyVet?</span>
+                        <i class="fas fa-chevron-down text-xs text-mute group-open:rotate-180 transition-transform"></i>
+                    </summary>
+                    <p class="text-xs sm:text-sm text-slate-600 mt-3 pt-3 border-t border-edge/60 leading-relaxed">
+                        Getting started takes less than a minute. Simply create your account, select the animals you care for (cattle, poultry, goats, pets, etc.), and you can immediately begin AI symptom screenings, view regional climate risks, or connect with licensed doctors.
+                    </p>
+                </details>
+
+                <!-- FAQ 3 -->
+                <details class="group bg-white rounded-2xl border border-edge p-4 sm:p-5 transition-all [&[open]]:border-teal/50 shadow-xs">
+                    <summary class="flex items-center justify-between font-bold text-sm sm:text-base text-deep cursor-pointer list-none select-none">
+                        <span>How accurate is the DailyVet Clinical AI?</span>
+                        <i class="fas fa-chevron-down text-xs text-mute group-open:rotate-180 transition-transform"></i>
+                    </summary>
+                    <p class="text-xs sm:text-sm text-slate-600 mt-3 pt-3 border-t border-edge/60 leading-relaxed">
+                        DailyVet AI is trained on certified veterinary literature and Bangladeshi field protocols, achieving high triage accuracy for common diseases like Mastitis, FMD, Anthrax, PPR, Newcastle, and Parvo. However, AI provides clinical guidance and first aid; we always recommend consulting a licensed veterinarian for prescription medication.
+                    </p>
+                </details>
+
+                <!-- FAQ 4 -->
+                <details class="group bg-white rounded-2xl border border-edge p-4 sm:p-5 transition-all [&[open]]:border-teal/50 shadow-xs">
+                    <summary class="flex items-center justify-between font-bold text-sm sm:text-base text-deep cursor-pointer list-none select-none">
+                        <span>What should I do during an animal emergency?</span>
+                        <i class="fas fa-chevron-down text-xs text-mute group-open:rotate-180 transition-transform"></i>
+                    </summary>
+                    <p class="text-xs sm:text-sm text-slate-600 mt-3 pt-3 border-t border-edge/60 leading-relaxed">
+                        Immediately dial the National Veterinary Hotline at <strong>16358</strong> or visit our Emergency section to view instant bleeding control, dystocia protocols, and mobile clinic contacts in your area.
+                    </p>
+                </details>
+
+                <!-- FAQ 5 -->
+                <details class="group bg-white rounded-2xl border border-edge p-4 sm:p-5 transition-all [&[open]]:border-teal/50 shadow-xs">
+                    <summary class="flex items-center justify-between font-bold text-sm sm:text-base text-deep cursor-pointer list-none select-none">
+                        <span>How do doctors join the DailyVet network?</span>
+                        <i class="fas fa-chevron-down text-xs text-mute group-open:rotate-180 transition-transform"></i>
+                    </summary>
+                    <p class="text-xs sm:text-sm text-slate-600 mt-3 pt-3 border-t border-edge/60 leading-relaxed">
+                        Licensed veterinary practitioners with degrees from recognized universities (BAU, CVASU, SAU, etc.) can register directly via our <a href="vet-login.html" class="text-teal font-bold hover:underline">Doctor Portal</a> using their phone number to receive clinical consult requests.
+                    </p>
+                </details>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ===== DEDICATED LANDING PAGE SUPPORT & CONTACT DESK ===== -->
+    <section id="support" class="py-16 sm:py-24 bg-white border-b border-edge relative overflow-hidden">
+        <!-- Subtle Background Accents -->
+        <div class="absolute top-0 right-0 w-96 h-96 bg-teal/5 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute bottom-0 left-0 w-96 h-96 bg-deep/5 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <!-- Section Header -->
+            <div class="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal/10 border border-teal/20 text-deep text-xs font-bold shadow-2xs mb-4">
+                    <i class="fas fa-headset text-teal"></i>
+                    <span>Direct Assistance &bull; Contact Care Desk</span>
+                </div>
+                <h2 class="text-2xl sm:text-4xl font-extrabold text-deep tracking-tight font-heading">
+                    Support Desk &amp; Contact Us
+                </h2>
+                <p class="text-xs sm:text-base text-slate-500 mt-2 leading-relaxed">
+                    Have questions about DailyVet, need urgent livestock guidance, or want to partner with our clinical veterinary network? Reach our care team directly.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+                
+                <!-- Left Column (5 cols): Direct Helplines & Care Channels -->
+                <div class="lg:col-span-5 flex flex-col gap-4">
+                    
+                    <!-- Emergency Helpline Card (Featured) -->
+                    <div class="p-6 rounded-3xl bg-gradient-to-br from-red-50 via-white to-red-50/50 border border-red-200/80 shadow-xs hover:shadow-md transition-all">
+                        <div class="flex items-center justify-between gap-3 mb-3">
+                            <div class="w-11 h-11 rounded-2xl bg-red-600 text-white flex items-center justify-center text-lg shadow-sm">
+                                <i class="fas fa-phone-volume animate-bounce"></i>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-full bg-red-100 text-red-700 text-[10px] font-extrabold uppercase tracking-wider">
+                                24/7 National Emergency
+                            </span>
+                        </div>
+                        <h3 class="text-base font-bold text-deep font-heading">Veterinary Emergency Hotline</h3>
+                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                            Immediate triage for acute livestock trauma, dystocia, poisoning, or severe animal distress nationwide.
+                        </p>
+                        <div class="mt-4 pt-3 border-t border-red-100 flex items-center justify-between">
+                            <span class="text-xl font-extrabold text-red-600 font-heading">16358</span>
+                            <a href="tel:16358" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs hover:shadow no-underline inline-flex items-center gap-1.5">
+                                <i class="fas fa-phone-alt text-[10px]"></i>
+                                <span>Call 16358 Now</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Email Support Desk Card -->
+                    <div class="p-6 rounded-3xl bg-[#F8FCFC] border border-edge shadow-xs hover:shadow-md transition-all">
+                        <div class="flex items-center justify-between gap-3 mb-3">
+                            <div class="w-11 h-11 rounded-2xl bg-teal/10 text-teal flex items-center justify-center text-lg shadow-2xs">
+                                <i class="fas fa-envelope-open-text"></i>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-full bg-teal/10 text-teal text-[10px] font-bold">
+                                SLA &lt; 24h
+                            </span>
+                        </div>
+                        <h3 class="text-base font-bold text-deep font-heading">Care Email Helpdesk</h3>
+                        <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                            Account inquiries, doctor onboarding questions, and institutional farm partnerships.
+                        </p>
+                        <div class="mt-4 pt-3 border-t border-edge flex items-center justify-between">
+                            <span class="text-xs font-bold text-deep">support@dailyvet.app</span>
+                            <a href="mailto:support@dailyvet.app" class="px-4 py-2 bg-deep hover:bg-dark text-white rounded-xl text-xs font-bold transition-all no-underline inline-flex items-center gap-1.5">
+                                <i class="fas fa-envelope text-[10px]"></i>
+                                <span>Email Us</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- WhatsApp & Regional Hubs Card -->
+                    <div class="p-6 rounded-3xl bg-soft/60 border border-edge shadow-xs flex flex-col gap-3.5">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center text-lg shrink-0">
+                                <i class="fab fa-whatsapp"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-deep">WhatsApp Live Support</h4>
+                                <span class="text-xs text-slate-500">+880 1700-000000 &bull; Sat – Thu, 9am – 8pm</span>
+                            </div>
+                        </div>
+                        <div class="pt-3 border-t border-edge text-xs text-slate-600 leading-relaxed flex flex-col gap-1.5">
+                            <div class="flex items-start gap-2">
+                                <i class="fas fa-location-dot text-teal mt-0.5"></i>
+                                <span><strong>Clinical Nodes:</strong> Dhaka &bull; BAU Mymensingh &bull; CVASU Chattogram &bull; Bogura</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Column (7 cols): Contact Us Form -->
+                <div class="lg:col-span-7">
+                    <div class="bg-[#F8FCFC] border border-edge p-6 sm:p-8 rounded-3xl shadow-sm">
+                        <div class="mb-6">
+                            <h3 class="text-lg sm:text-xl font-extrabold text-deep font-heading">
+                                Send Us a Direct Message
+                            </h3>
+                            <p class="text-xs sm:text-sm text-slate-500 mt-1">
+                                Fill out this contact form and our clinical coordination team will respond promptly.
+                            </p>
+                        </div>
+
+                        <!-- Success Alert Message (Hidden initially) -->
+                        <div id="contactSuccessMsg" class="hidden mb-5 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-3 animate-in fade-in duration-200">
+                            <i class="fas fa-circle-check text-emerald-600 text-lg shrink-0"></i>
+                            <div>
+                                <strong class="block text-emerald-900">Message Received!</strong>
+                                <span>Thank you for contacting DailyVet. Our care coordinator will call or email you within 24 hours.</span>
+                            </div>
+                        </div>
+
+                        <form id="landingContactForm" onsubmit="handleLandingContactSubmit(event)" class="flex flex-col gap-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-deep mb-1.5" for="contactName">Your Name *</label>
+                                    <input type="text"
+                                           id="contactName"
+                                           required
+                                           placeholder="e.g. Md. Rafiqul Islam"
+                                           class="w-full px-4 py-3 bg-white border border-line rounded-xl text-xs sm:text-sm text-deep placeholder-slate-400 focus:outline-none focus:border-teal focus:ring-2 focus:ring-teal/20 transition-all" />
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-deep mb-1.5" for="contactPhone">Mobile Number or Email *</label>
+                                    <input type="text"
+                                           id="contactPhone"
+                                           required
+                                           placeholder="e.g. 01712-XXXXXX / name@email.com"
+                                           class="w-full px-4 py-3 bg-white border border-line rounded-xl text-xs sm:text-sm text-deep placeholder-slate-400 focus:outline-none focus:border-teal focus:ring-2 focus:ring-teal/20 transition-all" />
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-deep mb-1.5" for="contactCategory">Inquiry Type</label>
+                                    <select id="contactCategory"
+                                            class="w-full px-4 py-3 bg-white border border-line rounded-xl text-xs sm:text-sm text-deep focus:outline-none focus:border-teal focus:ring-2 focus:ring-teal/20 transition-all">
+                                        <option value="General Question">General Question about DailyVet</option>
+                                        <option value="Urgent Animal Help">Urgent Animal Health Help</option>
+                                        <option value="Doctor Onboarding">Veterinary Doctor Verification</option>
+                                        <option value="Farmer Cooperative">Farmer Cooperative &amp; Dairy Group</option>
+                                        <option value="Technical Support">Website / App Technical Issue</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-deep mb-1.5" for="contactDivision">Division (Optional)</label>
+                                    <select id="contactDivision"
+                                            class="w-full px-4 py-3 bg-white border border-line rounded-xl text-xs sm:text-sm text-deep focus:outline-none focus:border-teal focus:ring-2 focus:ring-teal/20 transition-all">
+                                        <option value="">Select Division (Optional)</option>
+                                        <option value="Dhaka">Dhaka</option>
+                                        <option value="Chittagong">Chattogram</option>
+                                        <option value="Rajshahi">Rajshahi</option>
+                                        <option value="Khulna">Khulna</option>
+                                        <option value="Barisal">Barishal</option>
+                                        <option value="Sylhet">Sylhet</option>
+                                        <option value="Rangpur">Rangpur</option>
+                                        <option value="Mymensingh">Mymensingh</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-deep mb-1.5" for="contactMessage">How can we help you? *</label>
+                                <textarea id="contactMessage"
+                                          rows="4"
+                                          required
+                                          placeholder="Tell us about your animals, farm inquiry, questions, or how our clinical team can assist..."
+                                          class="w-full px-4 py-3 bg-white border border-line rounded-xl text-xs sm:text-sm text-deep placeholder-slate-400 focus:outline-none focus:border-teal focus:ring-2 focus:ring-teal/20 transition-all resize-none"></textarea>
+                            </div>
+
+                            <button type="submit"
+                                    id="contactSubmitBtn"
+                                    class="w-full py-3.5 px-6 bg-gradient-to-r from-deep via-dark to-teal hover:from-dark hover:to-deep text-white rounded-xl text-xs sm:text-sm font-bold shadow-md shadow-deep/15 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all cursor-pointer flex items-center justify-center gap-2 border-0">
+                                <i class="fas fa-paper-plane text-xs text-teal-200"></i>
+                                <span>Send Message to Support Desk</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FINAL CALL TO ACTION BANNER ===== -->
+    <section class="py-14 sm:py-20 bg-white">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-deep via-dark to-[#03525D] p-8 sm:p-12 text-white text-center flex flex-col items-center gap-5 shadow-xl shadow-deep/20">
+                <div class="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center p-3 border border-white/20">
+                    <img src="assets/dailyvetlogo.png" alt="DailyVet" class="w-full h-full object-contain" />
+                </div>
+                <h2 class="text-2xl sm:text-4xl font-extrabold font-heading tracking-tight max-w-xl">
+                    Get Instant Veterinary Care for Your Animals Today
+                </h2>
+                <p class="text-xs sm:text-base text-teal-100 max-w-lg leading-relaxed">
+                    Join thousands of livestock keepers and pet parents across Bangladesh. Start your free consultation now.
+                </p>
+                <div class="flex flex-col sm:flex-row items-center gap-3 pt-2">
+                    <a href="account.html"
+                       class="w-full sm:w-auto px-8 py-4 bg-white text-deep hover:bg-soft rounded-2xl font-extrabold text-sm sm:text-base shadow-lg hover:-translate-y-0.5 transition-all no-underline inline-flex items-center justify-center gap-2">
+                        <i class="fas fa-sparkles text-teal"></i>
+                        <span>Get Started Free</span>
+                    </a>
+                    <a href="#support"
+                       class="w-full sm:w-auto px-6 py-4 bg-white/15 hover:bg-white/25 text-white border border-white/20 rounded-2xl font-bold text-sm transition-all no-underline inline-flex items-center justify-center gap-2">
+                        <i class="fas fa-headset"></i>
+                        <span>Contact Support Desk</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FULL WEBSITE FOOTER ===== -->
+    <footer class="bg-slate-900 text-slate-400 text-xs pt-16 pb-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 pb-12 border-b border-slate-800">
+                
+                <!-- Brand Column -->
+                <div class="lg:col-span-2 flex flex-col gap-3">
+                    <div class="flex items-center gap-3">
+                        <img src="assets/dailyvetlogo.png" alt="DailyVet" class="w-10 h-10 object-contain drop-shadow-xs" />
+                        <span class="text-2xl font-extrabold text-white font-heading">
+                            <span>Daily</span><span class="text-teal">Vet</span>
+                        </span>
+                    </div>
+                    <p class="text-slate-400 text-xs leading-relaxed max-w-sm mt-1">
+                        Bangladesh's pioneering clinical AI &amp; veterinary intelligence platform, dedicated to animal welfare, smallholder farmer prosperity, and livestock health security.
+                    </p>
+                    <div class="flex items-center gap-3 pt-2">
+                        <a href="tel:16358" class="px-3 py-1.5 rounded-xl bg-red-950/80 border border-red-800 text-red-300 font-bold text-xs inline-flex items-center gap-2 no-underline">
+                            <i class="fas fa-phone-alt text-[10px]"></i>
+                            <span>Hotline: 16358</span>
+                        </a>
+                        <span class="text-slate-500 text-[11px]">24/7 SLA &lt; 24h</span>
+                    </div>
+                </div>
+
+                <!-- Column 2: Platform Links -->
+                <div class="flex flex-col gap-2.5">
+                    <span class="font-bold text-white text-xs uppercase tracking-wider mb-1">Platform</span>
+                    <a href="login.html" class="hover:text-teal transition-colors no-underline">Sign In</a>
+                    <a href="account.html" class="hover:text-teal transition-colors no-underline">Create Account</a>
+                    <a href="vet-login.html" class="hover:text-teal transition-colors no-underline">Doctor Registration</a>
+                    <a href="account.html" class="hover:text-teal transition-colors no-underline">Community Network</a>
+                    <a href="#support" class="hover:text-teal transition-colors no-underline">Contact Support Desk</a>
+                </div>
+
+                <!-- Column 3: Clinical Tools -->
+                <div class="flex flex-col gap-2.5">
+                    <span class="font-bold text-white text-xs uppercase tracking-wider mb-1">Clinical Tools</span>
+                    <a href="login.html" class="hover:text-teal transition-colors no-underline">AI Symptom Checker</a>
+                    <a href="login.html" class="hover:text-teal transition-colors no-underline">Verified Vet Directory</a>
+                    <a href="login.html" class="hover:text-teal transition-colors no-underline">Prescription OCR Scanner</a>
+                    <a href="login.html" class="hover:text-teal transition-colors no-underline">Excreta Health Scan</a>
+                    <a href="login.html" class="hover:text-teal transition-colors no-underline">NASA Outbreak Radar</a>
+                </div>
+
+                <!-- Column 4: Contact & Emergency -->
+                <div class="flex flex-col gap-2.5">
+                    <span class="font-bold text-white text-xs uppercase tracking-wider mb-1">Direct Assistance</span>
+                    <span class="text-slate-400">Emergency: <strong class="text-white">16358</strong></span>
+                    <span class="text-slate-400">Desk: <strong class="text-white">support@dailyvet.app</strong></span>
+                    <span class="text-slate-400">Dhaka &bull; Mymensingh &bull; Chattogram &bull; Bogura</span>
+                    <a href="#support" class="text-teal font-semibold hover:underline mt-1">Contact Support Desk →</a>
+                </div>
+
+            </div>
+
+            <!-- Bottom Disclaimer & Copyright -->
+            <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500">
+                <p class="m-0 text-center sm:text-left">
+                    &copy; 2026 DailyVet. All rights reserved. Clinical AI decisions are advisory; always consult a licensed doctor for controlled medications.
+                </p>
+                <div class="flex items-center gap-4">
+                    <a href="account.html" class="hover:text-slate-400 transition-colors">Privacy</a>
+                    <span>&bull;</span>
+                    <a href="account.html" class="hover:text-slate-400 transition-colors">Terms of Care</a>
+                    <span>&bull;</span>
+                    <a href="emergency.html" class="hover:text-slate-400 transition-colors">Emergency Protocol</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script defer src="js/scale.js"></script>
+
+    <!-- Navigation & Interactive Scripts -->
+    <script>
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            const icon = document.getElementById('menuIcon');
+            if (!menu) return;
+            const isOpen = !menu.classList.contains('hidden');
+            if (isOpen) {
+                menu.classList.add('hidden');
+                if (icon) { icon.classList.remove('fa-times'); icon.classList.add('fa-bars'); }
+            } else {
+                menu.classList.remove('hidden');
+                if (icon) { icon.classList.remove('fa-bars'); icon.classList.add('fa-times'); }
+            }
+        }
+
+        // Dedicated Landing Page Contact Us Form Handler
+        function handleLandingContactSubmit(e) {
+            if (e) e.preventDefault();
+            const name = document.getElementById('contactName')?.value.trim();
+            const phone = document.getElementById('contactPhone')?.value.trim();
+            const category = document.getElementById('contactCategory')?.value || 'General Question';
+            const division = document.getElementById('contactDivision')?.value || 'Not specified';
+            const msg = document.getElementById('contactMessage')?.value.trim();
+            const successEl = document.getElementById('contactSuccessMsg');
+            const btn = document.getElementById('contactSubmitBtn');
+
+            if (!name || !phone || !msg) {
+                alert('Please enter your name, contact number/email, and your message.');
+                return;
+            }
+
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin text-xs"></i> <span>Sending Message...</span>';
+            }
+
+            // Save inquiry to localStorage for offline retention and coordination
+            try {
+                const stored = JSON.parse(localStorage.getItem('dailyvet_landing_inquiries') || '[]');
+                stored.push({
+                    name: name,
+                    phone: phone,
+                    category: category,
+                    division: division,
+                    message: msg,
+                    timestamp: new Date().toISOString()
+                });
+                localStorage.setItem('dailyvet_landing_inquiries', JSON.stringify(stored));
+            } catch (err) {
+                console.warn('Could not cache inquiry:', err);
+            }
+
+            setTimeout(function() {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-paper-plane text-xs text-teal-200"></i> <span>Send Message to Support Desk</span>';
+                }
+                if (successEl) {
+                    successEl.classList.remove('hidden');
+                }
+                const form = document.getElementById('landingContactForm');
+                if (form) form.reset();
+                setTimeout(function() {
+                    if (successEl) successEl.classList.add('hidden');
+                }, 8000);
+            }, 600);
+        }
+
+        // Service Worker register (PWA)
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(() => console.log('✅ Service Worker registered'))
+                .catch(err => console.warn('SW registration failed:', err));
+        }
+    </script>
+</body>
+</html>

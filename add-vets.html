@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DailyVet Admin | Doctor Directory Seeder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+
+    <script src="js/tailwind-v4.js"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-deep: #035D69;
+            --color-dark: #023d47;
+            --color-teal: #088F8F;
+            --color-line: #b2e0e6;
+            --color-soft: #eef7f8;
+            --color-edge: #e0f0f2;
+            --color-mute: #8ab8be;
+            --color-danger: #e74c3c;
+        }
+        .success { @apply text-emerald-600 font-semibold; }
+        .error { @apply text-rose-600 font-semibold; }
+        .info { @apply text-teal; }
+        .warning-text { @apply text-amber-600; }
+    </style>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+</head>
+<body class="bg-gradient-to-b from-[#f4f9fa] to-[#eef5f6] text-slate-800 min-h-screen py-6 px-4 sm:px-6 lg:px-8 antialiased flex justify-center items-start">
+    <div class="w-full max-w-4xl bg-white/95 backdrop-blur-md border border-edge rounded-3xl shadow-[0_20px_60px_rgba(3,93,105,0.08)] p-6 sm:p-10 flex flex-col gap-6">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between pb-4 border-b border-edge text-left">
+            <div class="flex items-center gap-3">
+                <button class="w-10 h-10 rounded-xl bg-soft hover:bg-edge text-deep flex items-center justify-center transition-colors cursor-pointer border border-line flex-shrink-0" onclick="window.location.href='home.html'" title="Return Home">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-deep to-teal text-white flex items-center justify-center text-lg shadow-sm flex-shrink-0">
+                        <i class="fas fa-user-doctor"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-extrabold text-deep tracking-tight">Doctor Directory Seeder</h1>
+                        <p class="text-xs font-semibold text-teal">Database administrative provisioning tool</p>
+                    </div>
+                </div>
+            </div>
+            <span class="px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-bold border border-amber-200">
+                Admin Console
+            </span>
+        </div>
+
+        <!-- Warning -->
+        <div class="bg-amber-50/90 border border-amber-200 p-4 rounded-2xl text-amber-900 text-xs sm:text-sm leading-relaxed flex items-start gap-3 shadow-xs">
+            <i class="fas fa-triangle-exclamation text-amber-600 text-base shrink-0 mt-0.5"></i>
+            <div>
+                <strong>Administrative Setup:</strong> This seeder syncs registered veterinary practitioners into the Cloud Firestore <code class="px-1.5 py-0.5 bg-white border border-amber-300 rounded text-xs font-mono">vets</code> collection. Duplicate phone numbers are skipped automatically.
+            </div>
+        </div>
+
+        <!-- Metrics Overview -->
+        <div class="bg-soft/60 border border-edge p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm text-deep">
+            <span class="flex items-center gap-2 font-bold">
+                <i class="fas fa-database text-teal text-base"></i>
+                <span>Total Ready To Sync:</span>
+            </span>
+            <span class="text-lg font-extrabold text-deep bg-white px-3 py-1 rounded-xl border border-line shadow-xs">
+                <span id="totalCount">0</span> Practitioners
+            </span>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="bg-white p-4 rounded-2xl text-center border border-slate-200 shadow-xs">
+                <div class="text-2xl sm:text-3xl font-extrabold text-deep" id="statDairy">0</div>
+                <div class="text-xs text-teal font-bold mt-1">🐄 Dairy & Livestock</div>
+            </div>
+            <div class="bg-white p-4 rounded-2xl text-center border border-slate-200 shadow-xs">
+                <div class="text-2xl sm:text-3xl font-extrabold text-deep" id="statPet">0</div>
+                <div class="text-xs text-teal font-bold mt-1">🐕 Pet Care</div>
+            </div>
+            <div class="bg-white p-4 rounded-2xl text-center border border-slate-200 shadow-xs">
+                <div class="text-2xl sm:text-3xl font-extrabold text-deep" id="statPoultry">0</div>
+                <div class="text-xs text-teal font-bold mt-1">🐔 Poultry</div>
+            </div>
+            <div class="bg-white p-4 rounded-2xl text-center border border-slate-200 shadow-xs">
+                <div class="text-2xl sm:text-3xl font-extrabold text-deep" id="statGeneral">0</div>
+                <div class="text-xs text-teal font-bold mt-1">🏥 General Medicine</div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <button id="addBtn" onclick="addAllVets()" class="py-4 px-6 bg-gradient-to-r from-deep to-teal hover:from-dark hover:to-deep text-white rounded-xl text-sm font-bold shadow-lg shadow-teal/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border-none flex items-center justify-center gap-2">
+                <i class="fas fa-cloud-arrow-up"></i>
+                <span>Sync All Vets to Firestore</span>
+            </button>
+
+            <button id="clearBtn" onclick="clearAllVets()" class="py-4 px-6 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-sm font-bold transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                <i class="fas fa-trash-can text-danger"></i>
+                <span>Purge Vets Collection</span>
+            </button>
+        </div>
+
+        <!-- Log Terminal -->
+        <div class="flex flex-col gap-2 text-left">
+            <label class="text-xs font-bold text-deep uppercase tracking-wider">Sync Log Output</label>
+            <div id="log" class="bg-slate-900 text-emerald-400 border border-slate-800 rounded-2xl p-4 sm:p-5 font-mono text-xs sm:text-sm max-h-96 overflow-y-auto whitespace-pre-wrap leading-relaxed shadow-inner">Ready to add vets...</div>
+        </div>
+    </div>
+
+    <script src="js/firebase-config.js"></script>
+
+    <script>
+        // ============================================
+        // VETS DATA — 35 vets (demo phone numbers)
+        // ⚠️ Verify all numbers before production
+        // ============================================
+        const VETS_DATA = [
+            // ===== DAIRY / FARM VETS =====
+            {
+                name: "Dr. Md. Asaduzzaman Nur",
+                speciality: "Medicine & Surgery",
+                location: "Dinajpur",
+                city: "Dinajpur",
+                phone: "+8801819267661",
+                type: "dairy",
+                available: true,
+                verified: true
+            },
+            {
+                name: "BAU Veterinary Teaching Hospital",
+                speciality: "Animal Medicine",
+                location: "Mymensingh",
+                city: "Mymensingh",
+                phone: "+8801729301016",
+                type: "dairy",
+                available: true,
+                verified: true
+            },
+            {
+                name: "Dr. Md. Farhad Hossain",
+                speciality: "Dairy & Livestock",
+                location: "Chittagong",
+                city: "Chittagong",
+                phone: "+8801711172139",
+                type: "dairy",
+                available: true,
+                verified: true
+            },
+            {
+                name: "CVASU Veterinary Hospital",
+                speciality: "Livestock & Dairy",
+                location: "Khulshi, Chittagong",
+                city: "Chittagong",
+                phone: "+8801314300655",
+                type: "dairy",
+                available: true,
+                verified: true
+            },
+            {
+                name: "Dr. M. A. Halim",
+                speciality: "Dairy Medicine",
+                location: "Bogura",
+                city: "Bogura",
+                phone: "+8801712345670",
+                type: "dairy",
+                available: true,
+                verified: true
+            },
+            {
+                name: "Dr. Shahidul Islam",
+                speciality: "Livestock Surgery",
+                location: "Rajshahi",
+                city: "Rajshahi",
+                phone: "+8801812345671",
+                type: "dairy",
+                available: true,
+                verified: true
+            },
+            {
+                name: "Dr. Md. Motiur Rahman",
+                speciality: "Dairy Nutrition & Health",
+                location: "Pabna",
+                city: "Pabna",
+                phone: "+8801777889900",
+                type: "dairy",
+                available: true,
+                verified: true
+            },
+            {
+                name: "Dr. A.K.M. Khaleduzzaman",
+                speciality: "Reproduction & AI Specialist",
+                location: "Sirajganj",
+                city: "Sirajganj",
+                phone: "+8801888990011",
+                type: "dairy",
+                available: true,
+                verified: true
+            },
+            {
+                name: "Dr. Md. Nazrul Islam",
+                speciality: "Goat & Sheep Medicine",
+                location: "Kushtia",
+                city: "Kushtia",
+                phone: "+8801999001122",
+                type: "dairy",
+                available: true,
+                verified: true
+            },
+
+            // ===== PET VETS (Dog / Cat) =====
+            {
+                name: "Dr. Md. Saidur Rahman",
+                speciality: "Pet Dermatology & Medicine",
+                location: "Gulshan-2, Dhaka",
+                city: "Dhaka",
+                phone: "+8801521319843",
+                type: "pet",
+                available: true,
+                verified: true
+            },
+            {
+                name: "Elite Pet Care",
+                speciality: "Pet Clinic & Care",
+                location: "Dhaka",
+                city: "Dhaka",
+                phone: "+8801818417804",
+                type: "pet",
+                available: true,
+                verified: true
+            },
+            {
+                name: "Banani Pet Care",
+                speciality: "Pet Clinic",
+                location: "Banani, Dhaka",
+                city: "Dhaka",
+                phone: "+8801886334434",
+                type: "pet",
+                available: true,
+                verified: true
+            },
+            {
+                name: "Dr. Kazi Nazrul Islam",
+                speciality: "Pet Surgery",
+                location: "Dhanmondi, Dhaka",
+                city: "Dhaka",
+                phone: "+8801711556677",
+                type: "pet",
+                available: true,
+                verified: true
+            },
+            {
+                name: "Pet Zone Veterinary Clinic",
+                speciality: "General Pet Care",
+                location: "Uttara, Dhaka",
+                city: "Dhaka",
+                phone: "+8801999888777",
+                type: "pet",
+                available: true,
+                verified: true
+            },
+            {
+                name: "Dr. Nusrat Jahan",
+                speciality: "Feline Medicine (Cat Specialist)",
+                location: "Bashundhara, Dhaka",
+                city: "Dhaka",
+                phone: "+8801744556677",
+                type: "pet",
+                available: true,
+                verified: true
+            },
+            {
+                name: "Dr. Md. Tanvir Rahman",
+                speciality: "Canine Medicine (Dog Specialist)",
+                location: "Mirpur, Dhaka",
+                city: "Dhaka",
+                phone: "+8801855667788",
+                type: "pet",
+                available: true,
+                verified: true
+            },
+            {
+                name: "Happy Paws Veterinary Clinic",
+                speciality: "Pet Surgery & Dental",
+                location: "Mohammadpur, Dhaka",
+                city: "Dhaka",
+                phone: "+8801966778899",
+                type: "pet",
+                available: true,
+                verified: true
+            },
+
+            // ===== POULTRY VETS =====
+            {
+                name: "Dr. Md. Rafiqul Islam",
+                speciality: "Poultry Diseases",
+                location: "Gazipur",
+                city: "Gazipur",
+                phone: "+8801711223344",
+                type: "poultry",
+                available: true,
+                verified: true
+            },
+            {
+                name: "Poultry Research & Training Center",
+                speciality: "Poultry Health",
+                location: "Savar, Dhaka",
+                city: "Dhaka",
+                phone: "+8801755667788",
+                type: "poultry",
+                available: true,
+                verified: true
+            },
+            {
+                name: "Dr. Kazi Md. Nurul Huda",
+                speciality: "Poultry Medicine",
+                location: "Bogura",
+                city: "Bogura",
+                phone: "+8801912345679",
+                type: "poultry",
+                available: true,
+                verified: true
+            },
+            {
+                name: "Dr. Aminul Hoque",
+                speciality: "Poultry & Duck Health",
+                location: "Kishoreganj",
+                city: "Kishoreganj",
+                phone: "+8801611223344",
+                type: "poultry",
+                available: true,
+                verified: true
+            },
+            {
+                name: "Dr. Md. Habibur Rahman",
+                speciality: "Poultry Pathology",
+                location: "Narsingdi",
+                city: "Narsingdi",
+                phone: "+8801710112233",
+                type: "poultry",
+                available: true,
+                verified: true
+            },
+            {
+                name: "Dr. Sabbir Ahmed",
+                speciality: "Broiler & Layer Health",
+                location: "Tangail",
+                city: "Tangail",
+                phone: "+8801820223344",
+                type: "poultry",
+                available: true,
+                verified: true
+            },
+
+            // ===== GENERAL / EMERGENCY =====
+            {
+                name: "Government Mobile Vet Clinic",
+                speciality: "Emergency Veterinary Service",
+                location: "All Bangladesh",
+                city: "National",
+                phone: "16358",
+                type: "general",
+                available: true,
+                verified: true
+            },
+            {
+                name: "Dr. Rashedul Islam",
+                speciality: "General Veterinary Medicine",
+                location: "Rajshahi",
+                city: "Rajshahi",
+                phone: "+8801717889900",
+                type: "general",
+                available: true,
+                verified: true
+            },
+            {
+                name: "Dr. Md. Anwar Hossain",
+                speciality: "General Vet & Emergency",
+                location: "Sylhet",
+                city: "Sylhet",
+                phone: "+8801811223345",
+                type: "general",
+                available: true,
+                verified: true
+            },
+            {
+                name: "Dr. Shafiqul Alam",
+                speciality: "Veterinary Medicine",
+                location: "Khulna",
+                city: "Khulna",
+                phone: "+8801911112222",
+                type: "general",
+                available: true,
+                verified: true
+            },
+            {
+                name: "Upazila Livestock Office",
+                speciality: "Government Vet Service",
+                location: "All Upazilas",
+                city: "National",
+                phone: "16358",
+                type: "general",
+                available: true,
+                verified: true
+            },
+
+            // ===== SURGERY SPECIALISTS =====
+            {
+                name: "Dr. Md. Sirajul Islam",
+                speciality: "Veterinary Surgery",
+                location: "Dhaka",
+                city: "Dhaka",
+                phone: "+8801711334455",
+                type: "general",
+                available: true,
+                verified: true
+            },
+            {
+                name: "Dr. Abu Hena Mostofa Kamal",
+                speciality: "Orthopedic Surgery",
+                location: "Chittagong",
+                city: "Chittagong",
+                phone: "+8801822334455",
+                type: "general",
+                available: true,
+                verified: true
+            },
+            {
+                name: "Dr. Md. Zahangir Alam",
+                speciality: "Soft Tissue Surgery",
+                location: "Sylhet",
+                city: "Sylhet",
+                phone: "+8801933445566",
+                type: "general",
+                available: true,
+                verified: true
+            },
+
+            // ===== EQUINE & EXOTIC =====
+            {
+                name: "Dr. Md. Ariful Islam",
+                speciality: "Equine Medicine (Horse)",
+                location: "Dhaka",
+                city: "Dhaka",
+                phone: "+8801730334455",
+                type: "general",
+                available: true,
+                verified: true
+            },
+            {
+                name: "Dr. Shahnaz Parvin",
+                speciality: "Exotic Animals & Birds",
+                location: "Dhanmondi, Dhaka",
+                city: "Dhaka",
+                phone: "+8801840445566",
+                type: "general",
+                available: true,
+                verified: true
+            },
+
+            // ===== EMERGENCY & 24/7 =====
+            {
+                name: "Vet Emergency 24/7 Clinic",
+                speciality: "24/7 Emergency Vet Care",
+                location: "Gulshan, Dhaka",
+                city: "Dhaka",
+                phone: "+8801750556677",
+                type: "general",
+                available: true,
+                verified: true
+            },
+            {
+                name: "Dr. Md. Shariful Islam",
+                speciality: "Emergency & Critical Care",
+                location: "Chittagong",
+                city: "Chittagong",
+                phone: "+8801860667788",
+                type: "general",
+                available: true,
+                verified: true
+            },
+            {
+                name: "Central Vet Emergency Hospital",
+                speciality: "24/7 Vet Emergency",
+                location: "Mirpur, Dhaka",
+                city: "Dhaka",
+                phone: "+8801970778899",
+                type: "general",
+                available: true,
+                verified: true
+            }
+        ];
+
+        // ============================================
+        // LOG HELPER
+        // ============================================
+        const logEl = document.getElementById('log');
+
+        function log(message, type = 'info') {
+            const time = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = `[${time}] ${message}`;
+            logEl.appendChild(div);
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        // ============================================
+        // UPDATE STATS
+        // ============================================
+        function updateStats() {
+            const counts = { dairy: 0, pet: 0, poultry: 0, general: 0 };
+            VETS_DATA.forEach(v => {
+                if (counts[v.type] !== undefined) counts[v.type]++;
+            });
+
+            document.getElementById('totalCount').textContent = VETS_DATA.length;
+            document.getElementById('statDairy').textContent = counts.dairy;
+            document.getElementById('statPet').textContent = counts.pet;
+            document.getElementById('statPoultry').textContent = counts.poultry;
+            document.getElementById('statGeneral').textContent = counts.general;
+        }
+
+        // ============================================
+        // ADD ALL VETS (batch + chunk to avoid 500 limit)
+        // ============================================
+        async function addAllVets() {
+            const btn = document.getElementById('addBtn');
+            btn.disabled = true;
+            logEl.innerHTML = '';
+
+            log('🚀 Starting to add vets...', 'info');
+
+            try {
+                const db = firebase.firestore();
+
+                // Load existing vets (check duplicates by phone)
+                log('📋 Loading existing vets...', 'info');
+                const existingSnap = await db.collection('vets').get();
+                const existingPhones = new Set();
+                existingSnap.forEach(doc => {
+                    const data = doc.data();
+                    if (data.phone) existingPhones.add(data.phone);
+                });
+
+                log(`📊 Found ${existingPhones.size} existing vets`, 'info');
+
+                // Filter new vets
+                const newVets = VETS_DATA.filter(v => !existingPhones.has(v.phone));
+                const skipped = VETS_DATA.length - newVets.length;
+
+                if (skipped > 0) {
+                    log(`⏭️ Skipping ${skipped} vets (already in DB)`, 'warning-text');
+                }
+
+                if (newVets.length === 0) {
+                    log('ℹ️ All vets already exist. Nothing to add.', 'info');
+                    btn.disabled = false;
+                    return;
+                }
+
+                log(`📦 Queuing ${newVets.length} new vets...`, 'info');
+
+                // Chunk into batches of 400 (Firestore limit is 500)
+                const CHUNK_SIZE = 400;
+                let totalAdded = 0;
+
+                for (let i = 0; i < newVets.length; i += CHUNK_SIZE) {
+                    const chunk = newVets.slice(i, i + CHUNK_SIZE);
+                    const batch = db.batch();
+
+                    chunk.forEach(vet => {
+                        const docRef = db.collection('vets').doc();
+                        batch.set(docRef, {
+                            ...vet,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    });
+
+                    await batch.commit();
+                    totalAdded += chunk.length;
+
+                    log(`✅ Committed chunk ${Math.floor(i / CHUNK_SIZE) + 1} (${chunk.length} vets)`, 'success');
+                }
+
+                log('', 'info');
+                log(`🎉 Successfully added ${totalAdded} vets!`, 'success');
+                log(`📊 Total vets in Firestore: ${existingPhones.size + totalAdded}`, 'success');
+                log('✨ You can now close this page.', 'success');
+
+            } catch (error) {
+                console.error('Error:', error);
+                log(`❌ Error: ${error.message}`, 'error');
+
+                if (error.message.includes('permission')) {
+                    log('💡 Check Firestore Rules — vets collection needs write access', 'warning-text');
+                }
+            }
+
+            btn.disabled = false;
+        }
+
+        // ============================================
+        // CLEAR ALL VETS
+        // ============================================
+        async function clearAllVets() {
+            if (!confirm('⚠️ Delete ALL vets from Firestore?')) return;
+            if (!confirm('Are you absolutely sure? This cannot be undone!')) return;
+
+            const btn = document.getElementById('clearBtn');
+            btn.disabled = true;
+            logEl.innerHTML = '';
+
+            log('🗑️ Deleting all vets...', 'info');
+
+            try {
+                const db = firebase.firestore();
+                const snapshot = await db.collection('vets').get();
+
+                if (snapshot.empty) {
+                    log('ℹ️ No vets to delete.', 'info');
+                    btn.disabled = false;
+                    return;
+                }
+
+                // Chunk delete
+                const CHUNK_SIZE = 400;
+                const docs = snapshot.docs;
+                let deleted = 0;
+
+                for (let i = 0; i < docs.length; i += CHUNK_SIZE) {
+                    const batch = db.batch();
+                    const chunk = docs.slice(i, i + CHUNK_SIZE);
+
+                    chunk.forEach(doc => batch.delete(doc.ref));
+                    await batch.commit();
+
+                    deleted += chunk.length;
+                    log(`🗑️ Deleted ${deleted}/${docs.length}...`, 'warning-text');
+                }
+
+                log(`✅ Deleted ${deleted} vets.`, 'success');
+
+            } catch (error) {
+                console.error('Error:', error);
+                log(`❌ Error: ${error.message}`, 'error');
+            }
+
+            btn.disabled = false;
+        }
+
+        // ============================================
+        // INIT
+        // ============================================
+        document.addEventListener('DOMContentLoaded', function () {
+            updateStats();
+            setTimeout(() => {
+                if (typeof firebase === 'undefined' || !firebase.apps.length) {
+                    log('❌ Firebase not loaded. Check firebase-config.js', 'error');
+                } else {
+                    log('✅ Firebase ready. Click "Add All Vets" to start.', 'success');
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>

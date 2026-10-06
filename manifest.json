@@ -1,0 +1,230 @@
+{
+  "id": "/?source=pwa",
+  "name": "DailyVet — AI Vet Companion + NASA Suite",
+  "short_name": "DailyVet",
+  "description": "AI-powered veterinary assistant for pet & livestock care + NASA satellite-driven farm intelligence. Scan prescriptions, detect breeds, analyze dung/urine, monitor AQI, and get instant climate alerts.",
+  "start_url": "/index.html?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
+  "orientation": "portrait",
+  "theme_color": "#035D69",
+  "background_color": "#ffffff",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["medical", "health", "lifestyle", "utilities", "productivity", "weather"],
+  "prefer_related_applications": false,
+  "launch_handler": {
+    "client_mode": "auto"
+  },
+  "icons": [
+    {
+      "src": "assets/dailyvetlogo.jpeg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/dailyvetlogo.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/dailyvetlogo.jpeg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "maskable"
+    },
+    {
+      "src": "assets/dailyvetlogo.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Ask AI",
+      "short_name": "AI Chat",
+      "description": "Chat with DailyVet AI assistant",
+      "url": "/ai.html?source=shortcut",
+      "icons": [
+        {
+          "src": "assets/dailyvetlogo.jpeg",
+          "sizes": "192x192",
+          "type": "image/jpeg"
+        }
+      ]
+    },
+    {
+      "name": "PR Scanner",
+      "short_name": "Scanner",
+      "description": "Scan prescriptions & medical reports",
+      "url": "/scanner.html?source=shortcut",
+      "icons": [
+        {
+          "src": "assets/dailyvetlogo.jpeg",
+          "sizes": "192x192",
+          "type": "image/jpeg"
+        }
+      ]
+    },
+    {
+      "name": "Feed Advisor",
+      "short_name": "Advisor",
+      "description": "Get diet plans for your pets",
+      "url": "/advisor.html?source=shortcut",
+      "icons": [
+        {
+          "src": "assets/dailyvetlogo.jpeg",
+          "sizes": "192x192",
+          "type": "image/jpeg"
+        }
+      ]
+    },
+    {
+      "name": "Breed Detection",
+      "short_name": "Breed",
+      "description": "Detect animal breed & health",
+      "url": "/breed-detection.html?source=shortcut",
+      "icons": [
+        {
+          "src": "assets/dailyvetlogo.jpeg",
+          "sizes": "192x192",
+          "type": "image/jpeg"
+        }
+      ]
+    },
+    {
+      "name": "Find a Vet",
+      "short_name": "Vets",
+      "description": "Find nearby veterinarians",
+      "url": "/vet-home.html?source=shortcut",
+      "icons": [
+        {
+          "src": "assets/dailyvetlogo.jpeg",
+          "sizes": "192x192",
+          "type": "image/jpeg"
+        }
+      ]
+    },
+    {
+      "name": "Dung & Urine Scan",
+      "short_name": "Excreta",
+      "description": "Analyze animal waste for diseases",
+      "url": "/excreta-scan.html?source=shortcut",
+      "icons": [
+        {
+          "src": "assets/dailyvetlogo.jpeg",
+          "sizes": "192x192",
+          "type": "image/jpeg"
+        }
+      ]
+    },
+    {
+      "name": "NASA Climate Dashboard",
+      "short_name": "Climate",
+      "description": "NASA satellite-driven farm intelligence",
+      "url": "/climate-dashboard.html?source=shortcut",
+      "icons": [
+        {
+          "src": "assets/dailyvetlogo.jpeg",
+          "sizes": "192x192",
+          "type": "image/jpeg"
+        }
+      ]
+    },
+    {
+      "name": "Air Quality & UV",
+      "short_name": "Air",
+      "description": "Real-time AQI, PM2.5 & UV index",
+      "url": "/climate-air-quality.html?source=shortcut",
+      "icons": [
+        {
+          "src": "assets/dailyvetlogo.jpeg",
+          "sizes": "192x192",
+          "type": "image/jpeg"
+        }
+      ]
+    },
+    {
+      "name": "Heat-Stress Alert",
+      "short_name": "THI",
+      "description": "Species-specific heat-stress monitor",
+      "url": "/climate-thi.html?source=shortcut",
+      "icons": [
+        {
+          "src": "assets/dailyvetlogo.jpeg",
+          "sizes": "192x192",
+          "type": "image/jpeg"
+        }
+      ]
+    },
+    {
+      "name": "Forage Rotation",
+      "short_name": "Forage",
+      "description": "Soil moisture & grass advisor",
+      "url": "/climate-forage.html?source=shortcut",
+      "icons": [
+        {
+          "src": "assets/dailyvetlogo.jpeg",
+          "sizes": "192x192",
+          "type": "image/jpeg"
+        }
+      ]
+    },
+    {
+      "name": "Disease Risk Alert",
+      "short_name": "Disease",
+      "description": "Rainfall & vector model outbreak alert",
+      "url": "/climate-outbreak.html?source=shortcut",
+      "icons": [
+        {
+          "src": "assets/dailyvetlogo.jpeg",
+          "sizes": "192x192",
+          "type": "image/jpeg"
+        }
+      ]
+    },
+    {
+      "name": "Impact Mapping",
+      "short_name": "Impact",
+      "description": "Population & economic loss mapping",
+      "url": "/climate-impact.html?source=shortcut",
+      "icons": [
+        {
+          "src": "assets/dailyvetlogo.jpeg",
+          "sizes": "192x192",
+          "type": "image/jpeg"
+        }
+      ]
+    }
+  ],
+  "screenshots": [],
+  "related_applications": [],
+  "iarc_rating_id": "",
+  "prefer_related_applications": false,
+  "scope_extensions": [
+    {
+      "type": "origin",
+      "origin": "https://power.larc.nasa.gov"
+    },
+    {
+      "type": "origin",
+      "origin": "https://api.open-meteo.com"
+    },
+    {
+      "type": "origin",
+      "origin": "https://air-quality-api.open-meteo.com"
+    },
+    {
+      "type": "origin",
+      "origin": "https://geocoding-api.open-meteo.com"
+    },
+    {
+      "type": "origin",
+      "origin": "https://server.arcgisonline.com"
+    }
+  ]
+}

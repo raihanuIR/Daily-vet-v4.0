@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DailyVet Admin | Medicine Formulary Seeder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+
+    <script src="js/tailwind-v4.js"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-deep: #035D69;
+            --color-dark: #023d47;
+            --color-teal: #088F8F;
+            --color-line: #b2e0e6;
+            --color-soft: #eef7f8;
+            --color-edge: #e0f0f2;
+            --color-mute: #8ab8be;
+            --color-danger: #e74c3c;
+        }
+        .success { @apply text-emerald-600 font-semibold; }
+        .error { @apply text-rose-600 font-semibold; }
+        .info { @apply text-teal; }
+        .warning-text { @apply text-amber-600; }
+    </style>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+</head>
+<body class="bg-gradient-to-b from-[#f4f9fa] to-[#eef5f6] text-slate-800 min-h-screen py-6 px-4 sm:px-6 lg:px-8 antialiased flex justify-center items-start">
+    <div class="w-full max-w-4xl bg-white/95 backdrop-blur-md border border-edge rounded-3xl shadow-[0_20px_60px_rgba(3,93,105,0.08)] p-6 sm:p-10 flex flex-col gap-6">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between pb-4 border-b border-edge text-left">
+            <div class="flex items-center gap-3">
+                <button class="w-10 h-10 rounded-xl bg-soft hover:bg-edge text-deep flex items-center justify-center transition-colors cursor-pointer border border-line flex-shrink-0" onclick="window.location.href='home.html'" title="Return Home">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-deep to-teal text-white flex items-center justify-center text-lg shadow-sm flex-shrink-0">
+                        <i class="fas fa-pills"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-extrabold text-deep tracking-tight">Medicine Formulary Seeder</h1>
+                        <p class="text-xs font-semibold text-teal">Database administrative provisioning tool</p>
+                    </div>
+                </div>
+            </div>
+            <span class="px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-bold border border-amber-200">
+                Admin Console
+            </span>
+        </div>
+
+        <!-- Warning -->
+        <div class="bg-amber-50/90 border border-amber-200 p-4 rounded-2xl text-amber-900 text-xs sm:text-sm leading-relaxed flex items-start gap-3 shadow-xs">
+            <i class="fas fa-triangle-exclamation text-amber-600 text-base shrink-0 mt-0.5"></i>
+            <div>
+                <strong>Data Pipeline:</strong> Extracts all unique pharmaceutical generics from <code class="px-1.5 py-0.5 bg-white border border-amber-300 rounded text-xs font-mono">diseases_enhanced_medicines_bd.json</code> and populates the Firestore <code class="px-1.5 py-0.5 bg-white border border-amber-300 rounded text-xs font-mono">medicines</code> collection with normalized IDs.
+            </div>
+        </div>
+
+        <!-- Source Mapping Banner -->
+        <div class="bg-soft/60 border border-edge p-4 rounded-2xl text-xs sm:text-sm text-deep flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div class="flex flex-col gap-1">
+                <span>📁 <strong>Source:</strong> <code class="font-mono text-xs">diseases_enhanced_medicines_bd.json</code></span>
+                <span>🎯 <strong>Target:</strong> <code class="font-mono text-xs">medicines</code> collection</span>
+            </div>
+            <span class="px-2.5 py-1 bg-white border border-line rounded-lg text-xs font-bold text-teal">
+                Doc ID: MED-&lt;GENERIC-NAME-SLUG&gt;
+            </span>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5">
+            <div class="bg-white p-3.5 rounded-2xl text-center border border-slate-200 shadow-xs">
+                <div class="text-2xl font-extrabold text-deep" id="totalCount">0</div>
+                <div class="text-[11px] text-teal font-bold mt-1">💊 Total</div>
+            </div>
+            <div class="bg-white p-3.5 rounded-2xl text-center border border-slate-200 shadow-xs">
+                <div class="text-2xl font-extrabold text-deep" id="statAntibiotic">0</div>
+                <div class="text-[11px] text-teal font-bold mt-1">🦠 Antibiotic</div>
+            </div>
+            <div class="bg-white p-3.5 rounded-2xl text-center border border-slate-200 shadow-xs">
+                <div class="text-2xl font-extrabold text-deep" id="statDewormer">0</div>
+                <div class="text-[11px] text-teal font-bold mt-1">🪱 Dewormer</div>
+            </div>
+            <div class="bg-white p-3.5 rounded-2xl text-center border border-slate-200 shadow-xs">
+                <div class="text-2xl font-extrabold text-deep" id="statPain">0</div>
+                <div class="text-[11px] text-teal font-bold mt-1">💉 Painkiller</div>
+            </div>
+            <div class="bg-white p-3.5 rounded-2xl text-center border border-slate-200 shadow-xs">
+                <div class="text-2xl font-extrabold text-deep" id="statSupport">0</div>
+                <div class="text-[11px] text-teal font-bold mt-1">🧪 Support</div>
+            </div>
+            <div class="bg-white p-3.5 rounded-2xl text-center border border-slate-200 shadow-xs">
+                <div class="text-2xl font-extrabold text-deep" id="statOther">0</div>
+                <div class="text-[11px] text-teal font-bold mt-1">💊 Other</div>
+            </div>
+        </div>
+
+        <!-- Action Pipeline -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <button id="previewBtn" onclick="runPreview()" class="py-3.5 px-4 bg-gradient-to-r from-deep to-teal hover:from-dark hover:to-deep text-white rounded-xl text-sm font-bold shadow-md shadow-teal/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border-none flex items-center justify-center gap-2">
+                <i class="fas fa-search"></i>
+                <span>1. Extract &amp; Preview</span>
+            </button>
+
+            <button id="uploadBtn" onclick="uploadToFirestore()" disabled class="py-3.5 px-4 bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-xl text-sm font-bold shadow-md shadow-emerald-600/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border-none flex items-center justify-center gap-2">
+                <i class="fas fa-cloud-arrow-up"></i>
+                <span>2. Upload to DB</span>
+            </button>
+
+            <button id="clearBtn" onclick="clearAllMedicines()" class="py-3.5 px-4 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-sm font-bold transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                <i class="fas fa-trash-can text-danger"></i>
+                <span>Purge Collection</span>
+            </button>
+        </div>
+
+        <!-- Terminal Log -->
+        <div class="flex flex-col gap-2 text-left">
+            <label class="text-xs font-bold text-deep uppercase tracking-wider">Extraction &amp; Sync Log</label>
+            <div id="log" class="bg-slate-900 text-emerald-400 border border-slate-800 rounded-2xl p-4 sm:p-5 font-mono text-xs sm:text-sm max-h-96 overflow-y-auto whitespace-pre-wrap leading-relaxed shadow-inner">Ready. Click "Extract & Preview" to start.</div>
+        </div>
+        <div id="previewBox" class="text-left"></div>
+    </div>
+
+    <script src="js/firebase-config.js"></script>
+
+    <script>
+        const logEl = document.getElementById('log');
+        const previewBox = document.getElementById('previewBox');
+        let extractedMedicines = [];
+
+        function log(msg, type = 'info') {
+            const time = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = `[${time}] ${msg}`;
+            logEl.appendChild(div);
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        // ============================================
+        // 🏷️ Auto-classify by generic name
+        // ============================================
+        function classifyMedicine(name) {
+            const n = name.toLowerCase();
+
+            // Antiprotozoal (special case before antibiotic)
+            if (/metronidazole|ronidazole|amprolium|toltrazuril|imidocarb|diminazene|berenil|imizol/.test(n)) {
+                if (/amprolium|toltrazuril/.test(n)) return 'Antiprotozoal (Coccidiostat)';
+                if (/imidocarb|diminazene|berenil|imizol/.test(n)) return 'Antiprotozoal (Babesicide)';
+                return 'Antiprotozoal';
+            }
+
+            // Antibiotics
+            if (/penicillin|amoxicillin|ampicillin|oxytetracycline|tetracycline|doxycycline|ceftiofur|ceftriaxone|cephalexin|enrofloxacin|ciprofloxacin|florfenicol|tylosin|tiamulin|tilmicosin|sulphonamide|sulfadimidine|sulphadimidine|erythromycin|azithromycin|cloxacillin|streptomycin|neomycin|gentamicin/.test(n)) {
+                return 'Antibiotic';
+            }
+
+            // Dewormers / Antiparasitic
+            if (/albendazole|fenbendazole|mebendazole|levamisole|ivermectin|triclabendazole|closantel|praziquantel|pyrantel/.test(n)) {
+                return 'Dewormer';
+            }
+
+            // Painkillers / NSAIDs
+            if (/flunixin|meloxicam|carprofen|ketoprofen|phenylbutazone|aspirin|diclofenac|analgin|tolfenamic|vedaprofen/.test(n)) {
+                return 'Painkiller / NSAID';
+            }
+
+            // Antifungal
+            if (/ketoconazole|clotrimazole|itraconazole|fluconazole|miconazole|griseofulvin/.test(n)) {
+                return 'Antifungal';
+            }
+
+            // Antihistamine
+            if (/pheniramine|chlorpheniramine|diphenhydramine|cetirizine|hydroxyzine/.test(n)) {
+                return 'Antihistamine';
+            }
+
+            // Vitamins / Minerals / Supplements
+            if (/calcium|phosphorus|magnesium|vitamin|vit |renasol|ad3e|b-complex|iron|zinc|selenium|electrolyte|ors|glucose|dextrose|mineral|renalyte|hepatoprotective/.test(n)) {
+                return 'Vitamin / Supplement';
+            }
+
+            // Antiseptic / Topical
+            if (/povidone|iodine|permanganate|kmno4|potassium permanganate|sodium carbonate|chlorhexidine|antiseptic|copper sulphate|hydrogen peroxide|acetic acid/.test(n)) {
+                return 'Antiseptic / Topical';
+            }
+
+            // GI Support
+            if (/ondansetron|metoclopramide|omeprazole|ranitidine|simethicone|poloxalene|loperamide|domperidone/.test(n)) {
+                return 'GI Support';
+            }
+
+            // Antispasmodic
+            if (/spasmolytic|hyoscine|dicyclomine|drotaverine/.test(n)) {
+                return 'Antispasmodic';
+            }
+
+            // Anticonvulsant
+            if (/diazepam|phenobarbital|midazolam/.test(n)) {
+                return 'Anticonvulsant';
+            }
+
+            // Antitoxin / Serum
+            if (/antitoxin|antiserum|anti-venom|toxoid/.test(n)) {
+                return 'Antitoxin / Serum';
+            }
+
+            // Hormones / Reproductive
+            if (/prostaglandin|pgf2|oxytocin|estradiol|progesterone|gnrh/.test(n)) {
+                return 'Hormone / Reproductive';
+            }
+
+            // Respiratory support
+            if (/lysine|acetylcysteine|bromhexine|ambroxol/.test(n)) {
+                return 'Respiratory Support';
+            }
+
+            return 'Other';
+        }
+
+        // ============================================
+        // 🆔 Slugify
+        // ============================================
+        function slugify(text) {
+            return String(text)
+                .toLowerCase()
+                .trim()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '')
+                .slice(0, 70);
+        }
+
+        // ============================================
+        // 📥 Extract from diseases JSON
+        // ============================================
+        async function extractMedicines() {
+            log('📥 Loading diseases_enhanced_medicines_bd.json...', 'info');
+
+            const res = await fetch('diseases_enhanced_medicines_bd.json');
+            if (!res.ok) throw new Error('File not found: diseases_enhanced_medicines_bd.json (same folder?)');
+
+            const data = await res.json();
+            const diseases = data.diseases || [];
+            log(`✅ Loaded ${diseases.length} diseases`, 'success');
+
+            const map = new Map();
+
+            diseases.forEach(disease => {
+                (disease.treatment || []).forEach(tr => {
+                    const gn = (tr.generic_name || '').trim();
+                    if (!gn) return;
+
+                    const slug = slugify(gn);
+                    const id = 'MED-' + slug.toUpperCase();
+
+                    if (!map.has(id)) {
+                        map.set(id, {
+                            id,
+                            slug,
+                            generic_name: gn,
+                            category: classifyMedicine(gn),
+                            purposes: [],
+                            routes: [],
+                            forms: [],
+                            dosage_examples: [],
+                            used_for_diseases: [],
+                            used_for_animals: [],
+                            used_for_disease_categories: [],
+                            market_brands_bd: [],
+                            verify_with_vet: true,
+                            metadata: {
+                                verified_by_vet: false,
+                                production_ready: false,
+                                needs_vet_review: true,
+                                source: 'extracted_from_diseases',
+                                language: 'bn+en'
+                            }
+                        });
+                    }
+
+                    const med = map.get(id);
+
+                    if (tr.purpose && !med.purposes.includes(tr.purpose)) {
+                        med.purposes.push(tr.purpose);
+                    }
+
+                    if (tr.route && !med.routes.includes(tr.route)) {
+                        // handle compound routes like "IM/IV"
+                        tr.route.split('/').map(r => r.trim()).filter(Boolean).forEach(r => {
+                            if (!med.routes.includes(r)) med.routes.push(r);
+                        });
+                    }
+
+                    if (tr.medicine_form && !med.forms.includes(tr.medicine_form)) {
+                        med.forms.push(tr.medicine_form);
+                    }
+
+                    if (tr.dosage_adult) {
+                        const d = String(tr.dosage_adult).trim();
+                        if (d && d !== '-' && !med.dosage_examples.includes(d)) {
+                            med.dosage_examples.push(d);
+                        }
+                    }
+
+                    const dName = disease.disease_name_en || disease.disease_name_bn || disease.id;
+                    if (dName && !med.used_for_diseases.includes(dName)) {
+                        med.used_for_diseases.push(dName);
+                    }
+
+                    const animal = disease.animal_type;
+                    if (animal && !med.used_for_animals.includes(animal)) {
+                        med.used_for_animals.push(animal);
+                    }
+
+                    const cat = disease.disease_category;
+                    if (cat && !med.used_for_disease_categories.includes(cat)) {
+                        med.used_for_disease_categories.push(cat);
+                    }
+
+                    (tr.market_brands_bd || []).forEach(b => {
+                        const brand = String(b).trim();
+                        if (brand && !med.market_brands_bd.includes(brand)) {
+                            med.market_brands_bd.push(brand);
+                        }
+                    });
+                });
+            });
+
+            extractedMedicines = Array.from(map.values())
+                .sort((a, b) => a.generic_name.localeCompare(b.generic_name));
+
+            log(`✅ Extracted ${extractedMedicines.length} unique medicines`, 'success');
+            updateStats();
+            renderPreview();
+
+            return extractedMedicines;
+        }
+
+        // ============================================
+        // 📊 Update stats
+        // ============================================
+        function updateStats() {
+            const counts = {
+                total: extractedMedicines.length,
+                antibiotic: 0,
+                dewormer: 0,
+                pain: 0,
+                support: 0,
+                other: 0
+            };
+
+            extractedMedicines.forEach(m => {
+                const c = m.category;
+                if (c === 'Antibiotic') counts.antibiotic++;
+                else if (c === 'Dewormer') counts.dewormer++;
+                else if (c === 'Painkiller / NSAID') counts.pain++;
+                else if (/Vitamin|Support|Antiseptic|Antihistamine|GI Support|Respiratory/i.test(c)) counts.support++;
+                else counts.other++;
+            });
+
+            document.getElementById('totalCount').textContent = counts.total;
+            document.getElementById('statAntibiotic').textContent = counts.antibiotic;
+            document.getElementById('statDewormer').textContent = counts.dewormer;
+            document.getElementById('statPain').textContent = counts.pain;
+            document.getElementById('statSupport').textContent = counts.support;
+            document.getElementById('statOther').textContent = counts.other;
+        }
+
+        // ============================================
+        // 👁️ Preview table
+        // ============================================
+        function renderPreview() {
+            if (extractedMedicines.length === 0) return;
+
+            let html = `
+                <h3 class="mt-6 mb-2 text-sm font-bold text-deep">📋 Preview (first 40)</h3>
+                <div class="max-h-96 overflow-y-auto border border-line rounded-xl shadow-inner">
+                <table class="w-full border-collapse text-xs">
+                    <thead class="sticky top-0 bg-soft shadow-sm z-10">
+                        <tr>
+                            <th class="p-2.5 text-left font-bold text-deep border-b border-edge">#</th>
+                            <th class="p-2.5 text-left font-bold text-deep border-b border-edge">Generic Name</th>
+                            <th class="p-2.5 text-left font-bold text-deep border-b border-edge">Category</th>
+                            <th class="p-2.5 text-left font-bold text-deep border-b border-edge">Used For (Diseases)</th>
+                            <th class="p-2.5 text-left font-bold text-deep border-b border-edge">Brands</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-edge">
+            `;
+
+            extractedMedicines.slice(0, 40).forEach((m, i) => {
+                html += `
+                    <tr class="hover:bg-soft/50 transition-colors">
+                        <td class="p-2.5 text-deep/80">${i + 1}</td>
+                        <td class="p-2.5 font-bold text-deep">${escapeHtml(m.generic_name)}</td>
+                        <td class="p-2.5 font-semibold text-teal whitespace-nowrap">${escapeHtml(m.category)}</td>
+                        <td class="p-2.5 text-deep/70">${m.used_for_diseases.length}</td>
+                        <td class="p-2.5 text-deep/70">${m.market_brands_bd.length}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+                </div>
+            `;
+
+            if (extractedMedicines.length > 40) {
+                html += `<p class="text-xs text-mute mt-2">
+                    Showing first 40 of ${extractedMedicines.length} — full list will be uploaded.
+                </p>`;
+            }
+
+            previewBox.innerHTML = html;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ============================================
+        // 🔍 Step 1: Preview button
+        // ============================================
+        async function runPreview() {
+            const btn = document.getElementById('previewBtn');
+            btn.disabled = true;
+            logEl.innerHTML = '';
+            previewBox.innerHTML = '';
+
+            try {
+                await extractMedicines();
+                document.getElementById('uploadBtn').disabled = false;
+                log('', 'info');
+                log('✅ Preview ready. Now click "Upload Medicines to Firestore".', 'success');
+            } catch (err) {
+                log(`❌ Extraction failed: ${err.message}`, 'error');
+                log('💡 Make sure the JSON file is in the same folder as this HTML.', 'warning-text');
+            }
+
+            btn.disabled = false;
+        }
+
+        // ============================================
+        // 🚀 Step 2: Upload to Firestore
+        // ============================================
+        async function uploadToFirestore() {
+            if (extractedMedicines.length === 0) {
+                log('❌ Nothing to upload. Run Preview first.', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('uploadBtn');
+            btn.disabled = true;
+
+            try {
+                const db = firebase.firestore();
+
+                // Check existing
+                log('📋 Checking existing medicines in Firestore...', 'info');
+                const snap = await db.collection('medicines').get();
+                const existingIds = new Set();
+                snap.forEach(doc => existingIds.add(doc.id));
+                log(`📊 Found ${existingIds.size} existing medicines`, 'info');
+
+                const toAdd = extractedMedicines.filter(m => !existingIds.has(m.id));
+                const skipped = extractedMedicines.length - toAdd.length;
+
+                if (skipped > 0) {
+                    log(`⏭️ Skipping ${skipped} medicines (already exist)`, 'warning-text');
+                }
+
+                if (toAdd.length === 0) {
+                    log('ℹ️ All medicines already in Firestore.', 'info');
+                    btn.disabled = false;
+                    return;
+                }
+
+                log(`📦 Uploading ${toAdd.length} new medicines...`, 'info');
+
+                const CHUNK = 400;
+                let totalAdded = 0;
+
+                for (let i = 0; i < toAdd.length; i += CHUNK) {
+                    const chunk = toAdd.slice(i, i + CHUNK);
+                    const batch = db.batch();
+
+                    chunk.forEach(med => {
+                        med.metadata.uploaded_at = Date.now();
+                        const ref = db.collection('medicines').doc(med.id);
+                        batch.set(ref, med);
+                    });
+
+                    await batch.commit();
+                    totalAdded += chunk.length;
+                    log(`✅ Uploaded chunk ${Math.floor(i / CHUNK) + 1} (${chunk.length} medicines)`, 'success');
+                }
+
+                log('', 'info');
+                log(`🎉 Successfully uploaded ${totalAdded} medicines!`, 'success');
+                log(`📊 Total in Firestore: ${existingIds.size + totalAdded}`, 'success');
+                log('⚠️ REMINDER: All marked as NOT vet-verified.', 'warning-text');
+                log('✨ You can now close this page.', 'success');
+            } catch (err) {
+                console.error(err);
+                log(`❌ Error: ${err.message}`, 'error');
+                if (err.message.includes('permission')) {
+                    log('💡 Check Firestore Rules — "medicines" collection needs write access', 'warning-text');
+                }
+            }
+
+            btn.disabled = false;
+        }
+
+        // ============================================
+        // 🗑️ Clear all
+        // ============================================
+        async function clearAllMedicines() {
+            if (!confirm('⚠️ Delete ALL medicines from Firestore?')) return;
+            if (!confirm('Absolutely sure? This cannot be undone!')) return;
+
+            const btn = document.getElementById('clearBtn');
+            btn.disabled = true;
+            logEl.innerHTML = '';
+            log('🗑️ Deleting all medicines...', 'info');
+
+            try {
+                const db = firebase.firestore();
+                const snapshot = await db.collection('medicines').get();
+
+                if (snapshot.empty) {
+                    log('ℹ️ No medicines to delete.', 'info');
+                    btn.disabled = false;
+                    return;
+                }
+
+                const CHUNK = 400;
+                const docs = snapshot.docs;
+                let deleted = 0;
+
+                for (let i = 0; i < docs.length; i += CHUNK) {
+                    const batch = db.batch();
+                    docs.slice(i, i + CHUNK).forEach(d => batch.delete(d.ref));
+                    await batch.commit();
+                    deleted += Math.min(CHUNK, docs.length - i);
+                    log(`🗑️ Deleted ${deleted}/${docs.length}...`, 'warning-text');
+                }
+
+                log(`✅ Deleted ${deleted} medicines.`, 'success');
+            } catch (err) {
+                log(`❌ Error: ${err.message}`, 'error');
+            }
+
+            btn.disabled = false;
+        }
+
+        // ============================================
+        // Init
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                if (typeof firebase === 'undefined' || !firebase.apps.length) {
+                    log('❌ Firebase not loaded. Check js/firebase-config.js', 'error');
+                } else {
+                    log('✅ Firebase ready.', 'success');
+                    log('👉 Step 1: Click "Extract & Preview"', 'info');
+                }
+            }, 300);
+        });
+    </script>
+</body>
+</html>

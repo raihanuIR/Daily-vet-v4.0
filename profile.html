@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <title>DailyVet | Profile</title>
+    <meta name="theme-color" content="#035D69" />
+    <link rel="manifest" href="manifest.json" />
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="DailyVet" />
+    <link rel="apple-touch-icon" href="assets/dailyvetlogo.jpeg" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+
+    <!-- Tailwind CSS v4 -->
+    <script src="js/tailwind-v4.js"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-deep: #035D69;
+            --color-dark: #023d47;
+            --color-teal: #088F8F;
+            --color-line: #b2e0e6;
+            --color-soft: #eef7f8;
+            --color-edge: #e0f0f2;
+            --color-mute: #8ab8be;
+            --color-danger: #e74c3c;
+        }
+    </style>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <!-- Firebase SDKs -->
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+    <style>
+        /* Fixed Bottom Navigation Bar - ONLY on smaller devices (<1024px) */
+        @media (max-width: 1023px) {
+            .app-bottom-nav {
+                position: fixed !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                z-index: 50 !important;
+                display: flex !important;
+            }
+        }
+        @media (min-width: 1024px) {
+            .app-bottom-nav {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-[#f4f9fa] to-[#eef5f6] text-slate-800 min-h-screen py-6 px-4 sm:px-6 lg:px-8 antialiased selection:bg-teal selection:text-white flex justify-center items-start pb-24 lg:pb-6">
+    <div class="profile-container w-full max-w-3xl lg:max-w-4xl bg-white/95 backdrop-blur-md border border-edge rounded-3xl shadow-[0_20px_50px_rgba(3,93,105,0.08)] p-6 sm:p-10 flex flex-col gap-6" id="profileContainer">
+
+        <!-- ===== TOP BAR ===== -->
+        <div class="flex items-center justify-between pb-4 border-b border-edge">
+            <button class="w-10 h-10 rounded-xl bg-soft border border-line text-deep hover:bg-edge flex items-center justify-center transition-colors cursor-pointer" onclick="handleProfileBack()" title="Back">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h2 class="text-xl sm:text-2xl font-extrabold text-deep tracking-tight" id="profileTitle">Edit Profile</h2>
+            <div>
+                <button class="px-4 py-2 rounded-xl bg-red-50 text-danger hover:bg-red-100 text-xs sm:text-sm font-bold border border-red-200 transition-colors cursor-pointer inline-flex items-center gap-1.5" id="logoutBtn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== VIEW MODE BANNER (hidden by default) ===== -->
+        <div class="view-mode-banner flex items-center gap-3 p-4 bg-teal/10 border border-teal/20 rounded-2xl text-deep text-sm font-semibold" id="viewModeBanner" style="display:none;">
+            <i class="fas fa-eye text-teal text-lg"></i>
+            <span>Viewing <strong id="viewingName" class="text-deep font-bold">User</strong>'s profile</span>
+        </div>
+
+        <!-- ===== PROFILE FORM ===== -->
+        <form class="flex flex-col gap-6" id="profileForm">
+
+            <!-- Profile Picture Section -->
+            <div class="flex flex-col items-center gap-3 text-center p-6 bg-soft/50 rounded-2xl border border-edge">
+                <div class="relative w-28 h-28 rounded-full border-3 border-teal bg-white shadow-md flex items-center justify-center overflow-hidden group">
+                    <img id="profileImage" src="" alt="Profile" class="w-full h-full object-cover" onerror="this.src='assets/dailyvetlogo.png'" />
+                    <label for="profilePicInput" class="absolute bottom-1 right-1 w-9 h-9 rounded-full bg-deep text-white flex items-center justify-center text-sm shadow-md cursor-pointer hover:bg-teal transition-colors" id="editPicBtn">
+                        <i class="fas fa-camera"></i>
+                    </label>
+                    <input type="file" id="profilePicInput" accept="image/*" style="display:none;" />
+                </div>
+                <small class="text-xs text-mute font-medium" id="picHint">Click the camera icon to upload a new profile photo</small>
+            </div>
+
+            <!-- Form Grid: 2-column responsive layout -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 text-left">
+                <!-- Name -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-bold text-deep uppercase tracking-wider">Full Name</label>
+                    <div class="relative flex items-center">
+                        <i class="fas fa-user absolute left-4 text-mute text-sm pointer-events-none"></i>
+                        <input type="text" id="profileName" class="w-full pl-11 pr-4 py-3.5 text-[15px] font-medium text-deep bg-slate-50/50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-teal focus:ring-4 focus:ring-teal/10 transition-all placeholder:text-mute" placeholder="Your name" required />
+                    </div>
+                </div>
+
+                <!-- Phone (read-only) -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-bold text-deep uppercase tracking-wider">Mobile Number</label>
+                    <div class="relative flex items-center">
+                        <i class="fas fa-phone-alt absolute left-4 text-mute text-sm pointer-events-none"></i>
+                        <input type="tel" id="profilePhone" class="w-full pl-11 pr-4 py-3.5 text-[15px] font-medium text-slate-500 bg-slate-100 border border-slate-200 rounded-xl outline-none cursor-not-allowed" placeholder="01XXXXXXXXX" disabled />
+                    </div>
+                </div>
+
+                <!-- City -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-bold text-deep uppercase tracking-wider">City</label>
+                    <div class="relative flex items-center">
+                        <i class="fas fa-city absolute left-4 text-mute text-sm pointer-events-none"></i>
+                        <input type="text" id="profileCity" class="w-full pl-11 pr-4 py-3.5 text-[15px] font-medium text-deep bg-slate-50/50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-teal focus:ring-4 focus:ring-teal/10 transition-all placeholder:text-mute" placeholder="Dhaka, Chittagong..." />
+                    </div>
+                </div>
+
+                <!-- Area -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-bold text-deep uppercase tracking-wider">Area / Thana</label>
+                    <div class="relative flex items-center">
+                        <i class="fas fa-map-marker-alt absolute left-4 text-mute text-sm pointer-events-none"></i>
+                        <input type="text" id="profileArea" class="w-full pl-11 pr-4 py-3.5 text-[15px] font-medium text-deep bg-slate-50/50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-teal focus:ring-4 focus:ring-teal/10 transition-all placeholder:text-mute" placeholder="Gulshan, Banani..." />
+                    </div>
+                </div>
+
+                <!-- Joined (read-only) -->
+                <div class="flex flex-col gap-1.5 sm:col-span-2">
+                    <label class="text-xs font-bold text-deep uppercase tracking-wider">Member Since</label>
+                    <div class="relative flex items-center">
+                        <i class="fas fa-calendar-check absolute left-4 text-mute text-sm pointer-events-none"></i>
+                        <input type="text" id="profileJoined" class="w-full pl-11 pr-4 py-3 text-sm font-medium text-slate-500 bg-slate-100 border border-slate-200 rounded-xl outline-none cursor-not-allowed" placeholder="—" disabled />
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== MULTIPLE PET SELECTION ===== -->
+            <div class="flex flex-col gap-3 p-4 sm:p-5 bg-soft/50 rounded-2xl border border-edge text-left">
+                <div class="flex items-center justify-between">
+                    <label class="text-xs font-bold text-deep uppercase tracking-wider">What pets & livestock do you have?</label>
+                    <span class="text-[11px] font-semibold text-teal bg-white px-2 py-0.5 rounded-full border border-teal/20">Manage Animals</span>
+                </div>
+
+                <!-- Selected Pets Chips -->
+                <div class="flex flex-wrap gap-2 min-h-7 items-center" id="selectedPetsWrapper"></div>
+
+                <!-- Dropdown + Add Button -->
+                <div class="flex items-center gap-2 w-full mt-1" id="petSelectWrapper">
+                    <select id="petTypeSelect" class="flex-1 p-3 px-4 text-sm font-medium text-deep bg-white border border-slate-200 rounded-xl outline-none focus:border-teal focus:ring-4 focus:ring-teal/10 transition-all">
+                        <option value="">-- Select an animal --</option>
+                        <optgroup label="Common Pets">
+                            <option value="Dog">🐕 Dog</option>
+                            <option value="Cat">🐈 Cat</option>
+                            <option value="Bird">🦜 Bird</option>
+                            <option value="Fish">🐠 Fish</option>
+                            <option value="Rabbit">🐇 Rabbit</option>
+                            <option value="Hamster">🐹 Hamster</option>
+                            <option value="Guinea Pig">🐹 Guinea Pig</option>
+                        </optgroup>
+                        <optgroup label="Farm / Domestic Animals">
+                            <option value="Cow">🐄 Cow (গরু)</option>
+                            <option value="Goat">🐐 Goat (ছাগল)</option>
+                            <option value="Sheep">🐑 Sheep (ভেড়া)</option>
+                            <option value="Chicken">🐔 Chicken (মুরগি)</option>
+                            <option value="Duck">🦆 Duck (হাঁস)</option>
+                            <option value="Pigeon">🕊️ Pigeon (কবুতর)</option>
+                            <option value="Horse">🐎 Horse (ঘোড়া)</option>
+                            <option value="Buffalo">🐃 Buffalo (মহিষ)</option>
+                        </optgroup>
+                        <optgroup label="Other">
+                            <option value="Turtle">🐢 Turtle</option>
+                            <option value="Snake">🐍 Snake</option>
+                            <option value="Parrot">🦜 Parrot</option>
+                            <option value="Other">🐾 Other</option>
+                        </optgroup>
+                    </select>
+
+                    <button type="button"
+                            class="h-[46px] px-4 rounded-xl bg-teal text-white flex items-center justify-center gap-1.5 font-semibold text-sm hover:bg-deep transition-all cursor-pointer border-none shadow-sm active:scale-95 shrink-0"
+                            id="addPetBtn"
+                            onclick="addSelectedPet()"
+                            title="Add pet">
+                        <i class="fas fa-plus"></i>
+                        <span>Add</span>
+                    </button>
+                </div>
+
+                <small class="text-xs text-mute font-medium" id="petHint">
+                    Select an animal from the list and click <strong>Add</strong>.
+                </small>
+            </div>
+
+            <!-- Buttons (edit mode only) -->
+            <div class="flex items-center gap-3 pt-2" id="profileActions">
+                <button type="submit" class="flex-1 bg-gradient-to-r from-deep to-teal hover:from-dark hover:to-deep text-white rounded-xl py-3.5 font-bold text-sm tracking-wide shadow-md shadow-teal/20 hover:-translate-y-0.5 transition-all cursor-pointer border-none flex items-center justify-center gap-2">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+                <button type="button" class="w-32 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl py-3.5 font-semibold text-sm transition-all cursor-pointer border-none" onclick="window.location.href='home.html'">
+                    Cancel
+                </button>
+            </div>
+        </form>
+
+        <!-- ============================================================
+             VET ACCOUNT SECTION
+             ============================================================ -->
+        <div class="p-5 bg-gradient-to-br from-emerald-50 to-teal-50 border border-teal-200 rounded-2xl flex flex-col gap-3.5" id="vetAccountSection" style="display:none;">
+            <div class="flex items-center gap-2.5 text-deep font-bold text-base">
+                <div class="w-8 h-8 rounded-lg bg-teal text-white flex items-center justify-center text-sm shadow-xs">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <span>Veterinarian Account Connected</span>
+            </div>
+
+            <p class="text-sm text-slate-600 font-medium">
+                আপনার এই phone number-এ একটি Vet account registered আছে। আপনি ড্যাশবোর্ডে গিয়ে প্রেসক্রিপশন ও রোগী দেখতে পারবেন।
+            </p>
+
+            <div class="flex flex-col sm:flex-row gap-2.5">
+                <button type="button"
+                        class="flex-1 py-3 bg-teal text-white rounded-xl font-bold text-sm hover:bg-deep transition-all cursor-pointer border-none flex items-center justify-center gap-2 shadow-xs"
+                        onclick="window.location.href='vet-home.html'">
+                    <i class="fas fa-stethoscope"></i>
+                    <span>Open Vet Dashboard</span>
+                </button>
+
+                <button type="button"
+                        class="py-3 px-5 bg-white border border-red-200 text-danger rounded-xl font-bold text-xs sm:text-sm hover:bg-red-50 transition-colors cursor-pointer flex items-center justify-center gap-2"
+                        onclick="deleteVetAccount()">
+                    <i class="fas fa-user-slash"></i>
+                    <span>Delete Vet Account</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Delete Account (edit mode only) -->
+        <div class="pt-4 border-t border-edge flex flex-col items-center gap-1.5" id="dangerZone">
+            <button class="text-danger hover:text-red-700 text-xs sm:text-sm font-bold flex items-center gap-2 bg-transparent border-none cursor-pointer py-1.5 px-3 rounded-lg hover:bg-red-50 transition-colors" onclick="deleteAccount()">
+                <i class="fas fa-trash-alt"></i> Delete Account
+            </button>
+            <small class="text-xs text-mute">This action permanently deletes your account and cannot be undone</small>
+        </div>
+
+        <!-- ===== VIEW MODE ACTIONS (hidden by default) ===== -->
+        <div class="flex items-center gap-3 pt-2" id="viewModeActions" style="display:none;">
+            <button class="flex-1 py-3.5 bg-teal text-white rounded-xl font-bold text-sm hover:bg-deep transition-all cursor-pointer border-none flex items-center justify-center gap-2 shadow-sm" onclick="callFromProfile()">
+                <i class="fas fa-phone"></i> Call
+            </button>
+            <button class="flex-1 py-3.5 bg-[#25D366] text-white rounded-xl font-bold text-sm hover:opacity-90 transition-opacity cursor-pointer border-none flex items-center justify-center gap-2 shadow-sm" onclick="whatsappFromProfile()">
+                <i class="fab fa-whatsapp text-lg"></i> WhatsApp
+            </button>
+            <button class="w-28 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-sm transition-colors cursor-pointer border-none flex items-center justify-center gap-2" onclick="handleProfileBack()">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        function handleProfileBack() {
+            const params = new URLSearchParams(window.location.search);
+            const from = params.get('from');
+            if (from === 'community' || (document.referrer && document.referrer.includes('community.html'))) {
+                window.location.href = 'community.html';
+                return;
+            }
+            if (window.history.length > 1 && document.referrer && !document.referrer.includes('login.html')) {
+                window.history.back();
+            } else {
+                window.location.href = 'home.html';
+            }
+        }
+    </script>
+
+    <!-- ===== FIXED BOTTOM NAVIGATION BAR (SMALLER DEVICES ONLY) ===== -->
+    <nav class="app-bottom-nav lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-t border-edge shadow-[0_-4px_20px_rgba(3,93,105,0.08)] px-2 py-2 flex items-center justify-around">
+        <a href="home.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-home text-base"></i>
+            <span>Home</span>
+        </a>
+        <a href="ai.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-robot text-base"></i>
+            <span>AI Vet</span>
+        </a>
+        <a href="climate-dashboard.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-satellite-dish text-base"></i>
+            <span>Climate</span>
+        </a>
+        <a href="community.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-users text-base"></i>
+            <span>Community</span>
+        </a>
+        <a href="vet-home.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-user-md text-base"></i>
+            <span>Vets</span>
+        </a>
+    </nav>
+
+    <script defer src="js/firebase-config.js"></script>
+    <script defer src="js/auth.js"></script>
+    <script defer src="js/profile.js"></script>
+    <script defer src="js/scale.js"></script>
+</body>
+</html>

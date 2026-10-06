@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DailyVet | Interactive Division Risk & GIS Epidemiological Map</title>
+    <meta name="theme-color" content="#4f46e5" />
+    <link rel="manifest" href="manifest.json" />
+
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="DailyVet" />
+    <link rel="apple-touch-icon" href="assets/dailyvetlogo.jpeg" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+    <link rel="preconnect" href="https://unpkg.com" crossorigin />
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin="" />
+
+    <!-- Tailwind CSS v4 -->
+    <script src="js/tailwind-v4.js"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-deep: #035D69;
+            --color-dark: #023d47;
+            --color-teal: #088F8F;
+            --color-line: #b2e0e6;
+            --color-soft: #eef7f8;
+            --color-edge: #e0f0f2;
+            --color-mute: #8ab8be;
+            --color-danger: #e74c3c;
+        }
+    </style>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="stylesheet" href="css/climate.css" />
+
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <style>
+        /* Fixed Bottom Navigation Bar - ONLY on smaller devices (<1024px) */
+        @media (max-width: 1023px) {
+            .app-bottom-nav {
+                position: fixed !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                z-index: 50 !important;
+                display: flex !important;
+            }
+        }
+        @media (min-width: 1024px) {
+            .app-bottom-nav {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-[#f0f8fa] via-[#edf6f8] to-[#e7f2f4] text-slate-800 min-h-screen py-6 px-3 sm:px-6 lg:px-8 antialiased selection:bg-teal selection:text-white flex justify-center items-start pb-24 lg:pb-8">
+    <div class="climate-feature-container w-full max-w-5xl lg:max-w-6xl bg-white/95 backdrop-blur-xl border border-edge rounded-[32px] shadow-[0_24px_70px_rgba(3,93,105,0.09)] p-5 sm:p-8 lg:p-10 flex flex-col gap-6 text-left" data-feature="map">
+
+        <!-- ===== TOP HEADER ===== -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-edge">
+            <div class="flex items-center gap-3">
+                <button class="w-11 h-11 rounded-2xl bg-soft border border-line text-deep hover:bg-edge hover:scale-105 active:scale-95 flex items-center justify-center transition-all cursor-pointer flex-shrink-0 shadow-xs" onclick="window.location.href='climate-dashboard.html'" title="Back to Mission Hub">
+                    <i class="fas fa-arrow-left text-sm"></i>
+                </button>
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white flex items-center justify-center text-xl shadow-md flex-shrink-0 ring-4 ring-indigo-500/10">
+                        <i class="fas fa-map-location-dot"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h1 class="text-xl sm:text-2xl font-black text-deep tracking-tight">Interactive Division Risk Map</h1>
+                            <span class="px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-800 text-[10px] font-extrabold uppercase tracking-wider border border-indigo-200">GIS Choropleth</span>
+                        </div>
+                        <p class="text-xs font-semibold text-teal mt-0.5">Geographic risk bubbles &bull; Division to District &amp; Upazila drill-downs &bull; NASA POWER &times; SEDAC</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 self-start sm:self-auto">
+                <div class="telemetry-chip pulse-purple shadow-xs">
+                    <span class="live-beacon text-indigo-600"></span>
+                    <span>GEOJSON MULTI-LAYER GIS</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== UNIFIED CLIMATE SUITE NAVIGATION TABS ===== -->
+        <div class="climate-suite-nav shadow-xs">
+            <a href="climate-dashboard.html" class="climate-nav-pill">
+                <i class="fas fa-gauge-high"></i>
+                <span>Mission Hub</span>
+            </a>
+            <a href="climate-thi.html" class="climate-nav-pill">
+                <i class="fas fa-temperature-high text-amber-500"></i>
+                <span>Heat THI</span>
+            </a>
+            <a href="climate-forage.html" class="climate-nav-pill">
+                <i class="fas fa-seedling text-emerald-500"></i>
+                <span>Forage Rotation</span>
+            </a>
+            <a href="climate-outbreak.html" class="climate-nav-pill">
+                <i class="fas fa-triangle-exclamation text-rose-500"></i>
+                <span>Disease Radar</span>
+            </a>
+            <a href="climate-impact.html" class="climate-nav-pill">
+                <i class="fas fa-users-rays text-purple-500"></i>
+                <span>SEDAC Impact</span>
+            </a>
+            <a href="climate-air-quality.html" class="climate-nav-pill">
+                <i class="fas fa-wind text-cyan-500"></i>
+                <span>Air &amp; UV</span>
+            </a>
+        </div>
+
+        <!-- ===== GEOSPATIAL SEARCH BAR & BREADCRUMBS ===== -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5">
+            <div class="map-search-wrapper flex-1">
+                <div class="map-search-bar">
+                    <i class="fas fa-magnifying-glass"></i>
+                    <input type="text" id="mapSearchInput" placeholder="বিভাগ, জেলা বা উপজেলা খুঁজুন (Search division, district or upazila)..." autocomplete="off" />
+                </div>
+                <div id="mapSearchResults" class="map-search-results"></div>
+            </div>
+
+            <!-- BREADCRUMB & BACK BUTTON -->
+            <div class="map-breadcrumb-bar shrink-0 flex items-center gap-2.5 p-2 bg-slate-50 border border-slate-200 rounded-2xl">
+                <button class="map-back-btn" id="mapBackBtn" onclick="window.__mapBackToDivisions()" style="display: none;" title="Back to All Divisions">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="map-breadcrumb px-2 text-xs" id="mapBreadcrumb">
+                    <span class="map-bc-active text-deep font-black">বাংলাদেশ (All 8 Divisions)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== LEAFLET GIS MAP CONTAINER ===== -->
+        <div class="map-wrapper shadow-lg">
+            <div id="divisionMap"></div>
+            <div id="mapLoading" class="map-loading" style="display: flex;">
+                <div class="w-14 h-14 rounded-2xl bg-indigo-50 border border-indigo-200 text-indigo-600 flex items-center justify-center text-2xl shadow-xs">
+                    <i class="fas fa-satellite fa-bounce"></i>
+                </div>
+                <div class="text-center">
+                    <span class="block text-sm font-black text-slate-800">মানচিত্র ও স্যাটেলাইট রিস্ক লেয়ার লোড হচ্ছে...</span>
+                    <span class="block text-xs font-mono text-slate-500 mt-0.5">Fetching GeoJSON boundary polygons and NASA POWER telemetry</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== INTERACTIVE DRILL-DOWN RESULT CARD ===== -->
+        <div id="mapResult" class="map-result" style="display: none;"></div>
+
+        <!-- ===== RISK SCORE COLOR REFERENCE ===== -->
+        <div id="mapScoreReference" class="map-score-reference"></div>
+
+        <!-- ===== GEOSPATIAL DISCLAIMER ===== -->
+        <div class="p-4.5 bg-gradient-to-r from-indigo-50/90 via-violet-50/70 to-indigo-50/90 border border-indigo-200/90 rounded-2xl flex items-start gap-3.5 text-xs text-indigo-950 shadow-xs">
+            <div class="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center shrink-0 text-sm shadow-xs">
+                <i class="fas fa-layer-group"></i>
+            </div>
+            <div class="leading-relaxed">
+                <strong class="font-extrabold block text-indigo-900 mb-0.5">Geospatial Risk Layer Integration:</strong>
+                <span>Interactive map bubbles synthesize live NASA POWER meteorological feeds (temperature, relative humidity, precipitation anomalies), 7-day Open-Meteo forecasting models, and SEDAC GPWv4 livestock population densities. Click any region bubble to drill down into district and upazila containment strategies.</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== FIXED BOTTOM NAVIGATION BAR (SMALLER DEVICES ONLY) ===== -->
+    <nav class="app-bottom-nav lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-t border-edge shadow-[0_-4px_20px_rgba(3,93,105,0.08)] px-2 py-2 flex items-center justify-around">
+        <a href="home.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-home text-base"></i>
+            <span>Home</span>
+        </a>
+        <a href="ai.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-robot text-base"></i>
+            <span>AI Vet</span>
+        </a>
+        <a href="climate-dashboard.html" class="flex flex-col items-center gap-1 text-teal font-bold text-[10px] py-1 px-3 rounded-xl">
+            <i class="fas fa-satellite-dish text-base"></i>
+            <span>Climate</span>
+        </a>
+        <a href="community.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-users text-base"></i>
+            <span>Community</span>
+        </a>
+        <a href="vet-home.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-user-md text-base"></i>
+            <span>Vets</span>
+        </a>
+    </nav>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+
+    <!-- Scripts -->
+    <script defer src="js/firebase-config.js"></script>
+    <script defer src="js/auth.js"></script>
+    <script defer src="js/notification-engine.js"></script>
+    <script defer src="js/scale.js"></script>
+    <script defer src="js/nasa-power-api.js"></script>
+    <script defer src="js/nasa-climate-engine.js"></script>
+    <script defer src="js/nasa-outbreak-engine.js"></script>
+    <script defer src="js/nasa-sedac-mapper.js"></script>
+    <script defer src="js/open-meteo-forecast.js"></script>
+    <script defer src="js/bd-divisions.js"></script>
+    <script defer src="js/leaflet-geojson-loader.js"></script>
+    <script defer src="js/climate-map.js"></script>
+</body>
+</html>

@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DailyVet Admin | Medicine Purpose Bilingual Migration</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+
+    <script src="js/tailwind-v4.js"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-deep: #035D69;
+            --color-dark: #023d47;
+            --color-teal: #088F8F;
+            --color-line: #b2e0e6;
+            --color-soft: #eef7f8;
+            --color-edge: #e0f0f2;
+            --color-mute: #8ab8be;
+            --color-danger: #e74c3c;
+        }
+        .success { @apply text-emerald-600 font-semibold; }
+        .error { @apply text-rose-600 font-semibold; }
+        .info { @apply text-teal; }
+        .warning-text { @apply text-amber-600; }
+    </style>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+</head>
+<body class="bg-gradient-to-b from-[#f4f9fa] to-[#eef5f6] text-slate-800 min-h-screen py-6 px-4 sm:px-6 lg:px-8 antialiased flex justify-center items-start">
+    <div class="w-full max-w-4xl bg-white/95 backdrop-blur-md border border-edge rounded-3xl shadow-[0_20px_60px_rgba(3,93,105,0.08)] p-6 sm:p-10 flex flex-col gap-6">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between pb-4 border-b border-edge text-left">
+            <div class="flex items-center gap-3">
+                <button class="w-10 h-10 rounded-xl bg-soft hover:bg-edge text-deep flex items-center justify-center transition-colors cursor-pointer border border-line flex-shrink-0" onclick="window.location.href='home.html'" title="Return Home">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-700 text-white flex items-center justify-center text-lg shadow-sm flex-shrink-0">
+                        <i class="fas fa-language"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-extrabold text-deep tracking-tight">Purpose Bilingual Migration</h1>
+                        <p class="text-xs font-semibold text-teal">Database administrative translation pipeline</p>
+                    </div>
+                </div>
+            </div>
+            <span class="px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-bold border border-purple-200">
+                Admin Console
+            </span>
+        </div>
+
+        <!-- Warning -->
+        <div class="bg-amber-50/90 border border-amber-200 p-4 rounded-2xl text-amber-900 text-xs sm:text-sm leading-relaxed flex items-start gap-3 shadow-xs">
+            <i class="fas fa-triangle-exclamation text-amber-600 text-base shrink-0 mt-0.5"></i>
+            <div>
+                <strong>Schema Migration:</strong> Appends the normalized English <code class="px-1.5 py-0.5 bg-white border border-amber-300 rounded text-xs font-mono">purpose_en</code> field to each disease treatment object while retaining the original Bengali text.
+            </div>
+        </div>
+
+        <!-- Metrics Overview -->
+        <div class="bg-soft/60 border border-edge p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs sm:text-sm text-deep">
+            <div class="flex items-center gap-4">
+                <span>Unique BN: <strong id="uniqueCount">—</strong></span>
+                <span>Translated: <strong id="translatedCount" class="text-emerald-600">—</strong></span>
+            </div>
+            <span class="text-xs text-rose-600 font-bold">
+                Missing Translation: <span id="missingCount">—</span>
+            </span>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="bg-white p-4 rounded-2xl text-center border border-slate-200 shadow-xs">
+                <div class="text-2xl sm:text-3xl font-extrabold text-deep" id="statDiseases">0</div>
+                <div class="text-xs text-teal font-bold mt-1">📄 Diseases</div>
+            </div>
+            <div class="bg-white p-4 rounded-2xl text-center border border-slate-200 shadow-xs">
+                <div class="text-2xl sm:text-3xl font-extrabold text-deep" id="statTreatments">0</div>
+                <div class="text-xs text-teal font-bold mt-1">💊 Treatments</div>
+            </div>
+            <div class="bg-white p-4 rounded-2xl text-center border border-slate-200 shadow-xs">
+                <div class="text-2xl sm:text-3xl font-extrabold text-deep" id="statUnique">0</div>
+                <div class="text-xs text-teal font-bold mt-1">🈯 Unique Bengali</div>
+            </div>
+            <div class="bg-white p-4 rounded-2xl text-center border border-slate-200 shadow-xs">
+                <div class="text-2xl sm:text-3xl font-extrabold text-deep" id="statMissing">0</div>
+                <div class="text-xs text-teal font-bold mt-1">⚠️ Missing English</div>
+            </div>
+        </div>
+
+        <!-- Pipeline Actions -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <button id="previewBtn" onclick="runPreview()" class="py-3.5 px-4 bg-gradient-to-r from-deep to-teal hover:from-dark hover:to-deep text-white rounded-xl text-sm font-bold shadow-md shadow-teal/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border-none flex items-center justify-center gap-2">
+                <i class="fas fa-search"></i>
+                <span>1. Preview Translations</span>
+            </button>
+
+            <button id="migrateBtn" onclick="runMigration()" disabled class="py-3.5 px-4 bg-gradient-to-r from-purple-700 to-indigo-800 text-white rounded-xl text-sm font-bold shadow-md shadow-purple-900/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border-none flex items-center justify-center gap-2">
+                <i class="fas fa-database"></i>
+                <span>2. Migrate to Firestore</span>
+            </button>
+
+            <button id="undoBtn" onclick="removeEnglishField()" class="py-3.5 px-4 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl text-sm font-bold transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                <i class="fas fa-rotate-left text-danger"></i>
+                <span>Revert Field</span>
+            </button>
+        </div>
+
+        <!-- Output Log -->
+        <div class="flex flex-col gap-2 text-left">
+            <label class="text-xs font-bold text-deep uppercase tracking-wider">Migration Log Output</label>
+            <div id="log" class="bg-slate-900 text-emerald-400 border border-slate-800 rounded-2xl p-4 sm:p-5 font-mono text-xs sm:text-sm max-h-96 overflow-y-auto whitespace-pre-wrap leading-relaxed shadow-inner">Ready. Click "Preview Translations" to start.</div>
+        </div>
+        <div id="previewBox" class="text-left mt-2"></div>
+    </div>
+
+    <script src="js/firebase-config.js"></script>
+
+    <script>
+        // ============================================
+        // 🌐 COMPLETE TRANSLATION MAP (Bangla → English)
+        // ============================================
+        const PURPOSE_TRANSLATIONS = {
+            // Fever / Pain
+            'জ্বর ও ব্যথা': 'Fever & pain',
+            'জ্বর': 'Fever',
+            'ব্যথা': 'Pain relief',
+            'জ্বর-ব্যথা': 'Fever & pain',
+
+            // Secondary infection
+            'সেকেন্ডারি': 'Secondary infection',
+            'সেকেন্ডারি ইনফেকশন': 'Secondary infection',
+            'সেকেন্ডারি ইনফেকশন প্রতিরোধ': 'Prevent secondary infection',
+
+            // Allergy / Swelling
+            'অ্যালার্জি ও ফোলা': 'Allergy & swelling',
+            'অ্যালার্জি': 'Allergy',
+
+            // Mouth / Topical
+            'মুখ ধোয়া': 'Mouth wash',
+            'মুখ পরিষ্কার': 'Clean mouth',
+            'ক্ষত পরিষ্কার': 'Clean wounds',
+
+            // Dehydration / Support
+            'ডিহাইড্রেশন': 'Dehydration',
+            'সহায়ক': 'Supportive care',
+            'সহায়ক চিকিৎসা': 'Supportive care',
+
+            // Bacterial / Antibiotics
+            'ব্যাকটেরিয়া': 'Bacterial infection',
+            'ব্যাকটেরিয়া নিধন': 'Antibacterial action',
+            'অ্যান্টিবায়োটিক': 'Antibiotic',
+            'অ্যান্টিবায়োটিক থেরাপি': 'Antibiotic therapy',
+
+            // Primary treatment
+            'মূল চিকিৎসা': 'Primary treatment',
+            'প্রধান চিকিৎসা': 'Primary treatment',
+
+            // Parasites / Dewormers
+            'গোলকৃমি': 'Roundworm treatment',
+            'গোলকৃমি + এক্টো': 'Roundworm + external parasites',
+            'কৃমিনাশক': 'Dewormer',
+            'লিভার ফ্লুক': 'Liver fluke treatment',
+            'লিভার ফ্লুক নিধন': 'Liver fluke treatment',
+            'ম্যাগট নিধন': 'Maggot removal',
+            'মাইট নিধন': 'Mite treatment',
+            'লার্ভা নিধন': 'Larva treatment',
+            'ট্রাইকোমোনাস': 'Trichomonas treatment',
+            'ককসিডিয়া + রক্তপাত': 'Coccidia + bleeding control',
+            'ককসিডিয়া': 'Coccidia treatment',
+            'ককসিডিওসিস': 'Coccidiosis treatment',
+            'অ্যানাপ্লাজমা': 'Anaplasma treatment',
+            'বেবেসিয়া': 'Babesia treatment',
+
+            // Calcium / Minerals
+            'ক্যালসিয়াম': 'Calcium supplement',
+            'ক্যালসিয়াম ও D3': 'Calcium & Vitamin D3',
+            'খনিজ সাপ্লিমেন্ট': 'Mineral supplement',
+            'আয়রন': 'Iron supplement',
+
+            // Vitamins
+            'ভিটামিন': 'Vitamin supplement',
+            'ভিটামিন সি': 'Vitamin C',
+            'ভিটামিন কে': 'Vitamin K',
+
+            // GI
+            'গ্যাস ভাঙা': 'Gas relief',
+            'অ্যান্টি-ফোমিং': 'Anti-foaming',
+            'অন্ত্র চালু': 'Restart gut motility',
+            'অন্ত্র পরিষ্কার': 'Gut cleanse',
+            'বমি বন্ধ': 'Anti-emetic',
+            'অ্যাসিড নিয়ন্ত্রণ': 'Acid control',
+
+            // Respiratory
+            'শ্বাসকষ্ট কমাতে': 'Relieve breathing difficulty',
+            'কাশি নিয়ন্ত্রণ': 'Cough control',
+
+            // Urinary
+            'প্রস্রাব বাড়ানো': 'Increase urination',
+            'প্রস্রাবের স্প্যাজম': 'Urinary spasm relief',
+
+            // Skin
+            'অ্যান্টিফাঙ্গাল': 'Antifungal',
+            'ছত্রাক নিধন': 'Antifungal',
+            'চর্মরোগ': 'Skin disease treatment',
+
+            // Antiseptic / Topical
+            'অ্যান্টিসেপটিক': 'Antiseptic',
+            'ক্ষত জীবাণুমুক্তকরণ': 'Wound disinfection',
+            'ফুট বাথ': 'Foot bath',
+            'টপিক্যাল চিকিৎসা': 'Topical treatment',
+
+            // Toxin
+            'বিষক্রিয়া': 'Toxin neutralization',
+            'অ্যান্টিটক্সিন': 'Antitoxin',
+
+            // Reproductive
+            'জরায়ু সংকোচন': 'Uterine contraction',
+            'গর্ভফুল বের করা': 'Expel retained placenta',
+            'ডিম্বস্ফোটন': 'Ovulation induction',
+            'প্রসব ত্বরান্বিত': 'Induce labor',
+
+            // Hormone
+            'হরমোন থেরাপি': 'Hormone therapy',
+
+            // Toxin / Poisoning
+            'বিষাক্ত পদার্থ': 'Poison neutralization',
+
+            // Miscellaneous
+            'রক্তপাত বন্ধ': 'Stop bleeding',
+            'রক্তক্ষরণ নিয়ন্ত্রণ': 'Hemorrhage control',
+            'ব্যথানাশক': 'Painkiller',
+            'উত্তেজক': 'Stimulant',
+            'শক্তিশালীকরণ': 'Strengthening',
+            'পেশি শিথিলকরণ': 'Muscle relaxation',
+            'খিঁচুনি নিয়ন্ত্রণ': 'Seizure control',
+            'ঘুম পাড়ানো': 'Sedation',
+
+            // Growth
+            'বৃদ্ধি ত্বরান্বিত': 'Growth promotion',
+            'ওজন বৃদ্ধি': 'Weight gain',
+
+            // Prevention
+            'প্রতিরোধ': 'Prevention',
+            'টিকা কার্যকারিতা': 'Vaccine efficacy',
+
+            // Additional common ones
+            'গ্যাস্ট্রিক আলসার': 'Gastric ulcer treatment',
+            'লিভার সুরক্ষা': 'Liver protection',
+            'কিডনি সুরক্ষা': 'Kidney protection',
+            'রক্ত পরিষ্কার': 'Blood purification',
+            'ইমিউনিটি বুস্ট': 'Immunity boost',
+            'স্ট্রেস কমানো': 'Stress reduction'
+        };
+
+        // ============================================
+        // STATE
+        // ============================================
+        let allDiseases = [];           // All disease docs
+        let uniquePurposes = new Set(); // Unique Bangla purposes found
+        let missingTranslations = [];   // Bangla purposes without translation
+        let totalTreatments = 0;
+        let isPreviewDone = false;
+
+        // ============================================
+        // LOG
+        // ============================================
+        const logEl = document.getElementById('log');
+
+        function log(msg, type = 'info') {
+            const time = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = `[${time}] ${msg}`;
+            logEl.appendChild(div);
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        // ============================================
+        // STEP 1: PREVIEW
+        // ============================================
+        async function runPreview() {
+            const btn = document.getElementById('previewBtn');
+            btn.disabled = true;
+            logEl.innerHTML = '';
+            document.getElementById('previewBox').innerHTML = '';
+
+            log('📥 Loading diseases from Firestore...', 'info');
+
+            try {
+                const snap = await firebase.firestore().collection('diseases').get();
+
+                if (snap.empty) {
+                    log('❌ No diseases found in Firestore.', 'error');
+                    btn.disabled = false;
+                    return;
+                }
+
+                allDiseases = [];
+                snap.forEach(doc => {
+                    allDiseases.push({ id: doc.id, ...doc.data() });
+                });
+
+                log(`✅ Loaded ${allDiseases.length} diseases`, 'success');
+
+                // Scan all purposes
+                uniquePurposes = new Set();
+                missingTranslations = [];
+                totalTreatments = 0;
+
+                allDiseases.forEach(disease => {
+                    (disease.treatment || []).forEach(tr => {
+                        totalTreatments++;
+                        const p = (tr.purpose || '').trim();
+                        if (!p) return;
+
+                        uniquePurposes.add(p);
+
+                        if (!PURPOSE_TRANSLATIONS[p]) {
+                            if (!missingTranslations.includes(p)) {
+                                missingTranslations.push(p);
+                            }
+                        }
+                    });
+                });
+
+                // Update stats
+                const uniqueArr = Array.from(uniquePurposes);
+                const translatedCount = uniqueArr.filter(p => PURPOSE_TRANSLATIONS[p]).length;
+
+                document.getElementById('uniqueCount').textContent = uniqueArr.length;
+                document.getElementById('translatedCount').textContent = translatedCount;
+                document.getElementById('missingCount').textContent = missingTranslations.length;
+                document.getElementById('statDiseases').textContent = allDiseases.length;
+                document.getElementById('statTreatments').textContent = totalTreatments;
+                document.getElementById('statUnique').textContent = uniqueArr.length;
+                document.getElementById('statMissing').textContent = missingTranslations.length;
+
+                log('', 'info');
+                log(`📊 Unique Bangla purposes: ${uniqueArr.length}`, 'info');
+                log(`✅ Translated: ${translatedCount}`, 'success');
+                if (missingTranslations.length > 0) {
+                    log(`⚠️ Missing translation: ${missingTranslations.length}`, 'warning-text');
+                }
+
+                renderMappingPreview();
+                isPreviewDone = true;
+                document.getElementById('migrateBtn').disabled = false;
+
+            } catch (err) {
+                console.error(err);
+                log(`❌ Error: ${err.message}`, 'error');
+            }
+
+            btn.disabled = false;
+        }
+
+        // ============================================
+        // PREVIEW TABLE
+        // ============================================
+        function renderMappingPreview() {
+            const previewBox = document.getElementById('previewBox');
+            const uniqueArr = Array.from(uniquePurposes).sort();
+
+            let html = `
+                <h3 class="mb-2.5 text-sm font-bold text-deep">
+                    📋 All Unique Purposes (${uniqueArr.length})
+                </h3>
+                <div class="max-h-80 overflow-y-auto border border-line rounded-xl p-3 text-xs leading-loose bg-white">
+            `;
+
+            uniqueArr.forEach(p => {
+                const en = PURPOSE_TRANSLATIONS[p];
+                const isMissing = !en;
+                html += `
+                    <div class="flex gap-2.5 py-1 border-b border-dashed border-edge last:border-b-0">
+                        <span class="font-semibold min-w-[45%] break-words ${isMissing ? 'text-rose-600' : 'text-deep'}">${escapeHtml(p)}</span>
+                        <span class="font-semibold flex-1 break-words ${isMissing ? 'text-amber-600 italic' : 'text-teal'}">
+                            ${isMissing ? '⚠️ NO TRANSLATION' : '→ ' + escapeHtml(en)}
+                        </span>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+
+            if (missingTranslations.length > 0) {
+                html += `
+                    <div class="bg-amber-50 border border-amber-300 p-3 sm:p-4 rounded-xl text-amber-900 text-xs sm:text-sm mt-3.5 leading-relaxed">
+                        ⚠️ <strong>${missingTranslations.length} purposes</strong> এর translation নেই।
+                        Firestore-এ এগুলো original Bangla-তেই থাকবে (purpose_en field যোগ হবে না)।
+                        <br>💡 চাইলে আমাকে list পাঠান — translation যোগ করে দেব।
+                    </div>
+                `;
+            }
+
+            previewBox.innerHTML = html;
+        }
+
+        // ============================================
+        // STEP 2: MIGRATE
+        // ============================================
+        async function runMigration() {
+            if (!isPreviewDone) {
+                log('❌ Please run Preview first.', 'error');
+                return;
+            }
+
+            if (!confirm('⚠️ Migrate all diseases with purpose_en field?\n\nOriginal Bangla purpose field will be kept.')) {
+                return;
+            }
+
+            const btn = document.getElementById('migrateBtn');
+            btn.disabled = true;
+
+            log('', 'info');
+            log('🚀 Starting migration...', 'info');
+
+            try {
+                const db = firebase.firestore();
+                const CHUNK = 400;
+
+                let updated = 0;
+                let skipped = 0;
+                let noChange = 0;
+
+                // Process in chunks
+                for (let i = 0; i < allDiseases.length; i += CHUNK) {
+                    const chunk = allDiseases.slice(i, i + CHUNK);
+                    const batch = db.batch();
+
+                    let chunkUpdated = 0;
+
+                    chunk.forEach(disease => {
+                        const treatments = disease.treatment || [];
+                        let changed = false;
+
+                        const newTreatments = treatments.map(tr => {
+                            const p = (tr.purpose || '').trim();
+                            const en = PURPOSE_TRANSLATIONS[p];
+
+                            if (!p) return tr;
+
+                            if (en && tr.purpose_en !== en) {
+                                changed = true;
+                                return { ...tr, purpose_en: en };
+                            }
+                            return tr;
+                        });
+
+                        if (changed) {
+                            const ref = db.collection('diseases').doc(disease.id);
+                            batch.update(ref, {
+                                treatment: newTreatments,
+                                'metadata.purpose_translated_at': Date.now()
+                            });
+                            chunkUpdated++;
+                            updated++;
+                        } else {
+                            noChange++;
+                        }
+                    });
+
+                    if (chunkUpdated > 0) {
+                        await batch.commit();
+                        log(`✅ Chunk ${Math.floor(i / CHUNK) + 1}: updated ${chunkUpdated} diseases`, 'success');
+                    } else {
+                        log(`⏭️ Chunk ${Math.floor(i / CHUNK) + 1}: no changes needed`, 'info');
+                    }
+                }
+
+                log('', 'info');
+                log(`🎉 Migration complete!`, 'success');
+                log(`✅ Updated: ${updated} diseases`, 'success');
+                log(`⏭️ No change: ${noChange} diseases`, 'info');
+                log('✨ You can now close this page.', 'success');
+
+            } catch (err) {
+                console.error(err);
+                log(`❌ Migration failed: ${err.message}`, 'error');
+                if (err.message.includes('permission')) {
+                    log('💡 Check Firestore Rules — diseases collection needs write access', 'warning-text');
+                }
+            }
+
+            btn.disabled = false;
+        }
+
+        // ============================================
+        // UNDO: Remove purpose_en field
+        // ============================================
+        async function removeEnglishField() {
+            if (!confirm('⚠️ Remove purpose_en from all treatments?\n\nOriginal Bangla purpose will remain.')) return;
+            if (!confirm('Absolutely sure?')) return;
+
+            const btn = document.getElementById('undoBtn');
+            btn.disabled = true;
+
+            log('', 'info');
+            log('🗑️ Removing purpose_en field...', 'info');
+
+            try {
+                const snap = await firebase.firestore().collection('diseases').get();
+                const db = firebase.firestore();
+                const CHUNK = 400;
+
+                const docs = snap.docs;
+                let updated = 0;
+
+                for (let i = 0; i < docs.length; i += CHUNK) {
+                    const batch = db.batch();
+                    let chunkCount = 0;
+
+                    docs.slice(i, i + CHUNK).forEach(doc => {
+                        const data = doc.data();
+                        const treatments = data.treatment || [];
+
+                        const hasEn = treatments.some(tr => tr.purpose_en !== undefined);
+                        if (!hasEn) return;
+
+                        const newTreatments = treatments.map(tr => {
+                            const copy = { ...tr };
+                            delete copy.purpose_en;
+                            return copy;
+                        });
+
+                        batch.update(doc.ref, { treatment: newTreatments });
+                        chunkCount++;
+                        updated++;
+                    });
+
+                    if (chunkCount > 0) {
+                        await batch.commit();
+                        log(`🗑️ Chunk ${Math.floor(i / CHUNK) + 1}: cleaned ${chunkCount}`, 'warning-text');
+                    }
+                }
+
+                log(`✅ Removed purpose_en from ${updated} diseases.`, 'success');
+            } catch (err) {
+                log(`❌ Error: ${err.message}`, 'error');
+            }
+
+            btn.disabled = false;
+        }
+
+        // ============================================
+        // HELPERS
+        // ============================================
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = String(text);
+            return div.innerHTML;
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                if (typeof firebase === 'undefined' || !firebase.apps.length) {
+                    log('❌ Firebase not loaded. Check js/firebase-config.js', 'error');
+                } else {
+                    log('✅ Firebase ready.', 'success');
+                    log('👉 Click "Step 1: Preview Translations" to start.', 'info');
+                }
+            }, 300);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+    <title>DailyVet | Doctor Profile</title>
+    <meta name="theme-color" content="#035D69" />
+    <link rel="manifest" href="manifest.json" />
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="DailyVet" />
+    <link rel="apple-touch-icon" href="assets/dailyvetlogo.jpeg" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+
+    <!-- Tailwind CSS v4 -->
+    <script src="js/tailwind-v4.js"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-deep: #035D69;
+            --color-dark: #023d47;
+            --color-teal: #088F8F;
+            --color-line: #b2e0e6;
+            --color-soft: #eef7f8;
+            --color-edge: #e0f0f2;
+            --color-mute: #8ab8be;
+            --color-danger: #e74c3c;
+        }
+    </style>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <!-- Firebase SDKs -->
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+    <style>
+        /* Fixed Bottom Navigation Bar - ONLY on smaller devices (<1024px) */
+        @media (max-width: 1023px) {
+            .app-bottom-nav {
+                position: fixed !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                z-index: 50 !important;
+                display: flex !important;
+            }
+        }
+        @media (min-width: 1024px) {
+            .app-bottom-nav {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-b from-[#f4f9fa] to-[#eef5f6] text-slate-800 min-h-screen py-6 px-4 sm:px-6 lg:px-8 antialiased selection:bg-teal selection:text-white flex justify-center items-start pb-24 lg:pb-6">
+    <div class="profile-container w-full max-w-3xl lg:max-w-4xl bg-white/95 backdrop-blur-md border border-edge rounded-3xl shadow-[0_20px_50px_rgba(3,93,105,0.08)] p-6 sm:p-10 flex flex-col gap-6" id="vetProfileContainer">
+
+        <!-- ===== HEADER ===== -->
+        <div class="flex items-center justify-between pb-4 border-b border-edge">
+            <button class="w-10 h-10 rounded-xl bg-soft hover:bg-edge text-deep flex items-center justify-center transition-colors cursor-pointer border border-line" onclick="window.location.href='profile.html'" title="User Profile">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <div class="text-center">
+                <h2 class="text-xl sm:text-2xl font-extrabold text-deep tracking-tight">Doctor Profile</h2>
+                <p class="text-xs font-medium text-slate-500 hidden sm:block">Public professional credentials</p>
+            </div>
+            <button class="px-4 py-2 rounded-xl bg-teal/10 hover:bg-teal/20 text-deep font-bold text-xs sm:text-sm border border-teal/20 transition-all cursor-pointer inline-flex items-center gap-1.5" onclick="window.location.href='vet-home.html'">
+                <i class="fas fa-th-large text-teal"></i> Dashboard
+            </button>
+        </div>
+
+        <!-- ===== VET BANNER ===== -->
+        <div class="flex items-center gap-3.5 p-4 bg-gradient-to-r from-emerald-50 via-teal-50 to-cyan-50 border border-teal-200 rounded-2xl text-left text-sm text-deep shadow-xs">
+            <div class="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center text-lg shrink-0 shadow-xs">
+                <i class="fas fa-user-md"></i>
+            </div>
+            <div>
+                <p class="font-bold text-deep text-sm sm:text-base">Verified Veterinarian Practitioner</p>
+                <p class="text-xs text-slate-600 mt-0.5">Your profile and services are actively listed in the DailyVet public directory.</p>
+            </div>
+        </div>
+
+        <!-- ===== VET PROFILE FORM ===== -->
+        <form class="flex flex-col gap-6" id="vetProfileForm">
+
+            <!-- Profile Picture -->
+            <div class="flex flex-col items-center gap-2 text-center p-6 bg-soft/50 rounded-2xl border border-edge">
+                <div class="relative w-28 h-28 rounded-full bg-white border-3 border-teal flex items-center justify-center overflow-hidden shadow-md group">
+                    <img id="vetProfileImage" src="" alt="Profile" class="w-full h-full object-cover" onerror="this.src='assets/dailyvetlogo.png'" />
+                    <label for="vetProfilePicInput" class="absolute bottom-1 right-1 w-9 h-9 rounded-full bg-deep text-white flex items-center justify-center text-xs cursor-pointer shadow-md hover:bg-teal transition-colors">
+                        <i class="fas fa-camera"></i>
+                    </label>
+                    <input type="file" id="vetProfilePicInput" accept="image/*" style="display:none;" />
+                </div>
+                <small class="text-xs text-mute font-medium">Click camera icon to change profile photo</small>
+            </div>
+
+            <!-- Form Grid: 2-column on tablet and desktop -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 text-left">
+                <!-- Name -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-bold text-deep uppercase tracking-wider">Full Name <span class="text-danger">*</span></label>
+                    <div class="relative flex items-center">
+                        <i class="fas fa-user-md absolute left-4 text-mute text-sm pointer-events-none"></i>
+                        <input type="text" id="vetProfileName" class="w-full pl-11 pr-4 py-3.5 text-[15px] font-medium text-deep bg-slate-50/50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-teal focus:ring-4 focus:ring-teal/10 transition-all placeholder:text-mute" placeholder="Dr. Your name" required />
+                    </div>
+                </div>
+
+                <!-- Phone (read-only) -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-bold text-deep uppercase tracking-wider">Mobile Number</label>
+                    <div class="relative flex items-center">
+                        <i class="fas fa-phone-alt absolute left-4 text-mute text-sm pointer-events-none"></i>
+                        <input type="tel" id="vetProfilePhone" class="w-full pl-11 pr-4 py-3.5 text-[15px] font-medium text-slate-500 bg-slate-100 border border-slate-200 rounded-xl outline-none cursor-not-allowed" placeholder="01XXXXXXXXX" disabled />
+                    </div>
+                </div>
+
+                <!-- Speciality -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-bold text-deep uppercase tracking-wider">Speciality <span class="text-danger">*</span></label>
+                    <div class="relative flex items-center">
+                        <i class="fas fa-stethoscope absolute left-4 text-mute text-sm pointer-events-none"></i>
+                        <select id="vetProfileSpeciality" class="w-full pl-11 pr-4 py-3.5 text-[15px] font-medium text-deep bg-white border border-slate-200 rounded-xl outline-none focus:border-teal focus:ring-4 focus:ring-teal/10 transition-all" required>
+                            <option value="">Select your speciality</option>
+                            <option value="General Veterinary Medicine">General Veterinary Medicine</option>
+                            <option value="Surgery">Surgery</option>
+                            <option value="Pet Care (Dog & Cat)">Pet Care (Dog & Cat)</option>
+                            <option value="Dairy & Livestock">Dairy & Livestock</option>
+                            <option value="Poultry">Poultry</option>
+                            <option value="Wildlife">Wildlife</option>
+                            <option value="Dermatology">Dermatology (Skin)</option>
+                            <option value="Dentistry">Dentistry</option>
+                            <option value="Ophthalmology">Ophthalmology (Eye)</option>
+                            <option value="Cardiology">Cardiology</option>
+                            <option value="Orthopedics">Orthopedics</option>
+                            <option value="Emergency & Critical Care">Emergency & Critical Care</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Institute -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-bold text-deep uppercase tracking-wider">Institute <span class="text-danger">*</span></label>
+                    <div class="relative flex items-center">
+                        <i class="fas fa-university absolute left-4 text-mute text-sm pointer-events-none"></i>
+                        <select id="vetProfileInstitute" class="w-full pl-11 pr-4 py-3.5 text-[15px] font-medium text-deep bg-white border border-slate-200 rounded-xl outline-none focus:border-teal focus:ring-4 focus:ring-teal/10 transition-all" required>
+                            <option value="">Select your institute</option>
+                            <option value="Bangladesh Agricultural University (BAU)">Bangladesh Agricultural University (BAU)</option>
+                            <option value="Chittagong Veterinary and Animal Sciences University (CVASU)">Chittagong Veterinary & Animal Sciences University (CVASU)</option>
+                            <option value="Sylhet Agricultural University (SAU)">Sylhet Agricultural University (SAU)</option>
+                            <option value="Sher-e-Bangla Agricultural University (SAU)">Sher-e-Bangla Agricultural University (SAU)</option>
+                            <option value="Patuakhali Science and Technology University (PSTU)">Patuakhali Science and Technology University (PSTU)</option>
+                            <option value="Hajee Mohammad Danesh Science and Technology University (HSTU)">Hajee Mohammad Danesh Science & Technology University (HSTU)</option>
+                            <option value="Indian Veterinary Research Institute (IVRI)">Indian Veterinary Research Institute (IVRI)</option>
+                            <option value="Other Institute">Other Institute</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- City -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-bold text-deep uppercase tracking-wider">City <span class="text-danger">*</span></label>
+                    <div class="relative flex items-center">
+                        <i class="fas fa-city absolute left-4 text-mute text-sm pointer-events-none"></i>
+                        <input type="text" id="vetProfileCity" class="w-full pl-11 pr-4 py-3.5 text-[15px] font-medium text-deep bg-slate-50/50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-teal focus:ring-4 focus:ring-teal/10 transition-all placeholder:text-mute" placeholder="Dhaka" required />
+                    </div>
+                </div>
+
+                <!-- Area -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-bold text-deep uppercase tracking-wider">Area <span class="text-danger">*</span></label>
+                    <div class="relative flex items-center">
+                        <i class="fas fa-map-marker-alt absolute left-4 text-mute text-sm pointer-events-none"></i>
+                        <input type="text" id="vetProfileArea" class="w-full pl-11 pr-4 py-3.5 text-[15px] font-medium text-deep bg-slate-50/50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-teal focus:ring-4 focus:ring-teal/10 transition-all placeholder:text-mute" placeholder="Gulshan, Dhanmondi..." required />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Treatments Group -->
+            <div class="flex flex-col gap-2.5 p-4 sm:p-5 bg-soft/50 rounded-2xl border border-edge text-left">
+                <div class="flex items-center justify-between">
+                    <label class="text-xs font-bold text-deep uppercase tracking-wider">Which animals do you treat? <span class="text-danger">*</span></label>
+                    <span class="text-[11px] font-semibold text-teal bg-white px-2 py-0.5 rounded-full border border-teal/20">Select all applicable</span>
+                </div>
+                <div class="flex flex-wrap gap-2 pt-1" id="vetTreatmentGroup">
+                    <label class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-line bg-white text-deep text-xs sm:text-sm font-semibold cursor-pointer select-none transition-all has-[:checked]:bg-deep has-[:checked]:text-white has-[:checked]:border-deep hover:border-teal shadow-xs"><input type="checkbox" value="Dog" class="accent-teal cursor-pointer" /><span>🐕 Dog</span></label>
+                    <label class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-line bg-white text-deep text-xs sm:text-sm font-semibold cursor-pointer select-none transition-all has-[:checked]:bg-deep has-[:checked]:text-white has-[:checked]:border-deep hover:border-teal shadow-xs"><input type="checkbox" value="Cat" class="accent-teal cursor-pointer" /><span>🐈 Cat</span></label>
+                    <label class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-line bg-white text-deep text-xs sm:text-sm font-semibold cursor-pointer select-none transition-all has-[:checked]:bg-deep has-[:checked]:text-white has-[:checked]:border-deep hover:border-teal shadow-xs"><input type="checkbox" value="Bird" class="accent-teal cursor-pointer" /><span>🦜 Bird</span></label>
+                    <label class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-line bg-white text-deep text-xs sm:text-sm font-semibold cursor-pointer select-none transition-all has-[:checked]:bg-deep has-[:checked]:text-white has-[:checked]:border-deep hover:border-teal shadow-xs"><input type="checkbox" value="Fish" class="accent-teal cursor-pointer" /><span>🐠 Fish</span></label>
+                    <label class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-line bg-white text-deep text-xs sm:text-sm font-semibold cursor-pointer select-none transition-all has-[:checked]:bg-deep has-[:checked]:text-white has-[:checked]:border-deep hover:border-teal shadow-xs"><input type="checkbox" value="Rabbit" class="accent-teal cursor-pointer" /><span>🐇 Rabbit</span></label>
+                    <label class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-line bg-white text-deep text-xs sm:text-sm font-semibold cursor-pointer select-none transition-all has-[:checked]:bg-deep has-[:checked]:text-white has-[:checked]:border-deep hover:border-teal shadow-xs"><input type="checkbox" value="Hamster" class="accent-teal cursor-pointer" /><span>🐹 Hamster</span></label>
+                    <label class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-line bg-white text-deep text-xs sm:text-sm font-semibold cursor-pointer select-none transition-all has-[:checked]:bg-deep has-[:checked]:text-white has-[:checked]:border-deep hover:border-teal shadow-xs"><input type="checkbox" value="Cow" class="accent-teal cursor-pointer" /><span>🐄 Cow</span></label>
+                    <label class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-line bg-white text-deep text-xs sm:text-sm font-semibold cursor-pointer select-none transition-all has-[:checked]:bg-deep has-[:checked]:text-white has-[:checked]:border-deep hover:border-teal shadow-xs"><input type="checkbox" value="Goat" class="accent-teal cursor-pointer" /><span>🐐 Goat</span></label>
+                    <label class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-line bg-white text-deep text-xs sm:text-sm font-semibold cursor-pointer select-none transition-all has-[:checked]:bg-deep has-[:checked]:text-white has-[:checked]:border-deep hover:border-teal shadow-xs"><input type="checkbox" value="Sheep" class="accent-teal cursor-pointer" /><span>🐑 Sheep</span></label>
+                    <label class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-line bg-white text-deep text-xs sm:text-sm font-semibold cursor-pointer select-none transition-all has-[:checked]:bg-deep has-[:checked]:text-white has-[:checked]:border-deep hover:border-teal shadow-xs"><input type="checkbox" value="Chicken" class="accent-teal cursor-pointer" /><span>🐔 Chicken</span></label>
+                    <label class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-line bg-white text-deep text-xs sm:text-sm font-semibold cursor-pointer select-none transition-all has-[:checked]:bg-deep has-[:checked]:text-white has-[:checked]:border-deep hover:border-teal shadow-xs"><input type="checkbox" value="Duck" class="accent-teal cursor-pointer" /><span>🦆 Duck</span></label>
+                    <label class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-line bg-white text-deep text-xs sm:text-sm font-semibold cursor-pointer select-none transition-all has-[:checked]:bg-deep has-[:checked]:text-white has-[:checked]:border-deep hover:border-teal shadow-xs"><input type="checkbox" value="Horse" class="accent-teal cursor-pointer" /><span>🐎 Horse</span></label>
+                    <label class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-line bg-white text-deep text-xs sm:text-sm font-semibold cursor-pointer select-none transition-all has-[:checked]:bg-deep has-[:checked]:text-white has-[:checked]:border-deep hover:border-teal shadow-xs"><input type="checkbox" value="Buffalo" class="accent-teal cursor-pointer" /><span>🐃 Buffalo</span></label>
+                    <label class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-line bg-white text-deep text-xs sm:text-sm font-semibold cursor-pointer select-none transition-all has-[:checked]:bg-deep has-[:checked]:text-white has-[:checked]:border-deep hover:border-teal shadow-xs"><input type="checkbox" value="Turtle" class="accent-teal cursor-pointer" /><span>🐢 Turtle</span></label>
+                    <label class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-line bg-white text-deep text-xs sm:text-sm font-semibold cursor-pointer select-none transition-all has-[:checked]:bg-deep has-[:checked]:text-white has-[:checked]:border-deep hover:border-teal shadow-xs"><input type="checkbox" value="Parrot" class="accent-teal cursor-pointer" /><span>🦜 Parrot</span></label>
+                    <label class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-line bg-white text-deep text-xs sm:text-sm font-semibold cursor-pointer select-none transition-all has-[:checked]:bg-deep has-[:checked]:text-white has-[:checked]:border-deep hover:border-teal shadow-xs"><input type="checkbox" value="Other" class="accent-teal cursor-pointer" /><span>🐾 Other</span></label>
+                </div>
+            </div>
+
+            <!-- Save / Cancel -->
+            <div class="flex items-center gap-3 pt-2">
+                <button type="submit" class="save-btn flex-1 bg-gradient-to-r from-deep to-teal hover:from-dark hover:to-deep text-white rounded-xl py-3.5 px-6 font-bold text-sm tracking-wide shadow-md shadow-teal/20 hover:-translate-y-0.5 transition-all cursor-pointer border-none inline-flex items-center justify-center gap-2">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+                <button type="button" class="w-32 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl py-3.5 px-6 font-semibold text-sm cursor-pointer transition-colors border-none" onclick="window.location.href='profile.html'">
+                    Cancel
+                </button>
+            </div>
+        </form>
+
+        <!-- ===== DANGER ZONE ===== -->
+        <div class="flex flex-col items-center gap-1.5 pt-4 border-t border-edge">
+            <button class="delete-account-btn text-danger bg-red-50 hover:bg-red-100 border border-red-200 rounded-xl py-2.5 px-5 font-bold text-xs sm:text-sm transition-colors cursor-pointer inline-flex items-center gap-2" onclick="deleteVetProfileAccount()">
+                <i class="fas fa-user-slash"></i> Delete Vet Account
+            </button>
+            <small class="text-xs text-mute">This will remove you from the public veterinary doctor list. Your standard user account stays.</small>
+        </div>
+
+    </div>
+
+    <!-- ===== FIXED BOTTOM NAVIGATION BAR (SMALLER DEVICES ONLY) ===== -->
+    <nav class="app-bottom-nav lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-t border-edge shadow-[0_-4px_20px_rgba(3,93,105,0.08)] px-2 py-2 flex items-center justify-around">
+        <a href="home.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-home text-base"></i>
+            <span>Home</span>
+        </a>
+        <a href="ai.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-robot text-base"></i>
+            <span>AI Vet</span>
+        </a>
+        <a href="climate-dashboard.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-satellite-dish text-base"></i>
+            <span>Climate</span>
+        </a>
+        <a href="community.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-users text-base"></i>
+            <span>Community</span>
+        </a>
+        <a href="vet-home.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-user-md text-base"></i>
+            <span>Vets</span>
+        </a>
+    </nav>
+
+    <script defer src="js/firebase-config.js"></script>
+    <script defer src="js/auth.js"></script>
+    <script defer src="js/vet-profile.js"></script>
+    <script defer src="js/scale.js"></script>
+</body>
+</html>

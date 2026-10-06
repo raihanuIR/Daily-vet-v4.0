@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DailyVet | NASA Heat-Stress (THI) Telemetry</title>
+    <meta name="theme-color" content="#d97706" />
+    <link rel="manifest" href="manifest.json" />
+
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="DailyVet" />
+    <link rel="apple-touch-icon" href="assets/dailyvetlogo.jpeg" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+
+    <!-- Tailwind CSS v4 -->
+    <script src="js/tailwind-v4.js"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-deep: #035D69;
+            --color-dark: #023d47;
+            --color-teal: #088F8F;
+            --color-line: #b2e0e6;
+            --color-soft: #eef7f8;
+            --color-edge: #e0f0f2;
+            --color-mute: #8ab8be;
+            --color-danger: #e74c3c;
+        }
+    </style>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="stylesheet" href="css/climate.css" />
+
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <style>
+        /* Fixed Bottom Navigation Bar - ONLY on smaller devices (<1024px) */
+        @media (max-width: 1023px) {
+            .app-bottom-nav {
+                position: fixed !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                z-index: 50 !important;
+                display: flex !important;
+            }
+        }
+        @media (min-width: 1024px) {
+            .app-bottom-nav {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-100/90 text-slate-800 min-h-screen antialiased selection:bg-teal selection:text-white pb-24 lg:pb-12">
+    <div class="climate-feature-container w-full max-w-[1520px] mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col gap-6 text-left" data-feature="thi">
+
+        <!-- ===== TOP HEADER ===== -->
+        <div class="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <button class="w-11 h-11 rounded-2xl bg-soft border border-line text-deep hover:bg-edge hover:scale-105 active:scale-95 flex items-center justify-center transition-all cursor-pointer flex-shrink-0 shadow-xs" onclick="window.location.href='climate-dashboard.html'" title="Back to Mission Hub">
+                    <i class="fas fa-arrow-left text-sm"></i>
+                </button>
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 text-white flex items-center justify-center text-xl shadow-md flex-shrink-0 ring-4 ring-amber-500/10">
+                        <i class="fas fa-temperature-high"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h1 class="text-xl sm:text-2xl font-black text-deep tracking-tight">Heat-Stress Resilience (THI)</h1>
+                            <span class="px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 text-[10px] font-extrabold uppercase tracking-wider border border-amber-200">NASA POWER Feed</span>
+                        </div>
+                        <p class="text-xs font-semibold text-teal mt-0.5">Real-time Temperature-Humidity Index &bull; Multi-species thermal thresholds</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 self-start sm:self-auto">
+                <div class="telemetry-chip pulse-amber shadow-xs">
+                    <span class="live-beacon text-amber-500"></span>
+                    <span>T2M &bull; RH2M SATELLITE</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== UNIFIED CLIMATE SUITE NAVIGATION TABS ===== -->
+        <div class="climate-suite-nav shadow-xs">
+            <a href="climate-dashboard.html" class="climate-nav-pill">
+                <i class="fas fa-gauge-high"></i>
+                <span>Mission Hub</span>
+            </a>
+            <a href="climate-thi.html" class="climate-nav-pill active">
+                <i class="fas fa-temperature-high"></i>
+                <span>Heat THI</span>
+            </a>
+            <a href="climate-forage.html" class="climate-nav-pill">
+                <i class="fas fa-seedling text-emerald-500"></i>
+                <span>Forage Rotation</span>
+            </a>
+            <a href="climate-outbreak.html" class="climate-nav-pill">
+                <i class="fas fa-triangle-exclamation text-rose-500"></i>
+                <span>Disease Radar</span>
+            </a>
+            <a href="climate-impact.html" class="climate-nav-pill">
+                <i class="fas fa-users-rays text-purple-500"></i>
+                <span>SEDAC Impact</span>
+            </a>
+            <a href="climate-air-quality.html" class="climate-nav-pill">
+                <i class="fas fa-wind text-cyan-500"></i>
+                <span>Air &amp; UV</span>
+            </a>
+        </div>
+
+        <!-- ===== 12-COLUMN EXECUTIVE ANALYTICAL STAGE & SIDEBAR ===== -->
+        <div class="dv-dashboard-grid">
+            <!-- Left Stage (8 cols): Primary Telemetry, Species Strips, KPIs, Forecast -->
+            <div class="dv-stage-main">
+                <div id="thiAppRoot" class="thi-app-root"></div>
+            </div>
+
+            <!-- Right Sidebar (4 cols): Clinical Heat-Stress Advisory & Protocols -->
+            <div class="dv-stage-sidebar">
+                <!-- Veterinary Heat-Stress Advisory -->
+                <div class="p-5 bg-gradient-to-br from-amber-50/90 via-orange-50/70 to-amber-50/90 border border-amber-200/90 rounded-2xl flex flex-col gap-3 text-xs text-amber-950 shadow-xs">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 text-sm shadow-xs">
+                            <i class="fas fa-shield-halved"></i>
+                        </div>
+                        <div>
+                            <strong class="font-extrabold block text-amber-900 text-sm">Veterinary Heat-Stress Interventions</strong>
+                            <span class="text-[11px] text-amber-700">Clinical emergency mitigation guidelines</span>
+                        </div>
+                    </div>
+                    <p class="leading-relaxed text-slate-700 text-xs">
+                        When THI exceeds 72 (Mild Stress), enhance barn cross-ventilation. When THI exceeds 78 (Moderate-Severe Stress), provide shade netting, sprinkle drinking water with sodium bicarbonate &amp; potassium electrolytes, and adjust feeding to cooler dawn/dusk hours. Consult a registered vet for heat-apoplexy emergency.
+                    </p>
+                </div>
+
+                <!-- Multi-Species Critical Thresholds Reference Card -->
+                <div class="dv-sidebar-card">
+                    <div class="dv-sidebar-card-title">
+                        <i class="fas fa-layer-group text-amber-500"></i>
+                        <span>Species THI Stress Thresholds</span>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <div class="dv-sidebar-metric-row">
+                            <span class="flex items-center gap-2"><span>🐄</span> <span>Dairy Cattle</span></span>
+                            <span>Normal &lt;72 &bull; <b class="text-rose-600">Danger &gt;78</b></span>
+                        </div>
+                        <div class="dv-sidebar-metric-row">
+                            <span class="flex items-center gap-2"><span>🐃</span> <span>Water Buffalo</span></span>
+                            <span>Normal &lt;74 &bull; <b class="text-rose-600">Danger &gt;82</b></span>
+                        </div>
+                        <div class="dv-sidebar-metric-row">
+                            <span class="flex items-center gap-2"><span>🐔</span> <span>Broiler / Layer</span></span>
+                            <span>Normal &lt;70 &bull; <b class="text-rose-600">Danger &gt;80</b></span>
+                        </div>
+                        <div class="dv-sidebar-metric-row">
+                            <span class="flex items-center gap-2"><span>🐐</span> <span>Goat &amp; Sheep</span></span>
+                            <span>Normal &lt;75 &bull; <b class="text-rose-600">Danger &gt;84</b></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Emergency Protocol & AI Vet Hotline -->
+                <div class="dv-sidebar-card">
+                    <div class="dv-sidebar-card-title">
+                        <i class="fas fa-kit-medical text-rose-500"></i>
+                        <span>Heat Stroke Emergency Action</span>
+                    </div>
+                    <div class="dv-sidebar-checklist">
+                        <div class="dv-sidebar-check-item">
+                            <i class="fas fa-shower text-sky-500"></i>
+                            <span><b>Immediate Cooling</b>: Hose down legs and flank with ambient water. Avoid ice shock.</span>
+                        </div>
+                        <div class="dv-sidebar-check-item">
+                            <i class="fas fa-glass-water text-teal"></i>
+                            <span><b>Electrolyte Rehydration</b>: Add oral rehydration salts (ORS) &amp; potassium salts to ad-libitum water.</span>
+                        </div>
+                    </div>
+                    <a href="ai.html?q=Urgent%20heat%20stroke%20treatment%20for%20dairy%20cow" class="p-3 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-xl flex items-center justify-between text-xs font-bold text-amber-900 transition-colors mt-1">
+                        <span class="flex items-center gap-2">
+                            <i class="fas fa-robot text-amber-600"></i>
+                            <span>AI Vet Heat-Stroke Triage</span>
+                        </span>
+                        <i class="fas fa-arrow-right text-[11px]"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== FIXED BOTTOM NAVIGATION BAR (SMALLER DEVICES ONLY) ===== -->
+    <nav class="app-bottom-nav lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-t border-edge shadow-[0_-4px_20px_rgba(3,93,105,0.08)] px-2 py-2 flex items-center justify-around">
+        <a href="home.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-home text-base"></i>
+            <span>Home</span>
+        </a>
+        <a href="ai.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-robot text-base"></i>
+            <span>AI Vet</span>
+        </a>
+        <a href="climate-dashboard.html" class="flex flex-col items-center gap-1 text-teal font-bold text-[10px] py-1 px-3 rounded-xl">
+            <i class="fas fa-satellite-dish text-base"></i>
+            <span>Climate</span>
+        </a>
+        <a href="community.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-users text-base"></i>
+            <span>Community</span>
+        </a>
+        <a href="vet-home.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-user-md text-base"></i>
+            <span>Vets</span>
+        </a>
+    </nav>
+
+    <!-- Firebase + Engine Scripts -->
+    <script defer src="js/firebase-config.js"></script>
+    <script defer src="js/auth.js"></script>
+    <script defer src="js/notification-engine.js"></script>
+    <script defer src="js/scale.js"></script>
+    <script defer src="js/nasa-power-api.js"></script>
+    <script defer src="js/nasa-climate-engine.js"></script>
+    <script defer src="js/nasa-outbreak-engine.js"></script>
+    <script defer src="js/nasa-sedac-mapper.js"></script>
+    <script defer src="js/open-meteo-forecast.js"></script>
+    <script defer src="js/climate-feature.js"></script>
+</body>
+</html>

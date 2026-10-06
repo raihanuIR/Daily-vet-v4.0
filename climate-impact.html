@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DailyVet | NASA Socio-Economic Impact & Livestock Loss</title>
+    <meta name="theme-color" content="#7c3aed" />
+    <link rel="manifest" href="manifest.json" />
+
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="DailyVet" />
+    <link rel="apple-touch-icon" href="assets/dailyvetlogo.jpeg" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+
+    <!-- Tailwind CSS v4 -->
+    <script src="js/tailwind-v4.js"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-deep: #035D69;
+            --color-dark: #023d47;
+            --color-teal: #088F8F;
+            --color-line: #b2e0e6;
+            --color-soft: #eef7f8;
+            --color-edge: #e0f0f2;
+            --color-mute: #8ab8be;
+            --color-danger: #e74c3c;
+        }
+    </style>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="stylesheet" href="css/climate.css" />
+
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <style>
+        /* Fixed Bottom Navigation Bar - ONLY on smaller devices (<1024px) */
+        @media (max-width: 1023px) {
+            .app-bottom-nav {
+                position: fixed !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                z-index: 50 !important;
+                display: flex !important;
+            }
+        }
+        @media (min-width: 1024px) {
+            .app-bottom-nav {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-100/90 text-slate-800 min-h-screen antialiased selection:bg-teal selection:text-white pb-24 lg:pb-12">
+    <div class="climate-feature-container w-full max-w-[1520px] mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col gap-6 text-left" data-feature="impact">
+
+        <!-- ===== TOP HEADER ===== -->
+        <div class="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <button class="w-11 h-11 rounded-2xl bg-soft border border-line text-deep hover:bg-edge hover:scale-105 active:scale-95 flex items-center justify-center transition-all cursor-pointer flex-shrink-0 shadow-xs" onclick="window.location.href='climate-dashboard.html'" title="Back to Mission Hub">
+                    <i class="fas fa-arrow-left text-sm"></i>
+                </button>
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-600 text-white flex items-center justify-center text-xl shadow-md flex-shrink-0 ring-4 ring-purple-500/10">
+                        <i class="fas fa-users-rays"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h1 class="text-xl sm:text-2xl font-black text-deep tracking-tight">Socio-Economic &amp; Livestock Loss</h1>
+                            <span class="px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-800 text-[10px] font-extrabold uppercase tracking-wider border border-purple-200">NASA SEDAC &bull; GPW v4</span>
+                        </div>
+                        <p class="text-xs font-semibold text-teal mt-0.5">Gridded livestock density &bull; Smallholder farmers at risk &bull; Financial impact in Taka</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 self-start sm:self-auto">
+                <div class="telemetry-chip pulse-purple shadow-xs">
+                    <span class="live-beacon text-purple-600"></span>
+                    <span>SEDAC GPW v4 CENSUS</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== UNIFIED CLIMATE SUITE NAVIGATION TABS ===== -->
+        <div class="climate-suite-nav shadow-xs">
+            <a href="climate-dashboard.html" class="climate-nav-pill">
+                <i class="fas fa-gauge-high"></i>
+                <span>Mission Hub</span>
+            </a>
+            <a href="climate-thi.html" class="climate-nav-pill">
+                <i class="fas fa-temperature-high text-amber-500"></i>
+                <span>Heat THI</span>
+            </a>
+            <a href="climate-forage.html" class="climate-nav-pill">
+                <i class="fas fa-seedling text-emerald-500"></i>
+                <span>Forage Rotation</span>
+            </a>
+            <a href="climate-outbreak.html" class="climate-nav-pill">
+                <i class="fas fa-triangle-exclamation text-rose-500"></i>
+                <span>Disease Radar</span>
+            </a>
+            <a href="climate-impact.html" class="climate-nav-pill active">
+                <i class="fas fa-users-rays"></i>
+                <span>SEDAC Impact</span>
+            </a>
+            <a href="climate-air-quality.html" class="climate-nav-pill">
+                <i class="fas fa-wind text-cyan-500"></i>
+                <span>Air &amp; UV</span>
+            </a>
+        </div>
+
+        <!-- ===== 12-COLUMN EXECUTIVE ANALYTICAL STAGE & SIDEBAR ===== -->
+        <div class="dv-dashboard-grid">
+            <!-- Left Stage (8 cols): Primary Telemetry, Calculations & Grids -->
+            <div class="dv-stage-main">
+                <!-- Division Geolocation Selector Toolbar -->
+                <div class="dvf-toolbar dvm-toolbar-impact">
+                    <div class="dvf-toolbar-item dvf-div-box dvm-div-impact">
+                        <label for="climateDistrict" class="dvf-toolbar-lbl">
+                            <i class="fas fa-chart-pie text-purple-600"></i>
+                            <span>বিভাগ নির্বাচন:</span>
+                        </label>
+                        <div class="dvf-select-wrap">
+                            <select id="climateDistrict" class="dvf-select">
+                                <option value="dhaka">ঢাকা বিভাগ</option>
+                                <option value="chittagong">চট্টগ্রাম বিভাগ</option>
+                                <option value="rajshahi">রাজশাহী বিভাগ</option>
+                                <option value="khulna">খুলনা বিভাগ</option>
+                                <option value="barisal">বরিশাল বিভাগ</option>
+                                <option value="sylhet">সিলেট বিভাগ</option>
+                                <option value="rangpur">রংপুর বিভাগ</option>
+                                <option value="mymensingh">ময়মনসিংহ বিভাগ</option>
+                            </select>
+                            <i class="fas fa-chevron-down dvf-select-arrow text-purple-600"></i>
+                        </div>
+                    </div>
+                    <div class="dvf-toolbar-item" style="flex:1;display:flex;align-items:center;gap:10px;font-size:12.5px;color:#475569;background:#faf5ff;border:1px solid #f3e8ff;border-radius:14px;padding:9px 14px;">
+                        <i class="fas fa-satellite text-purple-600" style="font-size:16px;"></i>
+                        <span><b>NASA SEDAC GPW v4</b> &bull; আদমশুমারি ও সামাজিক-অর্থনৈতিক ক্ষতির বিশ্লেষণ</span>
+                    </div>
+                </div>
+
+                <!-- Feature Telemetry Body Container -->
+                <div class="climate-section impact-section">
+                    <div class="climate-section-body p-0 flex flex-col gap-4" id="impactBody">
+                        <div class="climate-empty">
+                            <i class="fas fa-chart-line text-purple-600 fa-bounce"></i>
+                            <div class="flex flex-col items-center gap-1">
+                                <span class="text-sm font-extrabold text-slate-800">Calculating Livestock Census &amp; Socio-Economic Exposure...</span>
+                                <span class="text-xs text-slate-500 font-mono">Synthesizing milk production drop and commercial hazard models</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Sidebar (4 cols): Financial Risk Advisory & Methodologies -->
+            <div class="dv-stage-sidebar">
+                <!-- Socio-Economic Loss Advisory -->
+                <div class="p-5 bg-gradient-to-br from-purple-50/90 via-indigo-50/70 to-purple-50/90 border border-purple-200/90 rounded-2xl flex flex-col gap-3 text-xs text-purple-950 shadow-xs">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0 text-sm shadow-xs">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div>
+                            <strong class="font-extrabold block text-purple-900 text-sm">Cooperative Planning &amp; Micro-Insurance</strong>
+                            <span class="text-[11px] text-purple-700">Financial risk assessment framework</span>
+                        </div>
+                    </div>
+                    <p class="leading-relaxed text-slate-700 text-xs">
+                        Daily economic loss projections reflect average daily milk yield reductions (10–25%) during acute thermal and vector stress, veterinary intervention costs, and morbidity loss. Dairy cooperatives (Milk Vita, Aarong, PRAN) and livestock insurance underwriters can use these numbers for proactive supply chain mitigation.
+                    </p>
+                </div>
+
+                <!-- NASA SEDAC Methodology & Data Integrity Card -->
+                <div class="dv-sidebar-card">
+                    <div class="dv-sidebar-card-title">
+                        <i class="fas fa-database text-purple-600"></i>
+                        <span>NASA SEDAC Data Methodology</span>
+                    </div>
+                    <div class="dv-sidebar-checklist">
+                        <div class="dv-sidebar-check-item">
+                            <i class="fas fa-globe text-purple-600"></i>
+                            <span><b>GPW v4 Gridded Population</b>: Census inputs modeled at 1-km spatial resolution to estimate rural agrarian density.</span>
+                        </div>
+                        <div class="dv-sidebar-check-item">
+                            <i class="fas fa-cow text-purple-600"></i>
+                            <span><b>DLS Cross-Reference</b>: Validated against Bangladesh Department of Livestock Services national herd census numbers.</span>
+                        </div>
+                        <div class="dv-sidebar-check-item">
+                            <i class="fas fa-calculator text-purple-600"></i>
+                            <span><b>Loss Formula</b>: Models lactating herd share (30%) × 4L/day × BDT 60/L milk floor pricing during stress episodes.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Operational Action & Support -->
+                <div class="dv-sidebar-card">
+                    <div class="dv-sidebar-card-title">
+                        <i class="fas fa-bolt text-amber-500"></i>
+                        <span>Action &amp; Mitigation Support</span>
+                    </div>
+                    <div class="flex flex-col gap-2.5">
+                        <a href="ai.html?q=How%20to%20reduce%20socio-economic%20milk%20loss%20during%20climate%20stress" class="p-3 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-xl flex items-center justify-between text-xs font-bold text-purple-800 transition-colors">
+                            <span class="flex items-center gap-2">
+                                <i class="fas fa-robot text-purple-600"></i>
+                                <span>AI Vet Financial Loss Audit</span>
+                            </span>
+                            <i class="fas fa-arrow-right text-[11px]"></i>
+                        </a>
+                        <a href="community.html" class="p-3 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-between text-xs font-bold text-slate-800 transition-colors">
+                            <span class="flex items-center gap-2">
+                                <i class="fas fa-users text-teal"></i>
+                                <span>Dairy Cooperative Forum</span>
+                            </span>
+                            <i class="fas fa-arrow-right text-[11px]"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== FIXED BOTTOM NAVIGATION BAR (SMALLER DEVICES ONLY) ===== -->
+    <nav class="app-bottom-nav lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-t border-edge shadow-[0_-4px_20px_rgba(3,93,105,0.08)] px-2 py-2 flex items-center justify-around">
+        <a href="home.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-home text-base"></i>
+            <span>Home</span>
+        </a>
+        <a href="ai.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-robot text-base"></i>
+            <span>AI Vet</span>
+        </a>
+        <a href="climate-dashboard.html" class="flex flex-col items-center gap-1 text-teal font-bold text-[10px] py-1 px-3 rounded-xl">
+            <i class="fas fa-satellite-dish text-base"></i>
+            <span>Climate</span>
+        </a>
+        <a href="community.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-users text-base"></i>
+            <span>Community</span>
+        </a>
+        <a href="vet-home.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
+            <i class="fas fa-user-md text-base"></i>
+            <span>Vets</span>
+        </a>
+    </nav>
+
+    <!-- Firebase + Engine Scripts -->
+    <script defer src="js/firebase-config.js"></script>
+    <script defer src="js/auth.js"></script>
+    <script defer src="js/notification-engine.js"></script>
+    <script defer src="js/scale.js"></script>
+    <script defer src="js/nasa-power-api.js"></script>
+    <script defer src="js/nasa-climate-engine.js"></script>
+    <script defer src="js/nasa-outbreak-engine.js"></script>
+    <script defer src="js/nasa-sedac-mapper.js"></script>
+    <script defer src="js/open-meteo-forecast.js"></script>
+    <script defer src="js/climate-feature.js"></script>
+</body>
+</html>

@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DailyVet | AI Clinical Veterinary Specialist</title>
+    <meta name="theme-color" content="#035D69" />
+    <link rel="manifest" href="manifest.json" />
+
+    <!-- iOS -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="DailyVet" />
+    <link rel="apple-touch-icon" href="assets/dailyvetlogo.jpeg" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+    <link rel="preconnect" href="https://generativelanguage.googleapis.com" crossorigin />
+    <link rel="preconnect" href="https://api.groq.com" crossorigin />
+    <link rel="dns-prefetch" href="https://openrouter.ai" />
+
+    <!-- Tailwind CSS v4 -->
+    <script src="js/tailwind-v4.js"></script>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-deep: #035D69;
+            --color-dark: #023d47;
+            --color-teal: #088F8F;
+            --color-line: #b2e0e6;
+            --color-soft: #eef7f8;
+            --color-edge: #e0f0f2;
+            --color-mute: #8ab8be;
+            --color-danger: #e74c3c;
+        }
+
+        /* --- SIDEBAR RESPONSIVE BEHAVIOR --- */
+        .chat-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 85%;
+            max-width: 340px;
+            background: linear-gradient(180deg, #021a1f 0%, #03242b 45%, #011519 100%);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            transform: translateX(-100%);
+            transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 16px 0 48px rgba(0, 0, 0, 0.45);
+            border-right: 1px solid rgba(45, 212, 191, 0.16);
+        }
+        .chat-sidebar.open {
+            transform: translateX(0);
+        }
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 35, 41, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 950;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s;
+        }
+        .sidebar-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Desktop Docked Sidebar */
+        @media (min-width: 1024px) {
+            .chat-sidebar {
+                position: static !important;
+                transform: none !important;
+                width: 310px !important;
+                max-width: 310px !important;
+                height: 100% !important;
+                box-shadow: none !important;
+                z-index: 20 !important;
+                flex-shrink: 0 !important;
+            }
+            .sidebar-overlay {
+                display: none !important;
+            }
+        }
+
+        /* --- CHAT MESSAGES & TYPOGRAPHY --- */
+        .message {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            animation: messageIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            max-width: 56rem; /* 896px standard reading column */
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        @keyframes messageIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .ai-message {
+            justify-content: flex-start;
+        }
+        .user-message {
+            justify-content: flex-end;
+            align-items: flex-end;
+        }
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #088F8F;
+            background: #ffffff;
+            font-weight: 700;
+            font-size: 13.5px;
+            color: #035D69;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .ai-avatar-small {
+            background: linear-gradient(135deg, #035D69, #023d47);
+            border-color: #088F8F;
+            color: #ffffff;
+        }
+        .ai-avatar-small img {
+            object-fit: contain;
+            padding: 3px;
+        }
+        .bubble {
+            max-width: 82%;
+            font-size: 14.5px;
+            line-height: 1.6;
+            padding: 14px 18px;
+            border-radius: 20px;
+            word-break: break-word;
+            text-align: left;
+        }
+        .ai-message .bubble {
+            background: #ffffff;
+            color: #0f2c31;
+            border: 1.5px solid #e0f0f2;
+            border-top-left-radius: 4px;
+            box-shadow: 0 4px 20px rgba(3,93,105,0.05);
+        }
+        .user-message .bubble {
+            background: linear-gradient(135deg, #035D69, #023d47);
+            color: #ffffff;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 6px 18px rgba(3,93,105,0.22);
+        }
+        .timestamp {
+            display: block;
+            font-size: 11px;
+            opacity: 0.65;
+            margin-top: 6px;
+            text-align: right;
+        }
+        .bubble-image img {
+            max-width: 280px;
+            border-radius: 14px;
+            margin-bottom: 8px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+        }
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 20px;
+            background: #ffffff;
+            border: 1.5px solid #e0f0f2;
+            border-radius: 18px;
+            border-top-left-radius: 4px;
+            box-shadow: 0 4px 12px rgba(3,93,105,0.05);
+            max-width: 56rem;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #088F8F;
+            animation: typing 1.2s infinite;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.15s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.3s; }
+        @keyframes typing {
+            0%,60%,100% { transform: translateY(0); opacity: 0.3; }
+            30% { transform: translateY(-6px); opacity: 1; }
+        }
+
+        /* Google search fallback button choices */
+        .google-search-options { display: flex; gap: 8px; margin-top: 10px; }
+        .google-opt-btn { padding: 6px 14px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: none; }
+        .google-yes-btn { background: #ecfdf5; color: #047857; border: 1px solid #86efac; }
+        .google-no-btn { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+
+        /* Menu dropdown anchored to trigger */
+        .menu-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 16px 40px rgba(3, 93, 105, 0.16), 0 4px 14px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e0f0f2;
+            z-index: 100;
+            overflow: hidden;
+            min-width: 215px;
+            animation: menuDropIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes menuDropIn {
+            from { opacity: 0; transform: translateY(-6px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .menu-dropdown button {
+            width: 100%;
+            padding: 11px 16px;
+            background: none;
+            border: none;
+            color: #035D69;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+            border-bottom: 1px solid #f1f8f9;
+        }
+        .menu-dropdown button:last-child {
+            border-bottom: none;
+        }
+        .menu-dropdown button:hover {
+            background: #eef7f8;
+            color: #023d47;
+        }
+        .menu-dropdown button i {
+            color: #088F8F;
+            font-size: 13.5px;
+            width: 18px;
+            text-align: center;
+            transition: transform 0.15s ease;
+        }
+        .menu-dropdown button:hover i {
+            transform: scale(1.1);
+        }
+
+        /* Danger Delete Action */
+        .menu-dropdown button.menu-danger-btn {
+            color: #dc2626;
+            font-weight: 700;
+        }
+        .menu-dropdown button.menu-danger-btn:hover {
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+        .menu-dropdown button.menu-danger-btn i {
+            color: #ef4444;
+        }
+        .menu-dropdown button.menu-danger-btn:hover i {
+            transform: scale(1.12);
+            color: #b91c1c;
+        }
+
+        /* Conversation list cards & Sidebar UX */
+        .conv-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 11px;
+            padding: 12px 13px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            cursor: pointer;
+            text-align: left;
+            position: relative;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+        .conv-item:hover {
+            border-color: rgba(45, 212, 191, 0.4);
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(45, 212, 191, 0.15);
+        }
+        .conv-item.active {
+            background: linear-gradient(135deg, rgba(8, 143, 143, 0.28) 0%, rgba(3, 93, 105, 0.46) 100%);
+            border-color: #2dd4bf;
+            box-shadow: 0 6px 20px rgba(8, 143, 143, 0.32), inset 3.5px 0 0 0 #2dd4bf;
+        }
+        .conv-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #088F8F 0%, #035D69 100%);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 800;
+            flex-shrink: 0;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25), 0 0 0 1.5px rgba(45, 212, 191, 0.35);
+        }
+        .conv-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: inherit;
+            display: block;
+        }
+        .conv-icon-initial {
+            font-weight: 800;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .conv-body {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 2.5px;
+        }
+        .conv-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #f8fafc;
+            letter-spacing: -0.01em;
+            line-height: 1.35;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .conv-item:hover .conv-title {
+            color: #ffffff;
+        }
+        .conv-item.active .conv-title {
+            color: #ffffff;
+            font-weight: 800;
+        }
+        .conv-preview {
+            font-size: 11.5px;
+            line-height: 1.45;
+            color: #94a3b8;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            word-break: break-word;
+        }
+        .conv-item:hover .conv-preview {
+            color: #cbd5e1;
+        }
+        .conv-item.active .conv-preview {
+            color: #e2e8f0;
+        }
+        .conv-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 5px;
+            font-size: 10.5px;
+            font-weight: 600;
+        }
+        .conv-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #5eead4; /* High visibility bright teal/cyan */
+            background: rgba(45, 212, 191, 0.12);
+            padding: 2px 7px;
+            border-radius: 6px;
+            border: 1px solid rgba(45, 212, 191, 0.22);
+            line-height: 1.1;
+        }
+        .conv-meta i {
+            font-size: 9.5px;
+            color: #2dd4bf;
+        }
+        .conv-item.active .conv-meta span {
+            color: #ecfeff;
+            background: rgba(8, 143, 143, 0.45);
+            border-color: rgba(45, 212, 191, 0.5);
+        }
+        .conv-item.active .conv-meta i {
+            color: #a5f3fc;
+        }
+        .conv-delete-btn {
+            width: 26px;
+            height: 26px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #94a3b8;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 11px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: auto;
+            flex-shrink: 0;
+            opacity: 0.6;
+            transition: all 0.18s ease;
+        }
+        .conv-item:hover .conv-delete-btn {
+            opacity: 1;
+        }
+        .conv-delete-btn:hover {
+            background: rgba(239, 68, 68, 0.25);
+            color: #fca5a5;
+            border-color: rgba(239, 68, 68, 0.45);
+            transform: scale(1.1);
+        }
+        .conv-empty {
+            text-align: center;
+            padding: 36px 16px;
+            font-size: 12.5px;
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+
+        /* Custom scrollbar */
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: rgba(45, 212, 191, 0.2);
+            border-radius: 10px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(45, 212, 191, 0.45);
+        }
+    </style>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <!-- Firebase SDKs -->
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+</head>
+<body class="bg-slate-900 text-slate-800 h-screen w-screen flex overflow-hidden antialiased selection:bg-teal selection:text-white">
+
+    <!-- ===== SIDEBAR OVERLAY (MOBILE ONLY) ===== -->
+    <div class="sidebar-overlay lg:hidden" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+    <!-- ===== LEFT WORKSTATION SIDEBAR (PERMANENT ON DESKTOP, DRAWER ON MOBILE) ===== -->
+    <aside class="chat-sidebar" id="chatSidebar">
+        <!-- Top App Branding -->
+        <div class="p-4 bg-[#011519]/90 backdrop-blur-md border-b border-teal-500/15 flex items-center justify-between flex-shrink-0">
+            <div class="flex items-center gap-3 cursor-pointer group" onclick="window.location.href='home.html'" title="Return to Dashboard">
+                <img src="assets/dailyvetlogo.png" alt="DailyVet" class="w-8.5 h-8.5 object-contain drop-shadow-md group-hover:scale-105 transition-transform" />
+                <div class="flex flex-col">
+                    <span class="text-sm font-extrabold tracking-tight text-white leading-tight font-heading">DailyVet <span class="text-teal-400 font-extrabold">AI Pro</span></span>
+                    <span class="text-[10px] font-semibold text-emerald-400 flex items-center gap-1.5 mt-0.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]"></span>
+                        Clinical Engine Active
+                    </span>
+                </div>
+            </div>
+            <div class="flex items-center gap-1.5">
+                <button class="w-8.5 h-8.5 rounded-xl bg-white/[0.07] hover:bg-teal-500/20 text-slate-300 hover:text-teal-300 border border-white/10 hover:border-teal-500/30 flex items-center justify-center text-xs transition-all cursor-pointer shadow-2xs" onclick="window.location.href='home.html'" title="Exit to Home">
+                    <i class="fas fa-home"></i>
+                </button>
+                <button class="w-8.5 h-8.5 rounded-xl bg-white/[0.07] hover:bg-white/15 text-white flex items-center justify-center cursor-pointer border border-white/10 text-xs transition-all lg:hidden" onclick="closeSidebar()" title="Close Drawer">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Action: New Consultation -->
+        <div class="p-3.5 pb-2 flex-shrink-0">
+            <button class="w-full py-2.5 px-4 bg-gradient-to-r from-teal-500 via-[#088F8F] to-[#035D69] hover:from-teal-400 hover:to-[#024a54] text-white rounded-xl font-bold text-xs flex items-center justify-between shadow-[0_4px_16px_rgba(8,143,143,0.35)] hover:shadow-[0_6px_22px_rgba(8,143,143,0.5)] cursor-pointer border border-teal-300/30 transition-all hover:-translate-y-0.5 active:scale-95" onclick="startNewChat()">
+                <span class="flex items-center gap-2">
+                    <i class="fas fa-plus-circle text-teal-200 text-sm"></i> New Consultation
+                </span>
+                <span class="text-[10px] bg-black/25 text-teal-100 border border-white/20 px-2 py-0.5 rounded-md font-mono font-bold tracking-wider">Ctrl+N</span>
+            </button>
+        </div>
+
+        <!-- Consultation Search -->
+        <div class="px-3.5 pb-2 flex-shrink-0">
+            <div class="relative flex items-center px-3 h-9.5 bg-white/[0.05] hover:bg-white/[0.08] border border-white/10 hover:border-teal-500/30 rounded-xl focus-within:!border-teal-400 focus-within:!bg-white/[0.09] focus-within:ring-2 focus-within:ring-teal-400/20 transition-all shadow-2xs">
+                <i class="fas fa-search text-teal-400/80 text-xs mr-2.5"></i>
+                <input type="text" id="convSearchInput" class="flex-1 bg-transparent border-none outline-none text-xs text-white placeholder:text-slate-400 font-medium" placeholder="Search case history..." autocomplete="off" />
+            </div>
+        </div>
+
+        <!-- Consultation List Feed -->
+        <div class="conversation-list flex-1 overflow-y-auto px-3.5 py-2 flex flex-col gap-2 custom-scroll" id="conversationList">
+            <div class="conv-empty">Loading consultations...</div>
+        </div>
+
+        <!-- Bottom Status & User Card -->
+        <div class="p-3.5 bg-[#011519]/90 backdrop-blur-md border-t border-teal-500/15 flex items-center justify-between text-xs text-slate-400 flex-shrink-0">
+            <span id="convCount" class="font-semibold text-[11.5px] text-slate-300 flex items-center gap-1.5">
+                <i class="fas fa-layer-group text-teal-400/70 text-[10px]"></i> 0 conversations
+            </span>
+            <a href="profile.html" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-teal-500/15 hover:bg-teal-500/30 text-teal-300 hover:text-white border border-teal-500/30 text-[11px] font-bold transition-all no-underline shadow-2xs">
+                <i class="fas fa-user-gear"></i> Account
+            </a>
+        </div>
+    </aside>
+
+    <!-- ===== MAIN CLINICAL AI WORKSPACE (CENTER) ===== -->
+    <main class="flex-1 flex flex-col h-full bg-[#f8fafc] overflow-hidden min-w-0 relative">
+
+        <!-- Top Header Bar -->
+        <header class="h-16 px-4 lg:px-6 bg-white/95 backdrop-blur-md border-b border-edge/80 flex items-center justify-between flex-shrink-0 z-10 shadow-xs">
+            <div class="flex items-center gap-3 min-w-0">
+                <!-- Mobile Drawer Toggle -->
+                <button class="w-9 h-9 rounded-xl bg-soft hover:bg-edge text-deep flex items-center justify-center text-sm cursor-pointer border border-line/60 transition-colors lg:hidden" onclick="toggleSidebar()" title="Open Consultations">
+                    <i class="fas fa-bars-staggered"></i>
+                </button>
+
+                <!-- Clinical Spec Title -->
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="w-9 h-9 rounded-xl bg-deep text-white flex items-center justify-center flex-shrink-0 shadow-xs">
+                        <i class="fas fa-stethoscope text-teal-300 text-sm"></i>
+                    </div>
+                    <h1 class="text-sm sm:text-base font-extrabold text-deep truncate m-0 font-heading">DailyVet Clinical AI</h1>
+                </div>
+            </div>
+
+            <!-- Right Action Tools -->
+            <div class="flex items-center gap-2 sm:gap-2.5 flex-shrink-0">
+                <!-- Voice Assistant Quick Toggle -->
+                <button class="hidden md:inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-soft hover:bg-edge text-deep font-bold text-xs border border-line/80 transition-all cursor-pointer" onclick="toggleVoiceAssistant()" id="voiceAssistantBtn">
+                    <i class="fas fa-volume-high text-teal"></i>
+                    <span id="voiceAssistantText">Voice: ON</span>
+                </button>
+
+                <!-- Options Dropdown Trigger & Anchored Menu -->
+                <div class="relative">
+                    <button class="menu-btn w-9 h-9 rounded-xl bg-soft hover:bg-edge text-deep flex items-center justify-center text-sm cursor-pointer border border-line/60 transition-colors" onclick="toggleMenu(event)" id="menuBtn" title="More Clinical Options">
+                        <i class="fas fa-ellipsis-vertical"></i>
+                    </button>
+
+                    <!-- ===== MENU DROPDOWN (ANCHORED UNDER BUTTON) ===== -->
+                    <div class="menu-dropdown shadow-xl" id="menuDropdown" style="display:none;">
+                        <!-- Delete Option (Always available on ALL screen sizes) -->
+                        <button onclick="deleteCurrentConversation()" class="menu-danger-btn">
+                            <i class="fas fa-trash-can"></i> Delete Conversation
+                        </button>
+
+                        <!-- Extra Options: Visible ONLY on smaller devices / mobile / tabs; hidden on big screens (xl:hidden) -->
+                        <div class="xl:hidden flex flex-col">
+                            <button onclick="toggleVoiceAssistant()" class="voice-assistant-btn">
+                                <i class="fas fa-volume-high"></i>
+                                <span class="voice-assistant-text">Voice Assistant: ON</span>
+                            </button>
+                            <button onclick="window.location.href='excreta-scan.html'">
+                                <i class="fas fa-flask"></i> Dung &amp; Urine Scan
+                            </button>
+                            <button onclick="window.location.href='breed-detection.html'">
+                                <i class="fas fa-cow"></i> Breed Detection
+                            </button>
+                            <button onclick="window.location.href='vet-home.html'">
+                                <i class="fas fa-user-md"></i> Find a Vet
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Clinical Disclaimer Banner -->
+        <div class="flex items-center gap-3 py-2 px-4 bg-amber-50/90 border-b border-amber-200/80 text-xs text-amber-900 flex-shrink-0 text-left" id="disclaimerBanner">
+            <div class="w-6 h-6 rounded-md bg-amber-200 text-amber-800 flex items-center justify-center flex-shrink-0 text-xs">
+                <i class="fas fa-shield-halved"></i>
+            </div>
+            <span class="flex-1 font-medium">DailyVet AI assists in preliminary differential triage. In acute animal distress or surgical emergencies, contact registered veterinarians immediately.</span>
+            <button class="text-amber-800 hover:text-amber-950 bg-transparent border-none cursor-pointer p-1 text-xs" onclick="closeDisclaimer()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- ===== CHAT MESSAGES SCROLL CONTAINER ===== -->
+        <!-- Note: Has both 'chat-messages' AND 'ai-container' classes to satisfy scrolling hooks in ai.js -->
+        <div class="chat-messages ai-container flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 flex flex-col gap-4.5 bg-gradient-to-b from-[#fbfdfd] to-[#f2f8f8] custom-scroll" id="chatMessages">
+
+            <!-- Professional Clinical Welcome Card -->
+            <div class="message ai-message">
+                <div class="avatar ai-avatar-small">
+                    <img src="assets/dailyvetlogo.jpeg" alt="DailyVet AI" />
+                </div>
+                <div class="bubble">
+                    <div class="flex items-center gap-2 mb-2 pb-2 border-b border-edge/80">
+                        <span class="text-xs font-bold text-teal uppercase tracking-wider flex items-center gap-1.5">
+                            <i class="fas fa-stethoscope"></i> DailyVet AI Clinical Specialist
+                        </span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 font-semibold border border-teal-200 ml-auto">Verified Protocol</span>
+                    </div>
+                    <p class="m-0 mb-1.5 font-bold text-deep text-base">Hello! I'm your Veterinary Clinical Diagnostics Assistant 🐾</p>
+                    <p class="m-0 mb-3 text-slate-700 leading-relaxed text-sm">Describe your livestock or pet's symptoms in <strong>English</strong> or <strong>বাংলা</strong>. You can attach a high-resolution photo, use real-time voice triage, or select one of the common clinical scenarios below.</p>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-medium text-slate-600 my-2.5">
+                        <div class="p-2.5 rounded-xl bg-soft/70 border border-line/60 flex items-center gap-2.5">
+                            <div class="w-6 h-6 rounded-lg bg-teal/10 text-teal flex items-center justify-center"><i class="fas fa-bolt"></i></div>
+                            <span>Instant Differential Triage</span>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-soft/70 border border-line/60 flex items-center gap-2.5">
+                            <div class="w-6 h-6 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center"><i class="fas fa-shield-heart"></i></div>
+                            <span>Bangladesh DLS Clinical Guidance</span>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-soft/70 border border-line/60 flex items-center gap-2.5">
+                            <div class="w-6 h-6 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center"><i class="fas fa-pills"></i></div>
+                            <span>Formulary & Dosage Pre-Checks</span>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-soft/70 border border-line/60 flex items-center gap-2.5">
+                            <div class="w-6 h-6 rounded-lg bg-red-50 text-red-600 flex items-center justify-center"><i class="fas fa-phone-alt"></i></div>
+                            <span>Emergency Escalation (16358)</span>
+                        </div>
+                    </div>
+
+                    <span class="timestamp">Just now</span>
+                </div>
+            </div>
+
+            <!-- Dynamic messages are appended here by ai.js -->
+
+        </div>
+
+        <!-- ===== 📍 LOCATION REQUEST CARD ===== -->
+        <div class="max-w-4xl mx-auto w-full px-4 sm:px-6">
+            <div class="location-request-card flex items-center gap-3 p-3.5 mb-2 bg-gradient-to-r from-teal/10 via-deep/10 to-teal/10 border border-teal/20 rounded-2xl text-left shadow-xs" id="locationRequestCard" style="display: none;">
+                <div class="w-10 h-10 rounded-xl bg-teal text-white flex items-center justify-center text-base flex-shrink-0 shadow-xs">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="text-xs sm:text-sm font-bold text-deep">📍 আপনার লোকেশন শেয়ার করুন</div>
+                    <div class="text-xs text-slate-500 font-medium">নিকটস্থ নিবন্ধিত ভেটেরিনারি ডাক্তার বা ক্লিনিক শনাক্ত করতে সাহায্য করে</div>
+                </div>
+                <button class="px-4 py-2 bg-teal text-white font-bold text-xs rounded-xl border-none cursor-pointer hover:bg-deep transition-all flex-shrink-0 shadow-sm inline-flex items-center gap-1.5" id="shareLocationBtn" onclick="requestUserLocation()">
+                    <i class="fas fa-location-crosshairs"></i>
+                    <span>Share</span>
+                </button>
+            </div>
+            <!-- Nearby Vets Results Container -->
+            <div class="nearby-vets-card mb-2 p-4 bg-white border border-edge rounded-2xl text-left text-xs shadow-sm" id="nearbyVetsCard" style="display: none;"></div>
+        </div>
+
+        <!-- ===== PROMPT CONSOLE & INPUT SUITE ===== -->
+        <div class="input-container-outer w-full bg-white/95 backdrop-blur-md border-t border-edge/80 flex-shrink-0 z-10 shadow-[0_-4px_20px_rgba(3,93,105,0.04)]">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex flex-col gap-2.5">
+
+                <!-- 💡 Common Triage Suggestion Chips -->
+                <div class="flex items-center gap-2 overflow-x-auto pb-1 custom-scroll" id="suggestionChips">
+                    <button class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-slate-50 hover:bg-teal hover:text-white border border-slate-200/90 rounded-full text-xs font-semibold text-deep cursor-pointer whitespace-nowrap flex-shrink-0 transition-all shadow-2xs" onclick="sendQuickMessage('My cow has a high fever and is not eating (গরুর জ্বর ও খাওয়া বন্ধ)')">
+                        🐄 Cow fever (গরুর জ্বর)
+                    </button>
+                    <button class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-slate-50 hover:bg-teal hover:text-white border border-slate-200/90 rounded-full text-xs font-semibold text-deep cursor-pointer whitespace-nowrap flex-shrink-0 transition-all shadow-2xs" onclick="sendQuickMessage('My dog has skin itching, hair loss and rash')">
+                        🐕 Dog skin rash & itching
+                    </button>
+                    <button class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-slate-50 hover:bg-teal hover:text-white border border-slate-200/90 rounded-full text-xs font-semibold text-deep cursor-pointer whitespace-nowrap flex-shrink-0 transition-all shadow-2xs" onclick="sendQuickMessage('My cat is vomiting and seems lethargic')">
+                        🐈 Cat vomiting & weakness
+                    </button>
+                    <button class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-slate-50 hover:bg-teal hover:text-white border border-slate-200/90 rounded-full text-xs font-semibold text-deep cursor-pointer whitespace-nowrap flex-shrink-0 transition-all shadow-2xs" onclick="sendQuickMessage('My chicken is sneezing and has respiratory distress (মুরগির শ্বাসকষ্ট)')">
+                        🐔 Poultry respiratory infection
+                    </button>
+                    <button class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-slate-50 hover:bg-teal hover:text-white border border-slate-200/90 rounded-full text-xs font-semibold text-deep cursor-pointer whitespace-nowrap flex-shrink-0 transition-all shadow-2xs" onclick="sendQuickMessage('How to clean and disinfect a bleeding wound on my animal')">
+                        🩹 Antiseptic wound treatment
+                    </button>
+                    <button class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-slate-50 hover:bg-teal hover:text-white border border-slate-200/90 rounded-full text-xs font-semibold text-deep cursor-pointer whitespace-nowrap flex-shrink-0 transition-all shadow-2xs" onclick="sendQuickMessage('What is the complete vaccination schedule for calves and goats')">
+                        💉 Vaccination timeline
+                    </button>
+                    <button class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-slate-50 hover:bg-teal hover:text-white border border-slate-200/90 rounded-full text-xs font-semibold text-deep cursor-pointer whitespace-nowrap flex-shrink-0 transition-all shadow-2xs" onclick="sendQuickMessage('Swollen udder and watery milk in dairy cow (ওলান ফোলা রোগ)')">
+                        🥛 Mastitis triage (ওলান প্রদাহ)
+                    </button>
+                </div>
+
+                <!-- 📷 Image Upload Preview Card -->
+                <div class="image-preview relative py-1" id="imagePreview" style="display:none;">
+                    <div class="relative inline-block">
+                        <img id="previewImg" src="" alt="Preview" class="h-20 w-20 rounded-xl border border-teal object-cover shadow-md" />
+                        <button class="remove-img-btn absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-600 text-white flex items-center justify-center text-xs cursor-pointer border-2 border-white shadow" onclick="removeImage()" title="Remove image">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 💬 Main Input Row -->
+                <div class="chat-input-area flex items-center gap-2 sm:gap-2.5 p-1.5 sm:p-2 bg-slate-50 border border-slate-300/80 rounded-2xl focus-within:border-teal focus-within:bg-white focus-within:ring-4 focus-within:ring-teal/10 transition-all shadow-xs">
+                    <!-- Photo Attachment Button -->
+                    <button class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white hover:bg-slate-100 text-deep flex items-center justify-center text-base cursor-pointer border border-slate-200/80 flex-shrink-0 transition-colors shadow-2xs" onclick="document.getElementById('imageInput').click()" title="Attach animal photo for visual diagnosis">
+                        <i class="fas fa-camera text-teal"></i>
+                    </button>
+                    <input type="file" id="imageInput" accept="image/*" style="display:none;" onchange="handleImageSelect(event)" />
+
+                    <!-- Microphone Voice Input Button -->
+                    <button class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white hover:bg-slate-100 text-deep flex items-center justify-center text-base cursor-pointer border border-slate-200/80 flex-shrink-0 transition-colors shadow-2xs" id="micBtn" onclick="toggleVoiceInput()" title="Speak your question">
+                        <i class="fas fa-microphone text-teal" id="micIcon"></i>
+                    </button>
+
+                    <!-- Text input -->
+                    <input type="text"
+                           id="chatInput"
+                           class="chat-input flex-1 min-w-0 h-10 sm:h-11 px-3 text-sm font-medium text-deep bg-transparent border-none outline-none placeholder:text-slate-400"
+                           placeholder="Describe symptoms, animal species, duration, or ask clinical questions..."
+                           autocomplete="off" />
+
+                    <!-- Send Message Button -->
+                    <button class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-r from-deep to-teal hover:from-dark hover:to-deep text-white flex items-center justify-center text-base cursor-pointer border-none flex-shrink-0 shadow-md shadow-teal/20 transition-all active:scale-95 disabled:opacity-50" onclick="sendMessage()" title="Send Message (Enter)">
+                        <i class="fas fa-paper-plane text-sm"></i>
+                    </button>
+                </div>
+
+                <!-- Footer Subtext -->
+                <div class="text-center text-[10.5px] text-slate-400 font-medium">
+                    DailyVet AI assists preliminary diagnosis. In critical situations, call <a href="tel:16358" class="text-teal font-bold hover:underline">16358</a> for National Veterinary Helpline.
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- ===== RIGHT CLINICAL WORKSTATION DRAWER (EXPANDED ON XL DESKTOPS) ===== -->
+    <aside class="hidden xl:flex w-76 2xl:w-80 flex-col bg-white border-l border-slate-200/80 p-5 gap-5 overflow-y-auto flex-shrink-0 z-10 shadow-xs custom-scroll">
+        <!-- 🚨 Emergency Vet Assistance -->
+        <div class="p-4 rounded-2xl bg-gradient-to-br from-red-50 to-amber-50 border border-red-200/80 flex flex-col gap-2.5 shadow-2xs">
+            <div class="flex items-center justify-between">
+                <span class="text-[11px] font-extrabold uppercase tracking-wider text-red-700 flex items-center gap-1.5">
+                    <i class="fas fa-triangle-exclamation animate-pulse"></i> Emergency Helpline
+                </span>
+                <span class="text-[10px] bg-red-100 text-red-800 font-bold px-1.5 py-0.5 rounded">24/7 DLS</span>
+            </div>
+            <div class="text-base font-extrabold text-slate-900 leading-tight">
+                Government Livestock Helpline
+            </div>
+            <p class="text-xs text-slate-600 m-0 leading-relaxed">
+                Toll-free hotline for emergency veterinary assistance across all 64 districts.
+            </p>
+            <div class="flex items-center gap-2">
+                <a href="tel:16358" class="flex-1 py-2 px-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all no-underline text-center">
+                    <i class="fas fa-phone-alt"></i> Call 16358
+                </a>
+                <a href="emergency.html" class="py-2 px-3 rounded-xl bg-red-100 hover:bg-red-200 text-red-800 font-bold text-xs flex items-center justify-center transition-all no-underline text-center" title="First Aid & Hotlines">
+                    <i class="fas fa-arrow-up-right-from-square"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- 🩺 Clinical Diagnostic Tools -->
+        <div class="flex flex-col gap-2.5">
+            <h3 class="text-xs font-extrabold text-deep uppercase tracking-wider flex items-center gap-2 m-0">
+                <i class="fas fa-cubes text-teal"></i> Specialized Diagnostic Tools
+            </h3>
+            
+            <a href="excreta-scan.html" class="p-3 bg-slate-50 hover:bg-teal/5 border border-slate-200/80 hover:border-teal/40 rounded-xl flex items-center gap-3 transition-all no-underline group shadow-2xs">
+                <div class="w-8 h-8 rounded-lg bg-teal/10 text-teal flex items-center justify-center text-sm group-hover:scale-105 transition-transform"><i class="fas fa-flask"></i></div>
+                <div class="flex-1 min-w-0">
+                    <div class="text-xs font-bold text-deep group-hover:text-teal transition-colors">Dung & Urine Scanner</div>
+                    <div class="text-[11px] text-slate-500 truncate">Parasite & digestive screening</div>
+                </div>
+                <i class="fas fa-chevron-right text-xs text-slate-400 group-hover:translate-x-0.5 transition-transform"></i>
+            </a>
+
+            <a href="breed-detection.html" class="p-3 bg-slate-50 hover:bg-teal/5 border border-slate-200/80 hover:border-teal/40 rounded-xl flex items-center gap-3 transition-all no-underline group shadow-2xs">
+                <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm group-hover:scale-105 transition-transform"><i class="fas fa-cow"></i></div>
+                <div class="flex-1 min-w-0">
+                    <div class="text-xs font-bold text-deep group-hover:text-teal transition-colors">Bovine Breed AI</div>
+                    <div class="text-[11px] text-slate-500 truncate">Phenotype & purity classifier</div>
+                </div>
+                <i class="fas fa-chevron-right text-xs text-slate-400 group-hover:translate-x-0.5 transition-transform"></i>
+            </a>
+
+            <a href="pharma.html" class="p-3 bg-slate-50 hover:bg-teal/5 border border-slate-200/80 hover:border-teal/40 rounded-xl flex items-center gap-3 transition-all no-underline group shadow-2xs">
+                <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center text-sm group-hover:scale-105 transition-transform"><i class="fas fa-pills"></i></div>
+                <div class="flex-1 min-w-0">
+                    <div class="text-xs font-bold text-deep group-hover:text-teal transition-colors">Veterinary Formulary</div>
+                    <div class="text-[11px] text-slate-500 truncate">Medicines & dose verification</div>
+                </div>
+                <i class="fas fa-chevron-right text-xs text-slate-400 group-hover:translate-x-0.5 transition-transform"></i>
+            </a>
+
+            <a href="vet-home.html" class="p-3 bg-slate-50 hover:bg-teal/5 border border-slate-200/80 hover:border-teal/40 rounded-xl flex items-center gap-3 transition-all no-underline group shadow-2xs">
+                <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm group-hover:scale-105 transition-transform"><i class="fas fa-user-md"></i></div>
+                <div class="flex-1 min-w-0">
+                    <div class="text-xs font-bold text-deep group-hover:text-teal transition-colors">Verified Doctors</div>
+                    <div class="text-[11px] text-slate-500 truncate">Schedule in-person visits</div>
+                </div>
+                <i class="fas fa-chevron-right text-xs text-slate-400 group-hover:translate-x-0.5 transition-transform"></i>
+            </a>
+        </div>
+
+        <!-- 📊 Livestock Normal Vitals Reference -->
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col gap-3 shadow-2xs">
+            <h4 class="text-xs font-extrabold text-deep uppercase tracking-wider flex items-center gap-2 m-0">
+                <i class="fas fa-heart-pulse text-red-500"></i> Vital Signs Reference
+            </h4>
+            <div class="flex flex-col gap-2 text-xs">
+                <div class="flex items-center justify-between pb-1.5 border-b border-slate-200/60">
+                    <span class="font-bold text-slate-700">🐄 Cattle Temp</span>
+                    <span class="font-mono font-semibold text-deep">38.5° - 39.5°C</span>
+                </div>
+                <div class="flex items-center justify-between pb-1.5 border-b border-slate-200/60">
+                    <span class="font-bold text-slate-700">🐐 Goat Temp</span>
+                    <span class="font-mono font-semibold text-deep">39.0° - 40.0°C</span>
+                </div>
+                <div class="flex items-center justify-between pb-1.5 border-b border-slate-200/60">
+                    <span class="font-bold text-slate-700">🐕 Canine Temp</span>
+                    <span class="font-mono font-semibold text-deep">38.3° - 39.2°C</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="font-bold text-slate-700">🐔 Poultry Temp</span>
+                    <span class="font-mono font-semibold text-deep">40.5° - 42.0°C</span>
+                </div>
+            </div>
+        </div>
+
+    </aside>
+
+    <!-- Firebase & Application Scripts -->
+    <script defer src="js/firebase-config.js"></script>
+    <script defer src="js/auth.js"></script>
+    <script defer src="js/notification-engine.js"></script>
+    <script defer src="js/location-service.js"></script>  
+    <script defer src="js/ai.js"></script>
+    <script defer src="js/ai-history.js"></script>
+    <script defer src="js/scale.js"></script>
+
+    <!-- Auto-initialize desktop conversation history & keyboard shortcut listener -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // If desktop (>= 1024px), automatically ensure conversations are loaded into the docked sidebar
+            if (window.innerWidth >= 1024) {
+                setTimeout(() => {
+                    if (typeof openSidebar === 'function') {
+                        openSidebar();
+                    }
+                }, 350);
+            }
+
+            // Keyboard shortcut: Ctrl+N or Command+N for New Consultation
+            document.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'n') {
+                    e.preventDefault();
+                    if (typeof startNewChat === 'function') startNewChat();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
