@@ -3,7 +3,7 @@
    Handles: offline caching + push notification clicks
    ============================================================ */
 
-const CACHE_NAME = 'dailyvet-v4-tailwind';   /* bumped: forces browsers to drop old cache and load Tailwind */
+const CACHE_NAME = 'dailyvet-v4-i18n';   /* bumped: forces browsers to drop old cache and load Tailwind */
 const CACHE_URLS = [
     '/',
     '/index.html',
@@ -11,6 +11,7 @@ const CACHE_URLS = [
     '/climate-dashboard.html',
     '/manifest.json',
     '/js/tailwind-v4.js',
+    '/js/i18n.js',
     '/assets/dailyvetlogo.jpeg'
 ];
 

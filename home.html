@@ -16,7 +16,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
     <noscript>
@@ -98,6 +98,7 @@
             }
         }
     </style>
+<style>html.lang-bn body, html.lang-bn button, html.lang-bn input, html.lang-bn textarea, html.lang-bn select { font-family: 'Noto Sans Bengali', 'Inter', sans-serif; }</style>
 </head>
 <body class="bg-[#F8FCFC] text-slate-800 antialiased min-h-screen flex flex-col">
     <!-- ===== NAVIGATION BAR ===== -->
@@ -110,7 +111,7 @@
                     <span class="text-xl sm:text-2xl font-extrabold tracking-tight leading-none font-heading whitespace-nowrap">
                         <span class="text-deep">Daily</span><span class="text-teal">Vet</span>
                     </span>
-                    <span class="hidden sm:block text-[10px] font-semibold text-teal tracking-wider uppercase mt-0.5 whitespace-nowrap">Clinical &amp; Farm Intelligence</span>
+                    <span data-i18n="nav.tagline" class="hidden sm:block text-[10px] font-semibold text-teal tracking-wider uppercase mt-0.5 whitespace-nowrap">Clinical &amp; Farm Intelligence</span>
                 </div>
             </div>
 
@@ -119,14 +120,14 @@
                 <!-- Dashboard with Hover Suites Dropdown -->
                 <div class="relative nav-dashboard-group group">
                     <a href="home.html" class="px-3 py-1 rounded-full bg-deep text-white shadow-xs inline-flex items-center gap-1.5 transition-all">
-                        <span>Dashboard</span>
+                        <span data-i18n="nav.dashboard">Dashboard</span>
                         <i class="fas fa-chevron-down text-[9px] opacity-75 nav-dashboard-chevron transition-transform duration-200"></i>
                     </a>
 
                     <!-- Hover Dropdown Menu -->
                     <div class="absolute left-0 top-full pt-2 z-50 min-w-[260px] nav-dashboard-dropdown">
                         <div class="bg-white/98 backdrop-blur-md border border-edge rounded-2xl shadow-xl shadow-deep/15 p-2 flex flex-col gap-1 text-slate-700">
-                            <div class="px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
+                            <div data-i18n="nav.suites" class="px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-400">
                                 Clinical &amp; Farm Suites
                             </div>
 
@@ -136,8 +137,8 @@
                                     <i class="fas fa-wheat-awn"></i>
                                 </div>
                                 <div class="flex flex-col min-w-0">
-                                    <span class="font-bold text-deep leading-tight">AI Feed Advisor</span>
-                                    <span class="text-[10px] text-slate-400 font-normal truncate">Smart nutrition &amp; ration planner</span>
+                                    <span data-i18n="nav.feedAdvisor" class="font-bold text-deep leading-tight">AI Feed Advisor</span>
+                                    <span data-i18n="nav.feedAdvisorSub" class="text-[10px] text-slate-400 font-normal truncate">Smart nutrition &amp; ration planner</span>
                                 </div>
                             </a>
 
@@ -147,8 +148,8 @@
                                     <i class="fas fa-pills"></i>
                                 </div>
                                 <div class="flex flex-col min-w-0">
-                                    <span class="font-bold text-deep leading-tight">DailyVet Pharma</span>
-                                    <span class="text-[10px] text-slate-400 font-normal truncate">Formulary &amp; dose verification</span>
+                                    <span data-i18n="nav.pharma" class="font-bold text-deep leading-tight">DailyVet Pharma</span>
+                                    <span data-i18n="nav.pharmaSub" class="text-[10px] text-slate-400 font-normal truncate">Formulary &amp; dose verification</span>
                                 </div>
                             </a>
 
@@ -158,8 +159,8 @@
                                     <i class="fas fa-cow"></i>
                                 </div>
                                 <div class="flex flex-col min-w-0">
-                                    <span class="font-bold text-deep leading-tight">Breed Detection AI</span>
-                                    <span class="text-[10px] text-slate-400 font-normal truncate">Bovine phenotype classifier</span>
+                                    <span data-i18n="nav.breed" class="font-bold text-deep leading-tight">Breed Detection AI</span>
+                                    <span data-i18n="nav.breedSub" class="text-[10px] text-slate-400 font-normal truncate">Bovine phenotype classifier</span>
                                 </div>
                             </a>
 
@@ -169,8 +170,8 @@
                                     <i class="fas fa-microscope"></i>
                                 </div>
                                 <div class="flex flex-col min-w-0">
-                                    <span class="font-bold text-deep leading-tight">Health Scan</span>
-                                    <span class="text-[10px] text-slate-400 font-normal truncate">Dung &amp; urine diagnostic scan</span>
+                                    <span data-i18n="nav.healthScan" class="font-bold text-deep leading-tight">Health Scan</span>
+                                    <span data-i18n="nav.healthScanSub" class="text-[10px] text-slate-400 font-normal truncate">Dung &amp; urine diagnostic scan</span>
                                 </div>
                             </a>
 
@@ -180,28 +181,28 @@
                                     <i class="fas fa-file-prescription"></i>
                                 </div>
                                 <div class="flex flex-col min-w-0">
-                                    <span class="font-bold text-deep leading-tight">PR Scan</span>
-                                    <span class="text-[10px] text-slate-400 font-normal truncate">Prescription neural OCR reader</span>
+                                    <span data-i18n="nav.prScan" class="font-bold text-deep leading-tight">PR Scan</span>
+                                    <span data-i18n="nav.prScanSub" class="text-[10px] text-slate-400 font-normal truncate">Prescription neural OCR reader</span>
                                 </div>
                             </a>
                         </div>
                     </div>
                 </div>
-                <a href="ai.html" class="px-3 py-1 rounded-full hover:text-deep hover:bg-white transition-all">AI Consultation</a>
+                <a href="ai.html" data-i18n="nav.aiConsult" class="px-3 py-1 rounded-full hover:text-deep hover:bg-white transition-all">AI Consultation</a>
                 <a href="climate-dashboard.html" class="px-3 py-1 rounded-full hover:text-deep hover:bg-white transition-all flex items-center gap-1.5">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    NASA Climate
+                    <span data-i18n="nav.climate">NASA Climate</span>
                 </a>
-                <a href="community.html" class="px-3 py-1 rounded-full hover:text-deep hover:bg-white transition-all">Community</a>
-                <a href="support.html" class="px-3 py-1 rounded-full hover:text-deep hover:bg-white transition-all">Support</a>
-                <a href="vet-home.html" class="px-3 py-1 rounded-full hover:text-deep hover:bg-white transition-all text-teal font-bold">Vets Portal</a>
+                <a href="community.html" data-i18n="nav.community" class="px-3 py-1 rounded-full hover:text-deep hover:bg-white transition-all">Community</a>
+                <a href="support.html" data-i18n="nav.support" class="px-3 py-1 rounded-full hover:text-deep hover:bg-white transition-all">Support</a>
+                <a href="vet-home.html" class="px-3 py-1 rounded-full hover:text-deep hover:bg-white transition-all text-teal font-bold" data-i18n="nav.vetsPortal">Vets Portal</a>
             </nav>
 
             <!-- User Area & Notifications -->
             <div class="flex items-center gap-2.5 sm:gap-4 shrink-0">
                 <div class="hidden md:flex flex-col text-right">
                     <span id="userName" class="text-sm font-bold text-deep leading-tight whitespace-nowrap">Welcome</span>
-                    <span class="text-[11px] text-teal font-medium whitespace-nowrap">Pet &amp; Farm Owner</span>
+                    <span class="text-[11px] text-teal font-medium whitespace-nowrap" data-i18n="nav.role">Pet &amp; Farm Owner</span>
                 </div>
 
                 <!-- 🔔 Bell + Dropdown -->
@@ -217,27 +218,27 @@
                         <div class="flex items-center justify-between p-3.5 px-4 bg-soft border-b border-edge font-bold text-deep text-sm">
                             <div class="flex items-center gap-2">
                                 <i class="fas fa-bell text-teal text-xs"></i>
-                                <span>Recent Notifications</span>
+                                <span data-i18n="nav.notifications">Recent Notifications</span>
                             </div>
                             <div class="flex items-center gap-2.5">
                                 <button id="markAllReadBtn" class="text-xs font-semibold text-teal hover:underline flex items-center gap-1 bg-transparent border-none cursor-pointer"
                                         onclick="markAllNotificationsRead()"
                                         title="Mark all as read">
                                     <i class="fas fa-check-double text-[11px]"></i>
-                                    <span>Read</span>
+                                    <span data-i18n="nav.read">Read</span>
                                 </button>
                                 <button id="clearAllNotifBtn" class="text-xs font-semibold text-mute hover:text-danger hover:underline flex items-center gap-1 bg-transparent border-none cursor-pointer"
                                         onclick="clearAllNotifications()"
                                         title="Delete all notifications">
                                     <i class="fas fa-trash-alt text-[11px]"></i>
-                                    <span>Clear</span>
+                                    <span data-i18n="nav.clear">Clear</span>
                                 </button>
                             </div>
                         </div>
                         <div id="notificationList" class="max-h-80 overflow-y-auto divide-y divide-edge text-left">
                             <div class="p-8 text-center text-mute text-sm flex flex-col items-center gap-2">
                                 <i class="fas fa-inbox text-2xl text-mute/50"></i>
-                                <span>No new notifications</span>
+                                <span data-i18n="nav.noNotifications">No new notifications</span>
                             </div>
                         </div>
                     </div>
@@ -297,8 +298,8 @@
                                     <i class="fas fa-user"></i>
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <span class="block font-bold">Profile</span>
-                                    <span class="block text-[10px] text-slate-400 font-normal">View &amp; edit account</span>
+                                    <span data-i18n="nav.profile" class="block font-bold">Profile</span>
+                                    <span data-i18n="nav.profileSub" class="block text-[10px] text-slate-400 font-normal">View &amp; edit account</span>
                                 </div>
                                 <i class="fas fa-chevron-right text-[10px] text-mute group-hover:translate-x-0.5 transition-transform"></i>
                             </a>
@@ -355,8 +356,8 @@
                             <i class="fas fa-wheat-awn"></i>
                         </div>
                         <div class="flex flex-col min-w-0 flex-1">
-                            <span class="font-bold text-deep leading-tight">AI Feed Advisor</span>
-                            <span class="text-[10px] text-slate-400 font-normal truncate">Smart nutrition &amp; ration planner</span>
+                            <span data-i18n="nav.feedAdvisor" class="font-bold text-deep leading-tight">AI Feed Advisor</span>
+                            <span data-i18n="nav.feedAdvisorSub" class="text-[10px] text-slate-400 font-normal truncate">Smart nutrition &amp; ration planner</span>
                         </div>
                         <i class="fas fa-chevron-right text-[10px] text-mute group-hover/item:translate-x-0.5 transition-transform"></i>
                     </a>
@@ -367,8 +368,8 @@
                             <i class="fas fa-pills"></i>
                         </div>
                         <div class="flex flex-col min-w-0 flex-1">
-                            <span class="font-bold text-deep leading-tight">DailyVet Pharma</span>
-                            <span class="text-[10px] text-slate-400 font-normal truncate">Formulary &amp; dose verification</span>
+                            <span data-i18n="nav.pharma" class="font-bold text-deep leading-tight">DailyVet Pharma</span>
+                            <span data-i18n="nav.pharmaSub" class="text-[10px] text-slate-400 font-normal truncate">Formulary &amp; dose verification</span>
                         </div>
                         <i class="fas fa-chevron-right text-[10px] text-mute group-hover/item:translate-x-0.5 transition-transform"></i>
                     </a>
@@ -379,8 +380,8 @@
                             <i class="fas fa-cow"></i>
                         </div>
                         <div class="flex flex-col min-w-0 flex-1">
-                            <span class="font-bold text-deep leading-tight">Breed Detection AI</span>
-                            <span class="text-[10px] text-slate-400 font-normal truncate">Bovine phenotype classifier</span>
+                            <span data-i18n="nav.breed" class="font-bold text-deep leading-tight">Breed Detection AI</span>
+                            <span data-i18n="nav.breedSub" class="text-[10px] text-slate-400 font-normal truncate">Bovine phenotype classifier</span>
                         </div>
                         <i class="fas fa-chevron-right text-[10px] text-mute group-hover/item:translate-x-0.5 transition-transform"></i>
                     </a>
@@ -391,8 +392,8 @@
                             <i class="fas fa-microscope"></i>
                         </div>
                         <div class="flex flex-col min-w-0 flex-1">
-                            <span class="font-bold text-deep leading-tight">Health Scan</span>
-                            <span class="text-[10px] text-slate-400 font-normal truncate">Dung &amp; urine diagnostic scan</span>
+                            <span data-i18n="nav.healthScan" class="font-bold text-deep leading-tight">Health Scan</span>
+                            <span data-i18n="nav.healthScanSub" class="text-[10px] text-slate-400 font-normal truncate">Dung &amp; urine diagnostic scan</span>
                         </div>
                         <i class="fas fa-chevron-right text-[10px] text-mute group-hover/item:translate-x-0.5 transition-transform"></i>
                     </a>
@@ -403,8 +404,8 @@
                             <i class="fas fa-file-prescription"></i>
                         </div>
                         <div class="flex flex-col min-w-0 flex-1">
-                            <span class="font-bold text-deep leading-tight">PR Scan</span>
-                            <span class="text-[10px] text-slate-400 font-normal truncate">Prescription neural OCR reader</span>
+                            <span data-i18n="nav.prScan" class="font-bold text-deep leading-tight">PR Scan</span>
+                            <span data-i18n="nav.prScanSub" class="text-[10px] text-slate-400 font-normal truncate">Prescription neural OCR reader</span>
                         </div>
                         <i class="fas fa-chevron-right text-[10px] text-mute group-hover/item:translate-x-0.5 transition-transform"></i>
                     </a>
@@ -441,8 +442,8 @@
                                 <i class="fas fa-user"></i>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <span class="block font-bold">Profile</span>
-                                <span class="block text-[10px] text-slate-400 font-normal">View &amp; edit account</span>
+                                <span data-i18n="nav.profile" class="block font-bold">Profile</span>
+                                <span data-i18n="nav.profileSub" class="block text-[10px] text-slate-400 font-normal">View &amp; edit account</span>
                             </div>
                             <i class="fas fa-chevron-right text-[10px] text-mute group-hover:translate-x-0.5 transition-transform"></i>
                         </a>
@@ -705,27 +706,28 @@
     <nav class="app-bottom-nav lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-t border-edge shadow-[0_-4px_20px_rgba(3,93,105,0.08)] px-2 py-2 flex items-center justify-around">
         <a href="home.html" class="flex flex-col items-center gap-1 text-teal font-bold text-[10px] py-1 px-3 rounded-xl">
             <i class="fas fa-home text-base"></i>
-            <span>Home</span>
+            <span data-i18n="bnav.home">Home</span>
         </a>
         <a href="ai.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
             <i class="fas fa-robot text-base"></i>
-            <span>AI Vet</span>
+            <span data-i18n="bnav.aiVet">AI Vet</span>
         </a>
         <a href="climate-dashboard.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
             <i class="fas fa-satellite-dish text-base"></i>
-            <span>Climate</span>
+            <span data-i18n="bnav.climate">Climate</span>
         </a>
         <a href="community.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
             <i class="fas fa-users text-base"></i>
-            <span>Community</span>
+            <span data-i18n="bnav.community">Community</span>
         </a>
         <a href="vet-home.html" class="flex flex-col items-center gap-1 text-slate-500 hover:text-deep font-semibold text-[10px] py-1 px-3 rounded-xl transition-colors">
             <i class="fas fa-user-md text-base"></i>
-            <span>Vets</span>
+            <span data-i18n="bnav.vets">Vets</span>
         </a>
     </nav>
 
     <!-- Firebase + Scripts -->
+    <script defer src="js/i18n.js"></script>
     <script defer src="js/motion.js"></script>
     <script defer src="js/firebase-config.js"></script>
     <script defer src="js/auth.js"></script>
