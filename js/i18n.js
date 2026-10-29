@@ -93,9 +93,38 @@
         'Edit': 'সম্পাদনা', 'Close': 'বন্ধ করুন', 'Back': 'পিছনে', 'Next': 'পরবর্তী', 'Loading...': 'লোড হচ্ছে...',
         'Emergency': 'জরুরি', 'Settings': 'সেটিংস', 'Account': 'অ্যাকাউন্ট'
     };
+    function addPhrases(more) {
+        for (var k in more) PHRASES[k] = more[k];
+        if (current === 'bn' && document.body) applyTo(document);
+    }
     var PH_RE = /\s+/g;
     function norm(s) { return s.replace(PH_RE, ' ').trim(); }
     var textState = (typeof WeakMap !== 'undefined') ? new WeakMap() : null;
+
+    var attrState = (typeof WeakMap !== 'undefined') ? new WeakMap() : null;
+    var PH_ATTRS = ['placeholder', 'title', 'aria-label', 'alt'];
+    function translateAttrs(root) {
+        if (!attrState) return;
+        var els = root.querySelectorAll('[placeholder],[title],[aria-label],[alt]');
+        if (root.nodeType === 1 && root.matches && root.matches('[placeholder],[title],[aria-label],[alt]')) {
+            els = [root].concat(Array.prototype.slice.call(els));
+        }
+        for (var i = 0; i < els.length; i++) {
+            var el = els[i], st = attrState.get(el) || {};
+            PH_ATTRS.forEach(function (a) {
+                if (!el.hasAttribute(a) || el.hasAttribute('data-i18n-' + a)) return;
+                var v = el.getAttribute(a), rec = st[a];
+                if (current === 'bn') {
+                    if (rec && v === rec.bn) return;
+                    var bn = PHRASES[norm(v)];
+                    if (bn) { st[a] = { en: v, bn: bn }; el.setAttribute(a, bn); }
+                } else if (rec && v === rec.bn) {
+                    el.setAttribute(a, rec.en); delete st[a];
+                }
+            });
+            attrState.set(el, st);
+        }
+    }
 
     function translateTextNodes(root) {
         if (!textState) return;
@@ -144,6 +173,7 @@
     function applyTo(root) {
         var scope = root && root.querySelectorAll ? root : document;
         translateTextNodes(scope === document ? document.body : scope);
+        translateAttrs(scope === document ? document.body : scope);
 
         var nodes = scope.querySelectorAll('[data-i18n]');
         for (var i = 0; i < nodes.length; i++) {
@@ -207,6 +237,7 @@
         b.addEventListener('click', function () { setLang(current === 'en' ? 'bn' : 'en'); });
         document.body.appendChild(b);
         /* on desktop there is no bottom nav, so sit lower */
+        if (!window.matchMedia) return;
         var mq = window.matchMedia('(min-width:1024px)');
         var place = function () { b.style.bottom = mq.matches ? '16px' : '84px'; };
         place();
@@ -248,7 +279,7 @@
         observe();
     }
 
-    window.DailyVetI18n = { t: t, setLang: setLang, getLang: function () { return current; }, extend: extend, apply: applyTo };
+    window.DailyVetI18n = { t: t, setLang: setLang, getLang: function () { return current; }, extend: extend, addPhrases: addPhrases, apply: applyTo };
     window.t = t;
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
